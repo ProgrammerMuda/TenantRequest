@@ -52,26 +52,8 @@ export function GridMenu({ items, onClickMenu }) {
                 }
               }}
             >
-              {/* Icon Container with Floating Badge */}
-              <Badge 
-                badgeContent={item.badgeCount} 
-                color="error" 
-                sx={{ 
-                  '& .MuiBadge-badge': { 
-                    fontWeight: 800, 
-                    right: -2, 
-                    top: 0,
-                    minWidth: 18,
-                    height: 18,
-                    fontSize: '0.65rem',
-                    backgroundColor: '#ef4444',
-                    color: '#ffffff',
-                    border: '2px solid #ffffff',
-                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
-                    zIndex: 10
-                  } 
-                }}
-              >
+              {/* Icon Container with Badge placed directly on top-right */}
+              <Box sx={{ position: 'relative', display: 'inline-flex' }}>
                 {item.imageIcon ? (
                   <Box
                     component="img"
@@ -106,7 +88,36 @@ export function GridMenu({ items, onClickMenu }) {
                     <Icon size={26} weight="bold" />
                   </Box>
                 )}
-              </Badge>
+
+                {/* Badge Count pinned directly on top-right corner of the icon */}
+                {Boolean(item.badgeCount) && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: -2,
+                      right: -2,
+                      minWidth: 18,
+                      height: 18,
+                      borderRadius: '9px',
+                      backgroundColor: '#ef4444',
+                      color: '#ffffff',
+                      border: '2px solid #ffffff',
+                      fontSize: '0.65rem',
+                      fontWeight: 800,
+                      fontFamily: "'Montserrat', sans-serif",
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      px: 0.5,
+                      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+                      zIndex: 10,
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    {item.badgeCount}
+                  </Box>
+                )}
+              </Box>
 
               {/* Title Label */}
               <Typography
