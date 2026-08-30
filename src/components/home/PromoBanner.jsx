@@ -52,7 +52,7 @@ export function PromoBanner({ promos = [] }) {
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           scrollBehavior: 'smooth',
-          py: 0.5,
+          py: 1,
           px: 0,
           '&::-webkit-scrollbar': { display: 'none' },
           scrollbarWidth: 'none',
@@ -66,21 +66,23 @@ export function PromoBanner({ promos = [] }) {
             sx={{
               flex: '0 0 100%',
               width: '100%',
+              aspectRatio: '1024 / 468',
               scrollSnapAlign: 'start',
-              borderRadius: '8px',
+              borderRadius: '10px',
               overflow: 'hidden',
-              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
-              border: '1px solid rgba(226, 232, 240, 0.8)',
-              backgroundColor: '#f8fafc',
+              boxShadow: '0 3px 12px rgba(15, 23, 42, 0.06)',
+              border: '1px solid rgba(226, 232, 240, 0.9)',
+              backgroundColor: 'transparent',
               position: 'relative',
               userSelect: 'none',
               cursor: 'pointer',
-              transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                transform: 'scale(1.01)'
+                transform: 'scale(1.008)',
+                boxShadow: '0 6px 18px rgba(15, 23, 42, 0.09)'
               },
               '&:active': {
-                transform: 'scale(0.99)'
+                transform: 'scale(0.995)'
               }
             }}
           >
@@ -91,10 +93,11 @@ export function PromoBanner({ promos = [] }) {
                 alt={promo.title || 'Pengumuman'}
                 sx={{
                   width: '100%',
-                  height: 'auto',
+                  height: '100%',
                   display: 'block',
-                  borderRadius: '8px',
-                  objectFit: 'cover'
+                  borderRadius: 'inherit',
+                  objectFit: 'cover',
+                  objectPosition: 'center'
                 }}
               />
             ) : (
