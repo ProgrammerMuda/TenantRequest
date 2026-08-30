@@ -59,8 +59,8 @@ export function GridMenu({ items, onClickMenu }) {
                 sx={{ 
                   '& .MuiBadge-badge': { 
                     fontWeight: 800, 
-                    right: 0, 
-                    top: 2,
+                    right: -2, 
+                    top: 0,
                     minWidth: 18,
                     height: 18,
                     fontSize: '0.65rem',
@@ -78,8 +78,8 @@ export function GridMenu({ items, onClickMenu }) {
                     src={item.imageIcon}
                     alt={item.title?.replace('\n', ' ')}
                     sx={{
-                      width: 44,
-                      height: 44,
+                      width: 52,
+                      height: 52,
                       objectFit: 'contain',
                       display: 'block',
                       filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.14))',
@@ -92,9 +92,9 @@ export function GridMenu({ items, onClickMenu }) {
                 ) : (
                   <Box
                     sx={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: '8px',
+                      width: 48,
+                      height: 48,
+                      borderRadius: '10px',
                       backgroundColor: item.bgColor,
                       display: 'flex',
                       alignItems: 'center',
@@ -103,7 +103,7 @@ export function GridMenu({ items, onClickMenu }) {
                       boxShadow: `0 2px 8px ${item.bgColor}`
                     }}
                   >
-                    <Icon size={24} weight="bold" />
+                    <Icon size={26} weight="bold" />
                   </Box>
                 )}
               </Badge>
