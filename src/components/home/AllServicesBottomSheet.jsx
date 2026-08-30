@@ -1,12 +1,11 @@
 /**
  * [V] COMPONENT: AllServicesBottomSheet
- * Bottom sheet modal displaying all Tenant and Management services.
- * Features:
- * - Clean drag notch and curved sheet styling (matching design screenshot)
- * - Grid & List view toggle
- * - Instant search filter across all services
- * - 3D icons for all service tiles
- * - Seamless navigation on service click
+ * Pixel-perfect bottom sheet modal matching design reference:
+ * - Rounded sheet with smooth backdrop
+ * - Pill view toggle (Grid / List)
+ * - Borderless rounded search bar
+ * - Squircle tile boxes (icon inside card, text outside below)
+ * - Tenant Menu & Management Menu sections
  */
 
 import React, { useState, useMemo } from 'react';
@@ -25,7 +24,7 @@ import {
   X
 } from '@phosphor-icons/react';
 
-// Existing 3D Icons
+// 3D Menu Icons
 import billing3d from '../../assets/menu_icons/billing_3d.png';
 import homeService3d from '../../assets/menu_icons/home_service_3d.png';
 import reservation3d from '../../assets/menu_icons/reservation_3d.png';
@@ -33,8 +32,6 @@ import workRequest3d from '../../assets/menu_icons/work_request_3d.png';
 import gigo3d from '../../assets/menu_icons/gigo_3d.png';
 import workPermit3d from '../../assets/menu_icons/work_permit_3d.png';
 import fitOutPermit3d from '../../assets/menu_icons/fit_out_permit_3d.png';
-
-// Extracted Management & Tenant 3D Icons
 import package3d from '../../assets/menu_icons/package_3d.png';
 import visitor3d from '../../assets/menu_icons/visitor_3d.png';
 import asset3d from '../../assets/menu_icons/asset_3d.png';
@@ -46,23 +43,23 @@ import scanmeter3d from '../../assets/menu_icons/scanmeter_3d.png';
 
 const ALL_TENANT_SERVICES = [
   { id: 'billing', title: 'Billing &\nPayment', cleanTitle: 'Billing & Payment', icon: billing3d, category: 'Finance' },
-  { id: 'goods_in_out', title: 'Goods\nIn/Out', cleanTitle: 'Goods In/Out', icon: gigo3d, category: 'Logistics' },
-  { id: 'home_service', title: 'Home\nService', cleanTitle: 'Home Service', icon: homeService3d, category: 'Maintenance' },
+  { id: 'goods_in_out', title: 'Goods In/Out', cleanTitle: 'Goods In/Out', icon: gigo3d, category: 'Logistics' },
+  { id: 'home_service', title: 'Home Service', cleanTitle: 'Home Service', icon: homeService3d, category: 'Maintenance' },
   { id: 'package', title: 'Package', cleanTitle: 'Package', icon: package3d, category: 'Delivery' },
   { id: 'facility_reservation', title: 'Reservation', cleanTitle: 'Reservation', icon: reservation3d, category: 'Facilities' },
   { id: 'visitor', title: 'Visitor', cleanTitle: 'Visitor', icon: visitor3d, category: 'Security' },
-  { id: 'work_order', title: 'Work\nOrder', cleanTitle: 'Work Order', icon: workRequest3d, category: 'Engineering' },
-  { id: 'work_permit', title: 'Work\nPermit', cleanTitle: 'Work Permit', icon: workPermit3d, category: 'Permits' },
-  { id: 'fit_out_permit', title: 'Fit Out\nPermit', cleanTitle: 'Fit Out Permit', icon: fitOutPermit3d, category: 'Permits' }
+  { id: 'work_order', title: 'Work Request', cleanTitle: 'Work Request', icon: workRequest3d, category: 'Engineering' },
+  { id: 'work_permit', title: 'Work Permit', cleanTitle: 'Work Permit', icon: workPermit3d, category: 'Permits' },
+  { id: 'fit_out_permit', title: 'Fit Out Permit', cleanTitle: 'Fit Out Permit', icon: fitOutPermit3d, category: 'Permits' }
 ];
 
 const ALL_MANAGEMENT_SERVICES = [
   { id: 'asset', title: 'Asset', cleanTitle: 'Asset Management', icon: asset3d, category: 'Operations' },
-  { id: 'attendance', title: 'Attendance', cleanTitle: 'Staff Attendance', icon: attendance3d, category: 'HR & Staff' },
+  { id: 'attendance', title: 'Attendance', cleanTitle: 'Attendance', icon: attendance3d, category: 'HR & Staff' },
   { id: 'incidental_report', title: 'Incidental\nReport', cleanTitle: 'Incidental Report', icon: incidental3d, category: 'Safety & Security' },
-  { id: 'inspection', title: 'Inspection', cleanTitle: 'Facility Inspection', icon: inspection3d, category: 'Quality Control' },
-  { id: 'payslip', title: 'Pay Slip', cleanTitle: 'Staff Pay Slip', icon: payslip3d, category: 'Payroll' },
-  { id: 'scan_meter', title: 'Scan\nMeter', cleanTitle: 'Scan Meter Utility', icon: scanmeter3d, category: 'Utilities & Engineering' }
+  { id: 'inspection', title: 'Inspection', cleanTitle: 'Inspection', icon: inspection3d, category: 'Quality Control' },
+  { id: 'payslip', title: 'Pay Slip', cleanTitle: 'Pay Slip', icon: payslip3d, category: 'Payroll' },
+  { id: 'scan_meter', title: 'Scan Meter', cleanTitle: 'Scan Meter', icon: scanmeter3d, category: 'Utilities' }
 ];
 
 export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
@@ -121,7 +118,7 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
           bottom: 0,
           backgroundColor: 'rgba(15, 23, 42, 0.55)',
           backdropFilter: 'blur(3px)',
-          animation: 'fadeIn 0.25s ease-out forwards',
+          animation: 'fadeIn 0.2s ease-out forwards',
           '@keyframes fadeIn': {
             from: { opacity: 0 },
             to: { opacity: 1 }
@@ -129,15 +126,15 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
         }}
       />
 
-      {/* Sliding Sheet Card Container */}
+      {/* Sliding Sheet Container */}
       <Box
         sx={{
           position: 'relative',
           width: '100%',
-          maxHeight: '85%',
+          maxHeight: '92%',
           backgroundColor: '#ffffff',
-          borderRadius: '28px 28px 0 0',
-          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.25)',
+          borderRadius: '32px 32px 0 0',
+          boxShadow: '0 -12px 48px rgba(0, 0, 0, 0.28)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -149,50 +146,49 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
           }
         }}
       >
-        {/* Drag Handle Notch */}
-        <Box sx={{ pt: 1.5, pb: 1, display: 'flex', justifyContent: 'center' }}>
+        {/* Top Drag Handle Notch */}
+        <Box sx={{ pt: 1.5, pb: 1.2, display: 'flex', justifyContent: 'center' }}>
           <Box
             sx={{
-              width: 44,
-              height: 5,
-              borderRadius: '3px',
+              width: 50,
+              height: 4.5,
+              borderRadius: '4px',
               backgroundColor: '#cbd5e1'
             }}
           />
         </Box>
 
-        {/* Header: Title + View Toggle (Grid / List) */}
+        {/* Header: Title + Segmented View Toggle */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            px: 2.5,
+            px: 3,
             pt: 0.5,
-            pb: 1.8
+            pb: 2
           }}
         >
           <Typography
-            variant="h6"
             sx={{
               fontWeight: 800,
-              fontSize: '1.25rem',
-              color: '#0f172a',
-              letterSpacing: '-0.01em'
+              fontSize: '1.32rem',
+              color: '#1e293b',
+              letterSpacing: '-0.02em',
+              fontFamily: 'Montserrat, sans-serif'
             }}
           >
             All Services
           </Typography>
 
-          {/* Segmented View Mode Toggle */}
+          {/* Segmented View Toggle Button */}
           <Box
             sx={{
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               backgroundColor: '#f1f5f9',
-              borderRadius: '10px',
-              p: '3px',
-              gap: '4px'
+              borderRadius: '24px',
+              p: '3.5px'
             }}
           >
             <Box
@@ -200,19 +196,20 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.6,
-                px: 1.4,
-                py: 0.5,
-                borderRadius: '8px',
-                fontSize: '0.78rem',
+                gap: 0.7,
+                px: 1.8,
+                py: 0.65,
+                borderRadius: '20px',
+                fontSize: '0.84rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                backgroundColor: viewMode === 'grid' ? '#27b29b' : 'transparent',
-                color: viewMode === 'grid' ? '#ffffff' : '#64748b'
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                backgroundColor: viewMode === 'grid' ? '#20b29a' : 'transparent',
+                color: viewMode === 'grid' ? '#ffffff' : '#64748b',
+                boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(32, 178, 154, 0.25)' : 'none'
               }}
             >
-              <SquaresFour size={16} weight={viewMode === 'grid' ? 'fill' : 'regular'} />
+              <SquaresFour size={17} weight={viewMode === 'grid' ? 'fill' : 'bold'} />
               Grid
             </Box>
 
@@ -221,36 +218,36 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.6,
-                px: 1.4,
-                py: 0.5,
-                borderRadius: '8px',
-                fontSize: '0.78rem',
+                gap: 0.7,
+                px: 1.8,
+                py: 0.65,
+                borderRadius: '20px',
+                fontSize: '0.84rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                backgroundColor: viewMode === 'list' ? '#27b29b' : 'transparent',
-                color: viewMode === 'list' ? '#ffffff' : '#64748b'
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                backgroundColor: viewMode === 'list' ? '#20b29a' : 'transparent',
+                color: viewMode === 'list' ? '#ffffff' : '#64748b',
+                boxShadow: viewMode === 'list' ? '0 2px 8px rgba(32, 178, 154, 0.25)' : 'none'
               }}
             >
-              <ListIcon size={16} weight={viewMode === 'list' ? 'bold' : 'regular'} />
+              <ListIcon size={17} weight="bold" />
               List
             </Box>
           </Box>
         </Box>
 
         {/* Search Services Field */}
-        <Box sx={{ px: 2.5, pb: 2 }}>
+        <Box sx={{ px: 3, pb: 2.2 }}>
           <TextField
             fullWidth
-            size="small"
             placeholder="Search services..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
-                  <MagnifyingGlass size={18} color="#94a3b8" weight="bold" />
+                <InputAdornment position="start" sx={{ mr: 1 }}>
+                  <MagnifyingGlass size={22} color="#94a3b8" weight="bold" />
                 </InputAdornment>
               ),
               endAdornment: searchQuery ? (
@@ -261,17 +258,17 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                 </InputAdornment>
               ) : null,
               sx: {
-                borderRadius: '14px',
+                borderRadius: '18px',
                 backgroundColor: '#f8fafc',
-                fontSize: '0.9rem',
+                fontSize: '0.94rem',
+                py: 0.4,
+                px: 1,
                 '& fieldset': {
-                  borderColor: '#e2e8f0'
+                  border: 'none'
                 },
-                '&:hover fieldset': {
-                  borderColor: '#cbd5e1'
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#27b29b'
+                '& input::placeholder': {
+                  color: '#94a3b8',
+                  opacity: 1
                 }
               }
             }}
@@ -283,7 +280,7 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
-            px: 2.5,
+            px: 3,
             pb: 5,
             '&::-webkit-scrollbar': { display: 'none' },
             scrollbarWidth: 'none',
@@ -294,12 +291,12 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
           {filteredTenantServices.length > 0 && (
             <Box sx={{ mb: 3 }}>
               <Typography
-                variant="subtitle1"
                 sx={{
                   fontWeight: 800,
-                  fontSize: '0.98rem',
+                  fontSize: '1.05rem',
                   color: '#1e293b',
-                  mb: 1.5
+                  mb: 1.8,
+                  fontFamily: 'Montserrat, sans-serif'
                 }}
               >
                 Tenant Menu
@@ -310,7 +307,8 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                   sx={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: 1.2
+                    columnGap: 1.6,
+                    rowGap: 2.2
                   }}
                 >
                   {filteredTenantServices.map((service) => (
@@ -321,44 +319,55 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        p: 1.2,
-                        minHeight: 96,
-                        backgroundColor: '#f8fafc',
-                        borderRadius: '16px',
                         cursor: 'pointer',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                         userSelect: 'none',
-                        '&:hover': {
+                        '&:hover .icon-box': {
                           backgroundColor: '#f1f5f9',
-                          transform: 'translateY(-2px)'
+                          transform: 'translateY(-3px)'
                         },
-                        '&:active': {
-                          transform: 'scale(0.96)'
+                        '&:active .icon-box': {
+                          transform: 'scale(0.95)'
                         }
                       }}
                     >
+                      {/* Squircle Card Container specifically for the icon */}
                       <Box
-                        component="img"
-                        src={service.icon}
-                        alt={service.cleanTitle}
+                        className="icon-box"
                         sx={{
-                          width: 44,
-                          height: 44,
-                          objectFit: 'contain',
-                          display: 'block',
-                          filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.08))'
+                          width: '100%',
+                          aspectRatio: '1 / 1',
+                          backgroundColor: '#f8fafc',
+                          borderRadius: '24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                          p: 1.2
                         }}
-                      />
+                      >
+                        <Box
+                          component="img"
+                          src={service.icon}
+                          alt={service.cleanTitle}
+                          sx={{
+                            width: '58%',
+                            height: '58%',
+                            objectFit: 'contain',
+                            display: 'block',
+                            filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08))'
+                          }}
+                        />
+                      </Box>
+
+                      {/* Text strictly OUTSIDE the card below */}
                       <Typography
-                        variant="caption"
                         sx={{
                           fontWeight: 600,
-                          fontSize: '0.72rem',
-                          color: '#334155',
+                          fontSize: '0.74rem',
+                          color: '#475569',
                           textAlign: 'center',
-                          mt: 0.8,
-                          lineHeight: 1.2,
+                          mt: 0.9,
+                          lineHeight: 1.25,
                           whiteSpace: 'pre-line'
                         }}
                       >
@@ -381,7 +390,7 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                         p: 1.2,
                         px: 1.6,
                         backgroundColor: '#f8fafc',
-                        borderRadius: '14px',
+                        borderRadius: '16px',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                         '&:hover': {
@@ -390,17 +399,30 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                         }
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.6 }}>
                         <Box
-                          component="img"
-                          src={service.icon}
-                          alt={service.cleanTitle}
                           sx={{
-                            width: 38,
-                            height: 38,
-                            objectFit: 'contain'
+                            width: 44,
+                            height: 44,
+                            backgroundColor: '#ffffff',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
                           }}
-                        />
+                        >
+                          <Box
+                            component="img"
+                            src={service.icon}
+                            alt={service.cleanTitle}
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              objectFit: 'contain'
+                            }}
+                          />
+                        </Box>
                         <Box>
                           <Typography sx={{ fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>
                             {service.cleanTitle}
@@ -420,14 +442,14 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
 
           {/* SECTION 2: Management Menu */}
           {filteredManagementServices.length > 0 && (
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ mb: 2, mt: 1 }}>
               <Typography
-                variant="subtitle1"
                 sx={{
                   fontWeight: 800,
-                  fontSize: '0.98rem',
+                  fontSize: '1.05rem',
                   color: '#1e293b',
-                  mb: 1.5
+                  mb: 1.8,
+                  fontFamily: 'Montserrat, sans-serif'
                 }}
               >
                 Management Menu
@@ -438,7 +460,8 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                   sx={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: 1.2
+                    columnGap: 1.6,
+                    rowGap: 2.2
                   }}
                 >
                   {filteredManagementServices.map((service) => (
@@ -449,44 +472,55 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        p: 1.2,
-                        minHeight: 96,
-                        backgroundColor: '#f8fafc',
-                        borderRadius: '16px',
                         cursor: 'pointer',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                         userSelect: 'none',
-                        '&:hover': {
+                        '&:hover .icon-box': {
                           backgroundColor: '#f1f5f9',
-                          transform: 'translateY(-2px)'
+                          transform: 'translateY(-3px)'
                         },
-                        '&:active': {
-                          transform: 'scale(0.96)'
+                        '&:active .icon-box': {
+                          transform: 'scale(0.95)'
                         }
                       }}
                     >
+                      {/* Squircle Card Container specifically for the icon */}
                       <Box
-                        component="img"
-                        src={service.icon}
-                        alt={service.cleanTitle}
+                        className="icon-box"
                         sx={{
-                          width: 44,
-                          height: 44,
-                          objectFit: 'contain',
-                          display: 'block',
-                          filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.08))'
+                          width: '100%',
+                          aspectRatio: '1 / 1',
+                          backgroundColor: '#f8fafc',
+                          borderRadius: '24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                          p: 1.2
                         }}
-                      />
+                      >
+                        <Box
+                          component="img"
+                          src={service.icon}
+                          alt={service.cleanTitle}
+                          sx={{
+                            width: '58%',
+                            height: '58%',
+                            objectFit: 'contain',
+                            display: 'block',
+                            filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08))'
+                          }}
+                        />
+                      </Box>
+
+                      {/* Text strictly OUTSIDE the card below */}
                       <Typography
-                        variant="caption"
                         sx={{
                           fontWeight: 600,
-                          fontSize: '0.72rem',
-                          color: '#334155',
+                          fontSize: '0.74rem',
+                          color: '#475569',
                           textAlign: 'center',
-                          mt: 0.8,
-                          lineHeight: 1.2,
+                          mt: 0.9,
+                          lineHeight: 1.25,
                           whiteSpace: 'pre-line'
                         }}
                       >
@@ -509,7 +543,7 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                         p: 1.2,
                         px: 1.6,
                         backgroundColor: '#f8fafc',
-                        borderRadius: '14px',
+                        borderRadius: '16px',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                         '&:hover': {
@@ -518,17 +552,30 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                         }
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.6 }}>
                         <Box
-                          component="img"
-                          src={service.icon}
-                          alt={service.cleanTitle}
                           sx={{
-                            width: 38,
-                            height: 38,
-                            objectFit: 'contain'
+                            width: 44,
+                            height: 44,
+                            backgroundColor: '#ffffff',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
                           }}
-                        />
+                        >
+                          <Box
+                            component="img"
+                            src={service.icon}
+                            alt={service.cleanTitle}
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              objectFit: 'contain'
+                            }}
+                          />
+                        </Box>
                         <Box>
                           <Typography sx={{ fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>
                             {service.cleanTitle}
