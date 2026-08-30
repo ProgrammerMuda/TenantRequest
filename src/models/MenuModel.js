@@ -19,6 +19,7 @@ import homeService3d from '../assets/menu_icons/home_service_3d.png';
 import reservation3d from '../assets/menu_icons/reservation_3d.png';
 import workRequest3d from '../assets/menu_icons/work_request_3d.png';
 import gigo3d from '../assets/menu_icons/gigo_3d.png';
+import workPermit3d from '../assets/menu_icons/work_permit_3d.png';
 import fitOutPermit3d from '../assets/menu_icons/fit_out_permit_3d.png';
 import allMenu3d from '../assets/menu_icons/all_menu_3d.png';
 
@@ -69,7 +70,7 @@ export const initialMenuItems = [
     id: 'work_permit',
     title: 'Work\nPermit',
     icon: Certificate,
-    imageIcon: fitOutPermit3d,
+    imageIcon: workPermit3d,
     color: '#27b29b',
     bgColor: 'rgba(39, 178, 155, 0.1)',
     badgeCount: 2

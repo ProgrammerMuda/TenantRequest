@@ -47,6 +47,7 @@ import homeService3d from '../assets/menu_icons/home_service_3d.png';
 import reservation3d from '../assets/menu_icons/reservation_3d.png';
 import workRequest3d from '../assets/menu_icons/work_request_3d.png';
 import gigo3d from '../assets/menu_icons/gigo_3d.png';
+import workPermit3d from '../assets/menu_icons/work_permit_3d.png';
 import fitOutPermit3d from '../assets/menu_icons/fit_out_permit_3d.png';
 import allMenu3d from '../assets/menu_icons/all_menu_3d.png';
 
@@ -106,7 +107,7 @@ export const ROLE_DATA = {
       { id: 'facility_reservation', title: 'Facility\nReservation', icon: Armchair, imageIcon: reservation3d, color: '#6366f1', bgColor: 'rgba(99, 102, 241, 0.1)' },
       { id: 'work_order', title: 'Work\nOrder', icon: Toolbox, imageIcon: workRequest3d, color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)', badgeCount: 2 },
       { id: 'goods_in_out', title: 'In & Out\nGoods', icon: Package, imageIcon: gigo3d, color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)', badgeCount: 1 },
-      { id: 'work_permit', title: 'Work\nPermit', icon: Certificate, imageIcon: fitOutPermit3d, color: '#27b29b', bgColor: 'rgba(39, 178, 155, 0.1)', badgeCount: 2 },
+      { id: 'work_permit', title: 'Work\nPermit', icon: Certificate, imageIcon: workPermit3d, color: '#27b29b', bgColor: 'rgba(39, 178, 155, 0.1)', badgeCount: 2 },
       { id: 'fit_out_permit', title: 'Fit Out\nPermit', icon: Certificate, imageIcon: fitOutPermit3d, color: '#06b6d4', bgColor: 'rgba(6, 182, 212, 0.1)', badgeCount: 2 },
       { id: 'all_menu', title: 'All\nMenu', icon: SquaresFour, imageIcon: allMenu3d, color: '#6366f1', bgColor: 'rgba(99, 102, 241, 0.1)' }
     ]
