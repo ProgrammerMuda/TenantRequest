@@ -60,8 +60,8 @@ export function GridMenu({ items, onClickMenu }) {
                     src={item.imageIcon}
                     alt={item.title?.replace('\n', ' ')}
                     sx={{
-                      width: item.id === 'fit_out_permit' ? 56 : 52,
-                      height: item.id === 'fit_out_permit' ? 56 : 52,
+                      width: ['fit_out_permit', 'work_permit'].includes(item.id) ? 56 : 52,
+                      height: ['fit_out_permit', 'work_permit'].includes(item.id) ? 56 : 52,
                       objectFit: 'contain',
                       display: 'block',
                       filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.14))',
