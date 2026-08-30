@@ -25,6 +25,7 @@ import { HeroHeader } from '../components/home/HeroHeader';
 import { OverviewSection } from '../components/home/OverviewSection';
 import { GridMenu } from '../components/home/GridMenu';
 import { PromoBanner } from '../components/home/PromoBanner';
+import { AllServicesBottomSheet } from '../components/home/AllServicesBottomSheet';
 import homeHeaderBg from '../assets/home_header_bg.png';
 
 export function HomeView({ controller }) {
@@ -41,6 +42,8 @@ export function HomeView({ controller }) {
     selectedLocation,
     isLocationMenuOpen,
     selectedMenuItem,
+    isAllServicesOpen,
+    setIsAllServicesOpen,
     setIsLocationMenuOpen,
     setSelectedMenuItem,
     handleSelectLocation,
@@ -210,6 +213,13 @@ export function HomeView({ controller }) {
           </DialogActions>
         </Dialog>
       )}
+
+      {/* All Services Bottom Sheet */}
+      <AllServicesBottomSheet
+        open={isAllServicesOpen}
+        onClose={() => setIsAllServicesOpen(false)}
+        onSelectService={handleClickMenu}
+      />
     </Box>
   );
 }

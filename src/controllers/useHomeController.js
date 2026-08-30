@@ -19,6 +19,7 @@ export function useHomeController() {
   const [isLocationMenuOpen, setIsLocationMenuOpen] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState(null);
   const [selectedPermit, setSelectedPermit] = useState(null);
+  const [isAllServicesOpen, setIsAllServicesOpen] = useState(false);
 
   // Switch Role
   const handleSelectRole = (roleId) => {
@@ -42,7 +43,9 @@ export function useHomeController() {
   };
 
   const handleClickMenu = (item) => {
-    if (item.id === 'work_order') {
+    if (item.id === 'all_menu') {
+      setIsAllServicesOpen(true);
+    } else if (item.id === 'work_order') {
       setActiveTab('work_order');
     } else if (item.id === 'goods_in_out') {
       setActiveTab('goods_in_out');
@@ -69,6 +72,8 @@ export function useHomeController() {
     isLocationMenuOpen,
     selectedMenuItem,
     selectedPermit,
+    isAllServicesOpen,
+    setIsAllServicesOpen,
     openPermitDetail,
     setActiveTab,
     setIsLocationMenuOpen,
