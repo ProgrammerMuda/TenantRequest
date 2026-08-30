@@ -52,18 +52,23 @@ export function GridMenu({ items, onClickMenu }) {
                 }
               }}
             >
-              {/* Phosphor Icon Container with Badge */}
+              {/* Icon Container with Floating Badge */}
               <Badge 
                 badgeContent={item.badgeCount} 
                 color="error" 
                 sx={{ 
                   '& .MuiBadge-badge': { 
                     fontWeight: 800, 
-                    right: 2, 
+                    right: 0, 
                     top: 2,
                     minWidth: 18,
                     height: 18,
-                    fontSize: '0.65rem'
+                    fontSize: '0.65rem',
+                    backgroundColor: '#ef4444',
+                    color: '#ffffff',
+                    border: '2px solid #ffffff',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+                    zIndex: 10
                   } 
                 }}
               >
