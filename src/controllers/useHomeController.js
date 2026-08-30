@@ -42,14 +42,16 @@ export function useHomeController() {
   };
 
   const handleClickMenu = (item) => {
-    if (item.id === 'fit_out_permit') {
-      setActiveTab('fit_out_permit');
-    } else if (item.id === 'work_order') {
+    if (item.id === 'work_order') {
       setActiveTab('work_order');
-    } else if (item.id === 'work_request') {
-      setActiveTab('work_request');
     } else if (item.id === 'goods_in_out') {
       setActiveTab('goods_in_out');
+    } else if (item.id === 'work_permit') {
+      setActiveTab('work_permit');
+    } else if (item.id === 'fit_out_permit') {
+      setActiveTab('fit_out_permit');
+    } else if (item.id === 'work_request') {
+      setActiveTab('work_request');
     } else {
       setSelectedMenuItem(item);
     }

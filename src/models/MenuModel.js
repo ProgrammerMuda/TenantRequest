@@ -45,27 +45,29 @@ export const initialMenuItems = [
     bgColor: 'rgba(99, 102, 241, 0.1)'
   },
   {
-    id: 'work_request',
-    title: 'Work\nRequest',
-    icon: ClipboardText,
+    id: 'work_order',
+    title: 'Work\nOrder',
+    icon: Toolbox,
     imageIcon: workRequest3d,
-    color: '#10b981', // Emerald
+    color: '#10b981',
     bgColor: 'rgba(16, 185, 129, 0.1)',
     badgeCount: 2
   },
   {
-    id: 'work_order',
-    title: 'Work\nOrder',
-    icon: Toolbox,
-    color: '#f59e0b', // Amber
-    bgColor: 'rgba(245, 158, 11, 0.1)'
+    id: 'goods_in_out',
+    title: 'In & Out\nGoods',
+    icon: Package,
+    color: '#f59e0b',
+    bgColor: 'rgba(245, 158, 11, 0.1)',
+    badgeCount: 1
   },
   {
-    id: 'goods_in_out',
-    title: 'Goods In\nGoods Out',
-    icon: Package,
-    color: '#27b29b', // Primary Teal
-    bgColor: 'rgba(39, 178, 155, 0.1)'
+    id: 'work_permit',
+    title: 'Work\nPermit',
+    icon: Certificate,
+    color: '#27b29b',
+    bgColor: 'rgba(39, 178, 155, 0.1)',
+    badgeCount: 2
   },
   {
     id: 'fit_out_permit',

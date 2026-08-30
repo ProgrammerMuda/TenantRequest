@@ -101,9 +101,9 @@ export const ROLE_DATA = {
       { id: 'billing', title: 'Billing\n& Payment', icon: Receipt, imageIcon: billing3d, color: '#06b6d4', bgColor: 'rgba(6, 182, 212, 0.1)' },
       { id: 'home_service', title: 'Home\nservice', icon: HouseLine, imageIcon: homeService3d, color: '#27b29b', bgColor: 'rgba(39, 178, 155, 0.1)' },
       { id: 'facility_reservation', title: 'Facility\nReservation', icon: Armchair, imageIcon: reservation3d, color: '#6366f1', bgColor: 'rgba(99, 102, 241, 0.1)' },
-      { id: 'work_request', title: 'Work\nRequest', icon: ClipboardText, imageIcon: workRequest3d, color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)', badgeCount: 2 },
-      { id: 'work_order', title: 'Work\nOrder', icon: Toolbox, color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)', badgeCount: 1 },
-      { id: 'goods_in_out', title: 'Goods In\nGoods Out', icon: Package, color: '#27b29b', bgColor: 'rgba(39, 178, 155, 0.1)', badgeCount: 2 },
+      { id: 'work_order', title: 'Work\nOrder', icon: Toolbox, imageIcon: workRequest3d, color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)', badgeCount: 2 },
+      { id: 'goods_in_out', title: 'In & Out\nGoods', icon: Package, color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)', badgeCount: 1 },
+      { id: 'work_permit', title: 'Work\nPermit', icon: Certificate, color: '#27b29b', bgColor: 'rgba(39, 178, 155, 0.1)', badgeCount: 2 },
       { id: 'fit_out_permit', title: 'Fit Out\nPermit', icon: Certificate, color: '#06b6d4', bgColor: 'rgba(6, 182, 212, 0.1)', badgeCount: 2 },
       { id: 'all_menu', title: 'All\nMenu', icon: SquaresFour, color: '#6366f1', bgColor: 'rgba(99, 102, 241, 0.1)' }
     ]

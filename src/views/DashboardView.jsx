@@ -15,6 +15,7 @@ import { FitOutPermitView } from './FitOutPermitView';
 import { WorkOrderView } from './WorkOrderView';
 import { GoodsInOutView } from './GoodsInOutView';
 import { WorkRequestView } from './WorkRequestView';
+import { WorkPermitView } from './WorkPermitView';
 import { FitOutPermitDetailView } from './FitOutPermitDetailView';
 
 export function DashboardView({ homeController, themeController }) {
@@ -26,6 +27,8 @@ export function DashboardView({ homeController, themeController }) {
         return <RoleSelectionView controller={homeController} />;
       case 'home':
         return <HomeView controller={homeController} />;
+      case 'work_permit':
+        return <WorkPermitView controller={homeController} />;
       case 'fit_out_permit':
         return <FitOutPermitView controller={homeController} />;
       case 'permit_detail':
@@ -61,7 +64,7 @@ export function DashboardView({ homeController, themeController }) {
         </Box>
 
         {/* Custom Bottom Navigation Bar */}
-        {!['role_select', 'fit_out_permit', 'permit_detail', 'work_order', 'work_request', 'goods_in_out'].includes(activeTab) && (
+        {!['role_select', 'fit_out_permit', 'permit_detail', 'work_order', 'work_request', 'goods_in_out', 'work_permit'].includes(activeTab) && (
           <CustomBottomNav
             activeTab={activeTab}
             onSelectTab={setActiveTab}
