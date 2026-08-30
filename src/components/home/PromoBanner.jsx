@@ -21,7 +21,8 @@ export function PromoBanner({ promos = [] }) {
   const handleScroll = () => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
-      const index = Math.round(scrollLeft / (clientWidth * 0.9));
+      const step = clientWidth + 12;
+      const index = Math.round(scrollLeft / step);
       if (index !== activeIndex && index >= 0 && index < promos.length) {
         setActiveIndex(index);
       }
@@ -30,9 +31,9 @@ export function PromoBanner({ promos = [] }) {
 
   const handleDotClick = (index) => {
     if (scrollRef.current) {
-      const cardWidth = scrollRef.current.clientWidth * 0.92;
+      const step = scrollRef.current.clientWidth + 12;
       scrollRef.current.scrollTo({
-        left: index * cardWidth,
+        left: index * step,
         behavior: 'smooth'
       });
       setActiveIndex(index);
@@ -40,7 +41,7 @@ export function PromoBanner({ promos = [] }) {
   };
 
   return (
-    <Box sx={{ m: 0 }}>
+    <Box sx={{ m: 0, width: '100%' }}>
       {/* Horizontal Scrollable Carousel Container */}
       <Box
         ref={scrollRef}
@@ -52,7 +53,7 @@ export function PromoBanner({ promos = [] }) {
           scrollSnapType: 'x mandatory',
           scrollBehavior: 'smooth',
           py: 0.5,
-          px: 0.5,
+          px: 0,
           '&::-webkit-scrollbar': { display: 'none' },
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
@@ -63,10 +64,9 @@ export function PromoBanner({ promos = [] }) {
             key={promo.id || idx}
             elevation={0}
             sx={{
-              flex: '0 0 94%',
-              minWidth: 280,
-              maxWidth: 420,
-              scrollSnapAlign: 'center',
+              flex: '0 0 100%',
+              width: '100%',
+              scrollSnapAlign: 'start',
               borderRadius: '8px',
               overflow: 'hidden',
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
