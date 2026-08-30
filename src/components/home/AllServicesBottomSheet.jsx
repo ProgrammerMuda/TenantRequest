@@ -131,7 +131,9 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
         sx={{
           position: 'relative',
           width: '100%',
+          height: '92%',
           maxHeight: '92%',
+          minHeight: 0,
           backgroundColor: '#ffffff',
           borderRadius: '32px 32px 0 0',
           boxShadow: '0 -12px 48px rgba(0, 0, 0, 0.28)',
@@ -279,9 +281,11 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
         <Box
           sx={{
             flexGrow: 1,
+            minHeight: 0,
             overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
             px: 3,
-            pb: 5,
+            pb: 6,
             '&::-webkit-scrollbar': { display: 'none' },
             scrollbarWidth: 'none',
             msOverflowStyle: 'none'

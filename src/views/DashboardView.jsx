@@ -17,6 +17,7 @@ import { GoodsInOutView } from './GoodsInOutView';
 import { WorkRequestView } from './WorkRequestView';
 import { WorkPermitView } from './WorkPermitView';
 import { FitOutPermitDetailView } from './FitOutPermitDetailView';
+import { AllServicesBottomSheet } from '../components/home/AllServicesBottomSheet';
 
 export function DashboardView({ homeController, themeController }) {
   const { activeTab, setActiveTab, selectedPermit } = homeController;
@@ -70,6 +71,13 @@ export function DashboardView({ homeController, themeController }) {
             onSelectTab={setActiveTab}
           />
         )}
+
+        {/* All Services Bottom Sheet Modal (Overlaying Phone Screen) */}
+        <AllServicesBottomSheet
+          open={homeController.isAllServicesOpen}
+          onClose={() => homeController.setIsAllServicesOpen(false)}
+          onSelectService={homeController.handleClickMenu}
+        />
       </Box>
     </DeviceFrame>
   );

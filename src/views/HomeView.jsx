@@ -166,14 +166,21 @@ export function HomeView({ controller }) {
                   width: 36,
                   height: 36,
                   borderRadius: '8px',
-                  backgroundColor: selectedMenuItem.bgColor,
-                  color: selectedMenuItem.color,
+                  backgroundColor: selectedMenuItem.bgColor || '#f1f5f9',
+                  color: selectedMenuItem.color || '#27b29b',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  overflow: 'hidden'
                 }}
               >
-                {React.createElement(selectedMenuItem.icon, { size: 20, weight: 'bold' })}
+                {typeof selectedMenuItem.icon === 'string' ? (
+                  <Box component="img" src={selectedMenuItem.icon} sx={{ width: 26, height: 26, objectFit: 'contain' }} />
+                ) : selectedMenuItem.imageIcon ? (
+                  <Box component="img" src={selectedMenuItem.imageIcon} sx={{ width: 26, height: 26, objectFit: 'contain' }} />
+                ) : selectedMenuItem.icon ? (
+                  React.createElement(selectedMenuItem.icon, { size: 20, weight: 'bold' })
+                ) : null}
               </Box>
               <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1rem' }}>
                 {selectedMenuItem.title.replace('\n', ' ')}
@@ -213,13 +220,6 @@ export function HomeView({ controller }) {
           </DialogActions>
         </Dialog>
       )}
-
-      {/* All Services Bottom Sheet */}
-      <AllServicesBottomSheet
-        open={isAllServicesOpen}
-        onClose={() => setIsAllServicesOpen(false)}
-        onSelectService={handleClickMenu}
-      />
     </Box>
   );
 }
