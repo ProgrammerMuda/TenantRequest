@@ -18,8 +18,9 @@ export function GridMenu({ items, onClickMenu }) {
   const theme = useTheme();
 
   return (
-    <Grid container spacing={1.5} sx={{ my: 1 }}>
-      {items.map(item => {
+    <Box sx={{ width: '100%', m: 0 }}>
+      <Grid container spacing={1.5}>
+        {items.map(item => {
         const Icon = item.icon;
 
         return (
@@ -28,27 +29,26 @@ export function GridMenu({ items, onClickMenu }) {
               elevation={0}
               onClick={() => onClickMenu(item)}
               sx={{
-                p: 1.5,
-                py: 2,
-                borderRadius: 4,
-                backgroundColor: theme.palette.mode === 'dark' ? '#1e293b' : '#f8fafc',
-                border: `1px solid ${theme.palette.mode === 'dark' ? '#334155' : '#f1f5f9'}`,
+                p: 1.2,
+                py: 1.8,
+                borderRadius: '8px',
+                backgroundColor: theme.palette.mode === 'dark' ? '#1e293b' : '#f8fafc', // Slate-50
+                border: 'none',
+                boxShadow: 'none',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 1.2,
+                gap: 1,
                 cursor: 'pointer',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                minHeight: 112,
+                minHeight: 108,
                 '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 20px rgba(39, 178, 155, 0.15)',
-                  borderColor: '#27b29b',
-                  backgroundColor: theme.palette.mode === 'dark' ? '#334155' : '#ffffff'
+                  backgroundColor: theme.palette.mode === 'dark' ? '#334155' : '#f1f5f9', // Slate-100 on hover
+                  boxShadow: 'none'
                 },
                 '&:active': {
-                  transform: 'scale(0.96)'
+                  transform: 'scale(0.97)'
                 }
               }}
             >
@@ -59,29 +59,48 @@ export function GridMenu({ items, onClickMenu }) {
                 sx={{ 
                   '& .MuiBadge-badge': { 
                     fontWeight: 800, 
-                    right: 4, 
-                    top: 4,
+                    right: 2, 
+                    top: 2,
                     minWidth: 18,
                     height: 18,
                     fontSize: '0.65rem'
                   } 
                 }}
               >
-                <Box
-                  sx={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: '14px',
-                    backgroundColor: item.bgColor,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: item.color,
-                    boxShadow: `0 4px 10px ${item.bgColor}`
-                  }}
-                >
-                  <Icon size={24} weight="bold" />
-                </Box>
+                {item.imageIcon ? (
+                  <Box
+                    component="img"
+                    src={item.imageIcon}
+                    alt={item.title?.replace('\n', ' ')}
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      objectFit: 'contain',
+                      display: 'block',
+                      filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.14))',
+                      transition: 'transform 0.2s',
+                      '&:hover': {
+                        transform: 'scale(1.06)'
+                      }
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '8px',
+                      backgroundColor: item.bgColor,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: item.color,
+                      boxShadow: `0 2px 8px ${item.bgColor}`
+                    }}
+                  >
+                    <Icon size={24} weight="bold" />
+                  </Box>
+                )}
               </Badge>
 
               {/* Title Label */}
@@ -89,12 +108,16 @@ export function GridMenu({ items, onClickMenu }) {
                 variant="caption"
                 sx={{
                   fontWeight: 700,
-                  fontSize: '0.73rem',
+                  fontSize: '0.72rem',
                   lineHeight: 1.25,
                   textAlign: 'center',
                   whiteSpace: 'pre-line',
                   color: theme.palette.text.primary,
-                  fontFamily: "'Montserrat', sans-serif"
+                  fontFamily: "'Montserrat', sans-serif",
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden'
                 }}
               >
                 {item.title}
@@ -103,6 +126,7 @@ export function GridMenu({ items, onClickMenu }) {
           </Grid>
         );
       })}
-    </Grid>
+      </Grid>
+    </Box>
   );
 }

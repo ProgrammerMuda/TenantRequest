@@ -5,40 +5,30 @@
  */
 
 import { useState } from 'react';
-import { initialMenuItems, userProfileData, promoBannersData } from '../models/MenuModel';
-import { permitMockData } from '../models/FitOutPermitModel';
-import { workOrderMockData } from '../models/WorkOrderModel';
-import { goodsInOutMockData } from '../models/GoodsInOutModel';
-import { workRequestMockData } from '../models/WorkRequestModel';
+import { promoBannersData } from '../models/MenuModel';
+import { ROLE_DATA } from '../models/RoleModel';
 
 export function useHomeController() {
-  const permitActionCount = permitMockData.filter(p => p.needAction).length;
-  const woActionCount = workOrderMockData.filter(p => p.needAction).length;
-  const goodsActionCount = goodsInOutMockData.filter(p => p.needAction).length;
-  const wrActionCount = workRequestMockData.filter(p => p.needAction).length;
-  
-  const menuItems = initialMenuItems.map(item => {
-    if (item.id === 'fit_out_permit') {
-      return { ...item, badgeCount: permitActionCount };
-    }
-    if (item.id === 'work_order') {
-      return { ...item, badgeCount: woActionCount };
-    }
-    if (item.id === 'work_request') {
-      return { ...item, badgeCount: wrActionCount };
-    }
-    if (item.id === 'goods_in_out') {
-      return { ...item, badgeCount: goodsActionCount };
-    }
-    return item;
-  });
-  const [profile, setProfile] = useState(userProfileData);
+  const [activeRole, setActiveRole] = useState('bm'); // 'bm' | 'tenant' | 'eng' | 'sec' | 'hk' | 'tr'
+  const currentRoleData = ROLE_DATA[activeRole] || ROLE_DATA.bm;
+
+  const [profile, setProfile] = useState(currentRoleData.profile);
   const [promos] = useState(promoBannersData);
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'chat' | 'qr' | 'notif' | 'profile'
-  const [selectedLocation, setSelectedLocation] = useState(userProfileData.currentLocation);
+  const [activeTab, setActiveTab] = useState('role_select'); // 'role_select' | 'home' | 'chat' | 'qr' | 'notif' | 'profile'
+  const [selectedLocation, setSelectedLocation] = useState(currentRoleData.profile.currentLocation);
   const [isLocationMenuOpen, setIsLocationMenuOpen] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState(null);
   const [selectedPermit, setSelectedPermit] = useState(null);
+
+  // Switch Role
+  const handleSelectRole = (roleId) => {
+    setActiveRole(roleId);
+    const targetData = ROLE_DATA[roleId];
+    if (targetData) {
+      setProfile(targetData.profile);
+      setSelectedLocation(targetData.profile.currentLocation);
+    }
+  };
 
   const openPermitDetail = (permit) => {
     setSelectedPermit(permit);
@@ -66,7 +56,10 @@ export function useHomeController() {
   };
 
   return {
-    menuItems,
+    activeRole,
+    handleSelectRole,
+    menuItems: currentRoleData.menuItems,
+    overview: currentRoleData.overview,
     profile,
     promos,
     activeTab,

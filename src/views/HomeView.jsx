@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import { X, ArrowRight, Buildings, CaretDown } from '@phosphor-icons/react';
 import { HeroHeader } from '../components/home/HeroHeader';
+import { OverviewSection } from '../components/home/OverviewSection';
 import { GridMenu } from '../components/home/GridMenu';
 import { PromoBanner } from '../components/home/PromoBanner';
 import homeHeaderBg from '../assets/home_header_bg.png';
@@ -31,6 +32,9 @@ export function HomeView({ controller }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const {
+    activeRole,
+    handleSelectRole,
+    overview,
     menuItems,
     profile,
     promos,
@@ -90,15 +94,12 @@ export function HomeView({ controller }) {
           pointerEvents: 'none'
         }}
       >
-        {/* Subtle Top Scrim Gradient */}
+        {/* Darkening Header Overlay matching photo */}
         <Box
           sx={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '70%',
-            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.05) 60%, transparent 100%)',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.46) 0%, rgba(15, 23, 42, 0.28) 45%, rgba(15, 23, 42, 0.5) 100%)',
             pointerEvents: 'none'
           }}
         />
@@ -106,7 +107,11 @@ export function HomeView({ controller }) {
 
       {/* 2. Top Status Bar & Floating Header Widget Container */}
       <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3, p: 2.2, pt: 1.4, pb: 0 }}>
-        <HeroHeader profile={profile} selectedLocation={selectedLocation} />
+        <HeroHeader
+          profile={profile}
+          selectedLocation={selectedLocation}
+          onChangeRole={() => setActiveTab('role_select')}
+        />
       </Box>
 
       {/* 3. White Curved Card Body */}
@@ -119,11 +124,17 @@ export function HomeView({ controller }) {
           backgroundColor: theme.palette.background.paper,
           p: 2,
           pt: 2.5,
-          pb: 12,
+          pb: 11,
           flexGrow: 1,
-          boxShadow: '0 -8px 25px rgba(0,0,0,0.07)'
+          boxShadow: '0 -8px 25px rgba(0,0,0,0.07)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2.5
         }}
       >
+        {/* Operational Overview KPI Section */}
+        <OverviewSection data={overview} />
+
         {/* 4x2 Grid Menu (8 Items) */}
         <GridMenu
           items={menuItems}
@@ -151,7 +162,7 @@ export function HomeView({ controller }) {
                 sx={{
                   width: 36,
                   height: 36,
-                  borderRadius: 3,
+                  borderRadius: '8px',
                   backgroundColor: selectedMenuItem.bgColor,
                   color: selectedMenuItem.color,
                   display: 'flex',

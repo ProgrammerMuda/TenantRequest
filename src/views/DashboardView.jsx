@@ -7,6 +7,7 @@ import React from 'react';
 import { Box } from '@mui/material';
 import { DeviceFrame } from '../components/common/DeviceFrame';
 import { CustomBottomNav } from '../components/common/CustomBottomNav';
+import { RoleSelectionView } from './RoleSelectionView';
 import { HomeView } from './HomeView';
 import { ThemeShowcaseView } from './ThemeShowcaseView';
 import { MobileInfoView } from './MobileInfoView';
@@ -21,6 +22,8 @@ export function DashboardView({ homeController, themeController }) {
 
   const renderActiveView = () => {
     switch (activeTab) {
+      case 'role_select':
+        return <RoleSelectionView controller={homeController} />;
       case 'home':
         return <HomeView controller={homeController} />;
       case 'fit_out_permit':
@@ -51,14 +54,14 @@ export function DashboardView({ homeController, themeController }) {
 
   return (
     <DeviceFrame>
-      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', flexGrow: 1, position: 'relative', overflow: 'hidden' }}>
-        {/* Main View Area */}
-        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', flexGrow: 1, position: 'relative', overflow: 'hidden', backgroundColor: '#ffffff' }}>
+        {/* Main View Area (minHeight 0 prevents flex overflow from squeezing navbar) */}
+        <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
           {renderActiveView()}
         </Box>
 
         {/* Custom Bottom Navigation Bar */}
-        {!['fit_out_permit', 'permit_detail', 'work_order', 'work_request', 'goods_in_out'].includes(activeTab) && (
+        {!['role_select', 'fit_out_permit', 'permit_detail', 'work_order', 'work_request', 'goods_in_out'].includes(activeTab) && (
           <CustomBottomNav
             activeTab={activeTab}
             onSelectTab={setActiveTab}

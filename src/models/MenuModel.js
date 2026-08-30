@@ -14,11 +14,17 @@ import {
   SquaresFour
 } from '@phosphor-icons/react';
 
+import billing3d from '../assets/menu_icons/billing_3d.png';
+import homeService3d from '../assets/menu_icons/home_service_3d.png';
+import reservation3d from '../assets/menu_icons/reservation_3d.png';
+import workRequest3d from '../assets/menu_icons/work_request_3d.png';
+
 export const initialMenuItems = [
   {
     id: 'billing',
     title: 'Billing\n& Payment',
     icon: Receipt,
+    imageIcon: billing3d,
     color: '#06b6d4', // Cyan
     bgColor: 'rgba(6, 182, 212, 0.1)'
   },
@@ -26,6 +32,7 @@ export const initialMenuItems = [
     id: 'home_service',
     title: 'Home\nservice',
     icon: HouseLine,
+    imageIcon: homeService3d,
     color: '#27b29b', // Primary Teal
     bgColor: 'rgba(39, 178, 155, 0.1)'
   },
@@ -33,6 +40,7 @@ export const initialMenuItems = [
     id: 'facility_reservation',
     title: 'Facility\nReservation',
     icon: Armchair,
+    imageIcon: reservation3d,
     color: '#6366f1', // Indigo
     bgColor: 'rgba(99, 102, 241, 0.1)'
   },
@@ -40,8 +48,10 @@ export const initialMenuItems = [
     id: 'work_request',
     title: 'Work\nRequest',
     icon: ClipboardText,
+    imageIcon: workRequest3d,
     color: '#10b981', // Emerald
-    bgColor: 'rgba(16, 185, 129, 0.1)'
+    bgColor: 'rgba(16, 185, 129, 0.1)',
+    badgeCount: 2
   },
   {
     id: 'work_order',
@@ -74,10 +84,10 @@ export const initialMenuItems = [
 ];
 
 export const userProfileData = {
-  name: 'Raga',
-  roleBadge: 'BM',
-  currentLocation: 'Paladian Park',
-  availableLocations: ['Paladian Park', 'Sudirman Park', 'Thamrin Executive', 'Kemang Village']
+  name: 'Aldy Mahardiansyah',
+  roleBadge: 'Resident',
+  currentLocation: 'Apartement A',
+  availableLocations: ['Apartement A', 'Paladian Park', 'Sudirman Park', 'Thamrin Executive', 'Kemang Village']
 };
 
 export const promoBannersData = [

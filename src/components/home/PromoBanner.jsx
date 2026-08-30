@@ -40,7 +40,7 @@ export function PromoBanner({ promos = [] }) {
   };
 
   return (
-    <Box sx={{ my: 2 }}>
+    <Box sx={{ m: 0 }}>
       {/* Horizontal Scrollable Carousel Container */}
       <Box
         ref={scrollRef}
@@ -68,7 +68,7 @@ export function PromoBanner({ promos = [] }) {
               maxWidth: 420,
               scrollSnapAlign: 'center',
               p: 2.2,
-              borderRadius: '20px',
+              borderRadius: '8px',
               background: promo.gradient || 'linear-gradient(135deg, #e0f2fe 0%, #e0f7fa 40%, #ffffff 100%)',
               border: `1.5px solid ${promo.borderColor || '#06b6d4'}`,
               position: 'relative',
