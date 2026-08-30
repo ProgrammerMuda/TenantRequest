@@ -99,47 +99,34 @@ export const userProfileData = {
   availableLocations: ['Apartement A', 'Paladian Park', 'Sudirman Park', 'Thamrin Executive', 'Kemang Village']
 };
 
+import bannerParkir from '../assets/banners/banner_parkir.jpg';
+import bannerListrik from '../assets/banners/banner_listrik.jpg';
+import bannerLift from '../assets/banners/banner_lift.jpg';
+import bannerFasilitas from '../assets/banners/banner_fasilitas.jpg';
+
 export const promoBannersData = [
   {
-    id: 'promo-1',
-    title: 'HOME SERVICE :',
-    subtitle: 'SOLUSI PRAKTIS RUMAH ANDA!',
-    badge: 'PROMO',
-    offerText: 'CUCI AC : RP. 50.000,-',
-    validUntil: '31 April 2026',
-    hotline: '081181221985',
-    brand: 'PROCARE HOME SERVICE',
-    gradient: 'linear-gradient(135deg, #e0f2fe 0%, #e0f7fa 40%, #ffffff 100%)',
-    borderColor: '#06b6d4',
-    badgeColor: '#65a30d',
-    textColor: '#0284c7'
+    id: 'banner-parkir',
+    image: bannerParkir,
+    title: 'Penutupan Sementara Area Parkir',
+    badge: 'PENGUMUMAN'
   },
   {
-    id: 'promo-2',
-    title: 'FACILITY RESERVATION :',
-    subtitle: 'DISCOUNT 20% FITNESS & POOL',
-    badge: 'EXCLUSIVE',
-    offerText: 'MEMBERSHIP DISC 20%',
-    validUntil: '15 Mei 2026',
-    hotline: '081181221985',
-    brand: 'PALADIAN CLUBHOUSE',
-    gradient: 'linear-gradient(135deg, #fef3c7 0%, #fef9c3 40%, #ffffff 100%)',
-    borderColor: '#f59e0b',
-    badgeColor: '#ea580c',
-    textColor: '#d97706'
+    id: 'banner-listrik',
+    image: bannerListrik,
+    title: 'Pemadaman Listrik Sementara',
+    badge: 'PENGUMUMAN'
   },
   {
-    id: 'promo-3',
-    title: 'DEEP CLEANING SERVICE :',
-    subtitle: 'FREE DISINFECTANT MISTING',
-    badge: 'SPECIAL',
-    offerText: 'START FROM RP. 150.000,-',
-    validUntil: '30 Juni 2026',
-    hotline: '081181221985',
-    brand: 'PROCARE CLEANING',
-    gradient: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 40%, #ffffff 100%)',
-    borderColor: '#10b981',
-    badgeColor: '#059669',
-    textColor: '#047857'
+    id: 'banner-lift',
+    image: bannerLift,
+    title: 'Maintenance Lift',
+    badge: 'PENGUMUMAN'
+  },
+  {
+    id: 'banner-fasilitas',
+    image: bannerFasilitas,
+    title: 'Pemeliharaan Fasilitas Apartemen',
+    badge: 'PENGUMUMAN'
   }
 ];

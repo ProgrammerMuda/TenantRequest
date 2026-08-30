@@ -67,29 +67,51 @@ export function PromoBanner({ promos = [] }) {
               minWidth: 280,
               maxWidth: 420,
               scrollSnapAlign: 'center',
-              p: 2.2,
               borderRadius: '8px',
-              background: promo.gradient || 'linear-gradient(135deg, #e0f2fe 0%, #e0f7fa 40%, #ffffff 100%)',
-              border: `1.5px solid ${promo.borderColor || '#06b6d4'}`,
-              position: 'relative',
               overflow: 'hidden',
-              boxShadow: '0 6px 20px rgba(0,0,0,0.06)',
-              userSelect: 'none'
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(226, 232, 240, 0.8)',
+              backgroundColor: '#f8fafc',
+              position: 'relative',
+              userSelect: 'none',
+              cursor: 'pointer',
+              transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                transform: 'scale(1.01)'
+              },
+              '&:active': {
+                transform: 'scale(0.99)'
+              }
             }}
           >
-            {/* Background Decorative Circles */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: -20,
-                right: -20,
-                width: 130,
-                height: 130,
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                pointerEvents: 'none'
-              }}
-            />
+            {promo.image ? (
+              <Box
+                component="img"
+                src={promo.image}
+                alt={promo.title || 'Pengumuman'}
+                sx={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  borderRadius: '8px',
+                  objectFit: 'cover'
+                }}
+              />
+            ) : (
+              <Box sx={{ p: 2.2, position: 'relative', background: promo.gradient || 'linear-gradient(135deg, #e0f2fe 0%, #e0f7fa 40%, #ffffff 100%)' }}>
+                {/* Background Decorative Circles */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: -20,
+                    right: -20,
+                    width: 130,
+                    height: 130,
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    pointerEvents: 'none'
+                  }}
+                />
 
             {/* Brand & Badge Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
@@ -166,7 +188,9 @@ export function PromoBanner({ promos = [] }) {
                 </Typography>
               </Box>
             </Box>
-          </Paper>
+          </Box>
+        )}
+        </Paper>
         ))}
       </Box>
 
