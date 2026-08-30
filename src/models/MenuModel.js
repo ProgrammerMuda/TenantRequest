@@ -18,6 +18,9 @@ import billing3d from '../assets/menu_icons/billing_3d.png';
 import homeService3d from '../assets/menu_icons/home_service_3d.png';
 import reservation3d from '../assets/menu_icons/reservation_3d.png';
 import workRequest3d from '../assets/menu_icons/work_request_3d.png';
+import gigo3d from '../assets/menu_icons/gigo_3d.png';
+import fitOutPermit3d from '../assets/menu_icons/fit_out_permit_3d.png';
+import allMenu3d from '../assets/menu_icons/all_menu_3d.png';
 
 export const initialMenuItems = [
   {
@@ -25,7 +28,7 @@ export const initialMenuItems = [
     title: 'Billing\n& Payment',
     icon: Receipt,
     imageIcon: billing3d,
-    color: '#06b6d4', // Cyan
+    color: '#06b6d4',
     bgColor: 'rgba(6, 182, 212, 0.1)'
   },
   {
@@ -33,7 +36,7 @@ export const initialMenuItems = [
     title: 'Home\nservice',
     icon: HouseLine,
     imageIcon: homeService3d,
-    color: '#27b29b', // Primary Teal
+    color: '#27b29b',
     bgColor: 'rgba(39, 178, 155, 0.1)'
   },
   {
@@ -41,7 +44,7 @@ export const initialMenuItems = [
     title: 'Facility\nReservation',
     icon: Armchair,
     imageIcon: reservation3d,
-    color: '#6366f1', // Indigo
+    color: '#6366f1',
     bgColor: 'rgba(99, 102, 241, 0.1)'
   },
   {
@@ -57,6 +60,7 @@ export const initialMenuItems = [
     id: 'goods_in_out',
     title: 'In & Out\nGoods',
     icon: Package,
+    imageIcon: gigo3d,
     color: '#f59e0b',
     bgColor: 'rgba(245, 158, 11, 0.1)',
     badgeCount: 1
@@ -65,6 +69,7 @@ export const initialMenuItems = [
     id: 'work_permit',
     title: 'Work\nPermit',
     icon: Certificate,
+    imageIcon: fitOutPermit3d,
     color: '#27b29b',
     bgColor: 'rgba(39, 178, 155, 0.1)',
     badgeCount: 2
@@ -73,14 +78,16 @@ export const initialMenuItems = [
     id: 'fit_out_permit',
     title: 'Fit Out\nPermit',
     icon: Certificate,
-    color: '#06b6d4', // Cyan
+    imageIcon: fitOutPermit3d,
+    color: '#06b6d4',
     bgColor: 'rgba(6, 182, 212, 0.1)'
   },
   {
     id: 'all_menu',
     title: 'All\nMenu',
     icon: SquaresFour,
-    color: '#6366f1', // Indigo
+    imageIcon: allMenu3d,
+    color: '#6366f1',
     bgColor: 'rgba(99, 102, 241, 0.1)'
   }
 ];
