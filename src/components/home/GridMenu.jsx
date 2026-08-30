@@ -107,12 +107,12 @@ export function GridMenu({ items, onClickMenu }) {
               <Typography
                 variant="caption"
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: '0.72rem',
                   lineHeight: 1.25,
                   textAlign: 'center',
                   whiteSpace: 'pre-line',
-                  color: theme.palette.text.primary,
+                  color: theme.palette.mode === 'dark' ? '#cbd5e1' : '#334155',
                   fontFamily: "'Montserrat', sans-serif",
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
