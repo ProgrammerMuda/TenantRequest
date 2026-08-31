@@ -665,7 +665,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     Schedule Extension
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.2 }}>
-                    <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e293b' }}>
+                    <Typography sx={{ fontSize: '0.88rem', fontWeight: 500, color: '#1e293b' }}>
                       {extensionSubmittedData.startDate} → {extensionSubmittedData.endDate}
                     </Typography>
                     <Box 
@@ -705,7 +705,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#94a3b8' }}>
                     Extension Scheme
                   </Typography>
-                  <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e293b', mt: 0.2 }}>
+                  <Typography sx={{ fontSize: '0.88rem', fontWeight: 500, color: '#1e293b', mt: 0.2 }}>
                     {extensionSubmittedData.feePolicy === 'CHARGEABLE' 
                       ? 'Chargeable Daily Supervision' 
                       : 'Free of Charge (Grace Period)'}
