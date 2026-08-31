@@ -40,6 +40,7 @@ import incidental3d from '../../assets/menu_icons/incidental_3d.png';
 import inspection3d from '../../assets/menu_icons/inspection_3d.png';
 import payslip3d from '../../assets/menu_icons/payslip_3d.png';
 import scanmeter3d from '../../assets/menu_icons/scanmeter_3d.png';
+import tenantUnit3d from '../../assets/menu_icons/tenant_unit_3d.png';
 
 const ALL_TENANT_SERVICES = [
   { id: 'billing', title: 'Billing &\nPayment', cleanTitle: 'Billing & Payment', icon: billing3d, category: 'Finance' },
@@ -54,6 +55,7 @@ const ALL_TENANT_SERVICES = [
 ];
 
 const ALL_MANAGEMENT_SERVICES = [
+  { id: 'tenant_unit', title: 'Tenant Unit', cleanTitle: 'Tenant Unit', icon: tenantUnit3d, category: 'Property Management' },
   { id: 'asset', title: 'Asset', cleanTitle: 'Asset Management', icon: asset3d, category: 'Operations' },
   { id: 'attendance', title: 'Attendance', cleanTitle: 'Attendance', icon: attendance3d, category: 'HR & Staff' },
   { id: 'incidental_report', title: 'Incidental\nReport', cleanTitle: 'Incidental Report', icon: incidental3d, category: 'Safety & Security' },
@@ -456,7 +458,7 @@ export function AllServicesBottomSheet({ open, onClose, onSelectService }) {
                   fontFamily: 'Montserrat, sans-serif'
                 }}
               >
-                Management Menu
+                Building Management
               </Typography>
 
               {viewMode === 'grid' ? (
