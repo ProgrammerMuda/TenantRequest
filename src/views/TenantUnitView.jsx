@@ -537,7 +537,6 @@ export function TenantUnitView({ controller }) {
               const occCount = towerUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length;
               const totalCount = towerUnits.length;
               const rate = totalCount > 0 ? Math.round((occCount / totalCount) * 100) : tower.occupancyRate;
-              const floorCount = [...new Set(towerUnits.map(u => u.floor))].length;
 
               return (
                 <Box
@@ -553,7 +552,7 @@ export function TenantUnitView({ controller }) {
                     }
                   }}
                 >
-                  {/* Top Row: Icon + Tower Name & Floors/Units + Blue Occupied Badge */}
+                  {/* Top Row: Icon + Tower Name & Total Units + Blue Occupied Badge */}
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
                       <Box
@@ -574,8 +573,8 @@ export function TenantUnitView({ controller }) {
                         <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>
                           {tower.name}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.84rem', fontWeight: 600, color: '#475569', mt: 0.3 }}>
-                          {floorCount} Lantai • {totalCount} Unit
+                        <Typography sx={{ fontSize: '0.86rem', fontWeight: 600, color: '#64748b', mt: 0.2 }}>
+                          {totalCount} Total Unit
                         </Typography>
                       </Box>
                     </Box>
