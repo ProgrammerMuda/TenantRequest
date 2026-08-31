@@ -451,7 +451,7 @@ export function TenantUnitView({ controller }) {
   }, [selectedUnit]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden', backgroundColor: '#f8fafc' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
       
       {/* ========================================================================= */}
       {/* MASTER TOP HEADER */}
