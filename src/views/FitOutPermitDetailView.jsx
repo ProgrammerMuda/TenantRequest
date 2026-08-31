@@ -785,31 +785,15 @@ export function FitOutPermitDetailView({ permit, controller }) {
               </Box>
             )}
 
-            {/* 1. Site Progress Documentation Photos (Visual Proof First) */}
+            {/* 1. Site Progress Documentation Photos (Visual Proof First - No Icon) */}
             {extensionSubmittedData.photos && extensionSubmittedData.photos.length > 0 && (
               <Box sx={{ mt: 2.2 }}>
                 <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
 
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box
-                      sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: '8px',
-                        backgroundColor: '#ecfdf5',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}
-                    >
-                      <Camera size={16} weight="fill" color="#27b29b" />
-                    </Box>
-                    <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
-                      Progress Photos
-                    </Typography>
-                  </Box>
+                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
+                    Progress Photos
+                  </Typography>
 
                   <Chip
                     label={`${extensionSubmittedData.photos.length} Photo${extensionSubmittedData.photos.length > 1 ? 's' : ''}`}
@@ -898,30 +882,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
               </Box>
             )}
 
-            {/* 2. Notes & Technical Remarks (Elaboration / Narrative below photos) */}
+            {/* 2. Notes & Technical Remarks (Elaboration / Narrative below photos - No Icon) */}
             {(extensionSubmittedData.notes || extensionSubmittedData.reason) && (
               <Box sx={{ mt: 2.2 }}>
                 <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
                 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <Box
-                    sx={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '8px',
-                      backgroundColor: '#ecfdf5',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}
-                  >
-                    <FileText size={16} weight="fill" color="#27b29b" />
-                  </Box>
-                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
-                    Notes & Remarks
-                  </Typography>
-                </Box>
+                <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b', mb: 1 }}>
+                  Notes & Remarks
+                </Typography>
 
                 <Box
                   sx={{
