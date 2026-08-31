@@ -486,12 +486,12 @@ export function TenantUnitView({ controller }) {
                 label={`${siteStats.rate}% Occupied`}
                 size="small"
                 sx={{
-                  backgroundColor: siteStats.rate >= 70 ? '#ecfdf5' : '#fff7ed',
-                  color: siteStats.rate >= 70 ? '#059669' : '#ea580c',
+                  backgroundColor: '#eff6ff',
+                  color: '#2563eb',
                   fontWeight: 700,
                   fontSize: '0.74rem',
                   borderRadius: '8px',
-                  border: `1px solid ${siteStats.rate >= 70 ? '#a7f3d0' : '#ffedd5'}`
+                  border: '1px solid #bfdbfe'
                 }}
               />
             </Box>
@@ -579,9 +579,9 @@ export function TenantUnitView({ controller }) {
 
                     <Box
                       sx={{
-                        backgroundColor: isHigh ? '#ecfdf5' : '#fff7ed',
-                        color: isHigh ? '#059669' : '#ea580c',
-                        border: `1px solid ${isHigh ? '#a7f3d0' : '#ffedd5'}`,
+                        backgroundColor: '#eff6ff',
+                        color: '#2563eb',
+                        border: '1px solid #bfdbfe',
                         borderRadius: '8px',
                         px: 1.2,
                         py: 0.35,
