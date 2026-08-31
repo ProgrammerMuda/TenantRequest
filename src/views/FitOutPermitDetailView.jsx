@@ -617,10 +617,26 @@ export function FitOutPermitDetailView({ permit, controller }) {
               boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
             }}
           >
-            {/* Header: Extension Information (No Icon) */}
-            <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
-              Extension Information
-            </Typography>
+            {/* Header: Extension Information & Status Badge */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
+                Extension Information
+              </Typography>
+              <Box 
+                sx={{ 
+                  backgroundColor: '#f97316', 
+                  color: '#ffffff', 
+                  borderRadius: '100px', 
+                  px: 1.4, 
+                  py: 0.35, 
+                  fontSize: '0.72rem', 
+                  fontWeight: 600,
+                  letterSpacing: '0.2px'
+                }}
+              >
+                Waiting Approval
+              </Box>
+            </Box>
 
             <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', my: 1.8 }} />
 
