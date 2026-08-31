@@ -76,6 +76,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const [completeSuccessOpen, setCompleteSuccessOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Work Complete Bottom Sheet State
+  const [completeSheetOpen, setCompleteSheetOpen] = useState(false);
+  const [completePhotos, setCompletePhotos] = useState([]);
+  const [completeNotes, setCompleteNotes] = useState('');
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [completedData, setCompletedData] = useState(null);
+  const completeFileInputRef = useRef(null);
+
   // Extension Requests with History & Multi-Extension State
   const [extensionRequests, setExtensionRequests] = useState([
     {
@@ -403,6 +411,37 @@ export function FitOutPermitDetailView({ permit, controller }) {
     setExtensionSuccessOpen(true);
   };
 
+  const handleCompletePhotoUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    const newPhotos = files.map(file => URL.createObjectURL(file));
+    setCompletePhotos(prev => [...prev, ...newPhotos]);
+  };
+
+  const removeCompletePhoto = (idxToRemove) => {
+    setCompletePhotos(prev => prev.filter((_, idx) => idx !== idxToRemove));
+  };
+
+  const handleConfirmComplete = () => {
+    const finalPhotos = completePhotos.length > 0 ? completePhotos : [
+      '/renovasi_kamar_1.jpg',
+      '/renovasi_kamar_2.jpg'
+    ];
+    const finalNotes = completeNotes.trim() || 'All renovation and interior fit-out work completed according to design specifications. Handover inspection passed.';
+    const timestamp = '31 Aug 2026, 17:35';
+    
+    setIsCompleted(true);
+    setCompletedData({
+      completedAt: timestamp,
+      completedBy: activePov === 'engineering' ? 'Engineering Lead' : 'Tenant Relation Lead',
+      photos: finalPhotos,
+      notes: finalNotes
+    });
+    setCompleteSheetOpen(false);
+    setSuccessMessage(`Fit out work successfully completed and documented!`);
+    setExtensionSuccessOpen(true);
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
       
@@ -507,7 +546,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
             </Typography>
             <Box 
               sx={{ 
-                backgroundColor: '#3b82f6', 
+                backgroundColor: isCompleted ? '#22c55e' : '#3b82f6', 
                 color: '#ffffff', 
                 borderRadius: '100px', 
                 px: 1.5, 
@@ -517,7 +556,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 letterSpacing: '0.2px'
               }}
             >
-              {data.status}
+              {isCompleted ? 'COMPLETED' : data.status}
             </Box>
           </Box>
 
@@ -735,7 +774,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 End Work
               </Typography>
               <Typography sx={{ fontWeight: 700, fontSize: '0.78rem', mt: 0.2 }}>
-                {data.endWork || 'Not Finished yet'}
+                {isCompleted ? (completedData?.completedAt || '31 Aug 2026, 17:35') : (data.endWork || 'Not Finished yet')}
               </Typography>
             </Box>
           </Box>
@@ -2431,9 +2470,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
               disableRipple
               disableFocusRipple
               disableTouchRipple
-              onClick={() => setCompleteSuccessOpen(true)}
+              onClick={() => isCompleted ? null : setCompleteSheetOpen(true)}
+              disabled={isCompleted}
               sx={{
-                backgroundColor: '#22c55e !important',
+                backgroundColor: isCompleted ? '#94a3b8 !important' : '#22c55e !important',
                 color: '#ffffff !important',
                 borderRadius: '10px',
                 py: 1.3,
@@ -2444,13 +2484,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 boxShadow: 'none !important',
                 transition: 'none !important',
                 '&:hover, &:focus, &:active': {
-                  backgroundColor: '#22c55e !important',
+                  backgroundColor: isCompleted ? '#94a3b8 !important' : '#22c55e !important',
                   color: '#ffffff !important',
                   boxShadow: 'none !important'
                 }
               }}
             >
-              Work Complete
+              {isCompleted ? 'Work Completed' : 'Work Complete'}
             </Button>
           </Box>
         );
@@ -4296,6 +4336,284 @@ export function FitOutPermitDetailView({ permit, controller }) {
             }}
           >
             Reject
+          </Button>
+        </Box>
+      </Box>
+
+      {/* ========================================================================= */}
+      {/* WORK COMPLETE BOTTOM SHEET (For Both TR & Engineering: Upload Photos + Notes) */}
+      {/* ========================================================================= */}
+      {/* Backdrop */}
+      <Box
+        onClick={() => setCompleteSheetOpen(false)}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
+          backdropFilter: 'blur(2px)',
+          zIndex: 60,
+          opacity: completeSheetOpen ? 1 : 0,
+          pointerEvents: completeSheetOpen ? 'auto' : 'none',
+          transition: 'opacity 0.25s ease'
+        }}
+      />
+
+      {/* Sheet Container */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          maxHeight: '85%',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#ffffff',
+          borderTopLeftRadius: '24px',
+          borderTopRightRadius: '24px',
+          boxShadow: '0 -10px 30px rgba(0,0,0,0.18)',
+          zIndex: 70,
+          overflow: 'hidden',
+          transform: completeSheetOpen ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
+          pointerEvents: completeSheetOpen ? 'auto' : 'none'
+        }}
+      >
+        {/* Handle + Header */}
+        <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9', flexShrink: 0 }}>
+          <Box sx={{ width: 40, height: 4, borderRadius: '4px', backgroundColor: '#cbd5e1', mx: 'auto', mb: 1.5 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+              <Box sx={{ width: 38, height: 38, borderRadius: '9px', backgroundColor: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <CheckCircle size={22} color="#22c55e" weight="fill" />
+              </Box>
+              <Box>
+                <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>
+                  Complete Fit Out Work
+                </Typography>
+                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.1 }}>
+                  {activePov === 'engineering' ? 'Engineering Lead' : 'Tenant Relation'} · Completion Documentation
+                </Typography>
+              </Box>
+            </Box>
+            <Box onClick={() => setCompleteSheetOpen(false)} sx={{ cursor: 'pointer', p: 0.5, color: '#94a3b8' }}>
+              <X size={20} weight="bold" />
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Scrollable Body */}
+        <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2.2 }}>
+          {/* Info callout */}
+          <Box sx={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', p: 1.5, display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+            <Info size={18} color="#16a34a" weight="fill" style={{ flexShrink: 0, marginTop: 2 }} />
+            <Typography sx={{ fontSize: '0.78rem', color: '#15803d', lineHeight: 1.45, fontWeight: 500 }}>
+              Upload final completion photos and provide handover remarks before closing this fit out permit.
+            </Typography>
+          </Box>
+
+          {/* 1. Upload Completion Photos */}
+          <Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
+                Completion Photos <span style={{ color: '#ef4444' }}>*</span>
+              </Typography>
+              <Typography sx={{ fontSize: '0.72rem', color: '#64748b' }}>
+                {completePhotos.length} Photo{completePhotos.length > 1 ? 's' : ''} Attached
+              </Typography>
+            </Box>
+
+            {/* Hidden native file input */}
+            <input
+              type="file"
+              ref={completeFileInputRef}
+              multiple
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleCompletePhotoUpload}
+            />
+
+            {/* Photos Grid & Add Tile */}
+            <Box sx={{ display: 'flex', gap: 1.2, flexWrap: 'wrap', alignItems: 'center' }}>
+              {completePhotos.map((photoUrl, idx) => (
+                <Box
+                  key={idx}
+                  sx={{
+                    width: 82,
+                    height: 82,
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    border: '1.5px solid #e2e8f0',
+                    position: 'relative',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={photoUrl}
+                    alt={`Completion photo ${idx + 1}`}
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  {/* Delete Badge */}
+                  <Box
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeCompletePhoto(idx);
+                    }}
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(15, 23, 42, 0.75)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: '#ef4444' }
+                    }}
+                  >
+                    <X size={12} color="#ffffff" weight="bold" />
+                  </Box>
+                  {/* Preview Eye */}
+                  <Box
+                    onClick={() => setPreviewPhoto(photoUrl)}
+                    sx={{
+                      position: 'absolute',
+                      bottom: 4,
+                      right: 4,
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.65)',
+                      p: '2px 5px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Eye size={12} color="#ffffff" weight="bold" />
+                  </Box>
+                </Box>
+              ))}
+
+              {/* Add Photo Button Tile */}
+              <Box
+                onClick={() => completeFileInputRef.current?.click()}
+                sx={{
+                  width: 82,
+                  height: 82,
+                  borderRadius: '10px',
+                  border: '1.5px dashed #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 0.4,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    backgroundColor: '#dcfce7',
+                    borderColor: '#16a34a'
+                  }
+                }}
+              >
+                <Camera size={24} color="#22c55e" weight="bold" />
+                <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#15803d' }}>
+                  + Photo
+                </Typography>
+              </Box>
+
+              {/* Sample Photo Auto-Fill if empty */}
+              {completePhotos.length === 0 && (
+                <Button
+                  size="small"
+                  onClick={() => setCompletePhotos(['/renovasi_kamar_1.jpg', '/renovasi_kamar_2.jpg'])}
+                  sx={{
+                    fontSize: '0.72rem',
+                    textTransform: 'none',
+                    color: '#22c55e',
+                    fontWeight: 600,
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    py: 0.3,
+                    px: 0.5
+                  }}
+                >
+                  (Use Sample Photos)
+                </Button>
+              )}
+            </Box>
+            <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8', mt: 0.8, fontStyle: 'italic' }}>
+              *Attach photos showing the completed work condition and handover status
+            </Typography>
+          </Box>
+
+          {/* 2. Completion Notes & Remarks */}
+          <Box>
+            <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b', mb: 0.8 }}>
+              Completion Notes & Handover Remarks
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              value={completeNotes}
+              onChange={(e) => setCompleteNotes(e.target.value)}
+              placeholder="Enter completion remarks, handover notes, or final inspection observations..."
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '10px',
+                  fontSize: '0.84rem'
+                },
+                '& .MuiOutlinedInput-input::placeholder': {
+                  color: '#94a3b8',
+                  opacity: 1
+                }
+              }}
+            />
+          </Box>
+        </Box>
+
+        {/* Fixed Footer */}
+        <Box sx={{ p: 2, pt: 1.5, pb: { xs: 4, sm: 2.5 }, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 1.2, flexShrink: 0 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            disableElevation
+            disableRipple
+            onClick={() => setCompleteSheetOpen(false)}
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 700,
+              color: '#64748b',
+              borderColor: '#cbd5e1 !important',
+              py: 1.3,
+              boxShadow: 'none !important'
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            disableElevation
+            disableRipple
+            onClick={handleConfirmComplete}
+            sx={{
+              backgroundColor: '#22c55e !important',
+              color: '#ffffff !important',
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 700,
+              py: 1.3,
+              boxShadow: 'none !important',
+              '&:hover, &:focus, &:active': {
+                backgroundColor: '#16a34a !important'
+              }
+            }}
+          >
+            Confirm Work Complete
           </Button>
         </Box>
       </Box>
