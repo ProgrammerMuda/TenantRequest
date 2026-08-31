@@ -114,6 +114,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const latestExtension = extensionRequests.length > 0 ? extensionRequests[extensionRequests.length - 1] : null;
   const extensionSubmittedData = latestExtension;
   const canRequestExtension = !latestExtension || latestExtension.status === 'REJECTED';
+  const showExtensionCard = Boolean(
+    latestExtension &&
+    !(activePov === 'tenant_relation' && latestExtension.status === 'REJECTED')
+  );
+  const visibleHistoryRequests = extensionRequests
+    .slice(0, -1)
+    .filter(req => !(activePov === 'tenant_relation' && req.status === 'REJECTED'));
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
   const [depositInvoiceOpen, setDepositInvoiceOpen] = useState(false);
   const [earlyInspectionDetailOpen, setEarlyInspectionDetailOpen] = useState(false);
@@ -698,8 +705,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
           </Box>
         </Box>
 
-        {/* Extension Information Card (Displayed above Early Inspection when submitted) */}
-        {extensionSubmittedData && (
+        {/* Extension Information Card (Displayed above Early Inspection when submitted - Hidden on TR if rejected) */}
+        {showExtensionCard && (
           <Box 
             sx={{ 
               backgroundColor: '#ffffff', 
@@ -1160,8 +1167,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
           </Box>
         )}
 
-        {/* Card: Riwayat Pengajuan Extension (Extension History) */}
-        {extensionRequests.length > 1 && (
+        {/* Card: Extension Request History (Hidden on TR if only rejected) */}
+        {visibleHistoryRequests.length > 0 && (
           <Box
             sx={{
               backgroundColor: '#ffffff',
@@ -1195,7 +1202,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     Extension Request History
                   </Typography>
                   <Typography sx={{ fontSize: '0.74rem', color: '#64748b' }}>
-                    {extensionRequests.length - 1} Previous Request{extensionRequests.length - 1 > 1 ? 's' : ''}
+                    {visibleHistoryRequests.length} Previous Request{visibleHistoryRequests.length > 1 ? 's' : ''}
                   </Typography>
                 </Box>
               </Box>
@@ -1206,7 +1213,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
             <Collapse in={historySectionOpen}>
               <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1.8 }}>
-                {extensionRequests.slice(0, -1).reverse().map((req) => (
+                {visibleHistoryRequests.slice().reverse().map((req) => (
                   <Box
                     key={req.id}
                     sx={{
