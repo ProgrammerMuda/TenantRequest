@@ -558,8 +558,8 @@ export function TenantUnitView({ controller }) {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
                       <Box
                         sx={{
-                          width: 44,
-                          height: 44,
+                          width: 46,
+                          height: 46,
                           borderRadius: '8px',
                           backgroundColor: '#ecfdf5',
                           display: 'flex',
@@ -568,13 +568,13 @@ export function TenantUnitView({ controller }) {
                           flexShrink: 0
                         }}
                       >
-                        <Building size={24} color="#27b29b" weight="fill" />
+                        <Building size={26} color="#27b29b" weight="fill" />
                       </Box>
                       <Box>
-                        <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: '#1e293b' }}>
+                        <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>
                           {tower.name}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
+                        <Typography sx={{ fontSize: '0.84rem', fontWeight: 600, color: '#475569', mt: 0.3 }}>
                           {floorCount} Lantai • {totalCount} Unit
                         </Typography>
                       </Box>
