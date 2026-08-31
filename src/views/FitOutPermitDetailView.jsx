@@ -1150,9 +1150,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
             {/* Guidance for Rejected State */}
             {latestExtension?.status === 'REJECTED' && (
-              <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Info size={16} color="#2563eb" weight="fill" />
-                <Typography sx={{ fontSize: '0.74rem', color: '#2563eb', fontWeight: 600 }}>
+              <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                <Info size={22} color="#2563eb" weight="fill" style={{ flexShrink: 0 }} />
+                <Typography sx={{ fontSize: '0.78rem', color: '#2563eb', fontWeight: 600, lineHeight: 1.4 }}>
                   Use the "Request Extension" button below to submit a revised schedule extension.
                 </Typography>
               </Box>
