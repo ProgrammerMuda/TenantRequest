@@ -35,6 +35,7 @@ import {
 } from '@mui/material';
 import {
   CaretLeft,
+  CaretRight,
   Building,
   Door,
   User,
@@ -536,7 +537,7 @@ export function TenantUnitView({ controller }) {
               const occCount = towerUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length;
               const totalCount = towerUnits.length;
               const rate = totalCount > 0 ? Math.round((occCount / totalCount) * 100) : tower.occupancyRate;
-              const isHigh = rate >= 70;
+              const floorCount = [...new Set(towerUnits.map(u => u.floor))].length;
 
               return (
                 <Box
@@ -552,17 +553,19 @@ export function TenantUnitView({ controller }) {
                     }
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                  {/* Top Row: Icon + Tower Name & Floors/Units + Blue Occupied Badge */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
                       <Box
                         sx={{
-                          width: 42,
-                          height: 42,
+                          width: 44,
+                          height: 44,
                           borderRadius: '8px',
                           backgroundColor: '#ecfdf5',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center'
+                          justifyContent: 'center',
+                          flexShrink: 0
                         }}
                       >
                         <Building size={24} color="#27b29b" weight="fill" />
@@ -571,8 +574,8 @@ export function TenantUnitView({ controller }) {
                         <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: '#1e293b' }}>
                           {tower.name}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.76rem', color: '#64748b' }}>
-                          {totalCount} Total Unit terdaftar
+                        <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
+                          {floorCount} Lantai • {totalCount} Unit
                         </Typography>
                       </Box>
                     </Box>
@@ -584,7 +587,7 @@ export function TenantUnitView({ controller }) {
                         border: '1px solid #bfdbfe',
                         borderRadius: '8px',
                         px: 1.2,
-                        py: 0.35,
+                        py: 0.4,
                         fontSize: '0.74rem',
                         fontWeight: 700
                       }}
@@ -593,26 +596,53 @@ export function TenantUnitView({ controller }) {
                     </Box>
                   </Box>
 
-                  {/* Occupancy Progress Bar */}
-                  <Box sx={{ width: '100%', height: 6, backgroundColor: '#f1f5f9', borderRadius: '8px', overflow: 'hidden', mb: 1.2 }}>
-                    <Box
-                      sx={{
-                        width: `${rate}%`,
-                        height: '100%',
-                        backgroundColor: isHigh ? '#27b29b' : '#f97316',
-                        borderRadius: '8px',
-                        transition: 'width 0.5s ease'
-                      }}
-                    />
-                  </Box>
+                  {/* Clean Divider */}
+                  <Box sx={{ height: '1.5px', backgroundColor: '#f1f5f9', my: 1.6 }} />
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                      {occCount} Terhuni • {totalCount - occCount} Vacant
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.74rem', color: '#27b29b', fontWeight: 700 }}>
-                      Lihat Unit →
-                    </Typography>
+                  {/* Bottom Row: Breakdown Counters & Tap CTA */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.6,
+                          backgroundColor: '#ecfdf5',
+                          borderRadius: '8px',
+                          px: 1,
+                          py: 0.4
+                        }}
+                      >
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#059669' }} />
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#065f46' }}>
+                          {occCount} Terhuni
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.6,
+                          backgroundColor: '#fff7ed',
+                          borderRadius: '8px',
+                          px: 1,
+                          py: 0.4
+                        }}
+                      >
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#ea580c' }} />
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#9a3412' }}>
+                          {totalCount - occCount} Vacant
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, color: '#27b29b' }}>
+                      <Typography sx={{ fontSize: '0.76rem', fontWeight: 700 }}>
+                        Pilih Tower
+                      </Typography>
+                      <CaretRight size={16} weight="bold" />
+                    </Box>
                   </Box>
                 </Box>
               );
