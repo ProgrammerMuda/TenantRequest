@@ -181,7 +181,7 @@ function generateTowerUnits(towerLetter, towerId, totalFloors, unitsPerFloor) {
   return result;
 }
 
-// Generate hundreds of units per tower across 5 towers:
+// Generate hundreds of units per tower across 5 towers (A, B, C, D, F):
 // Tower A: 20 floors x 9 units = 180 units!
 const towerAUnits = generateTowerUnits('A', 'tower-a', 20, 9);
 // Tower B: 15 floors x 8 units = 120 units!
@@ -190,16 +190,16 @@ const towerBUnits = generateTowerUnits('B', 'tower-b', 15, 8);
 const towerCUnits = generateTowerUnits('C', 'tower-c', 10, 8);
 // Tower D: 18 floors x 8 units = 144 units!
 const towerDUnits = generateTowerUnits('D', 'tower-d', 18, 8);
-// Tower E: 12 floors x 6 units = 72 units!
-const towerEUnits = generateTowerUnits('E', 'tower-e', 12, 6);
+// Tower F: 12 floors x 6 units = 72 units!
+const towerFUnits = generateTowerUnits('F', 'tower-f', 12, 6);
 
-// Combine all units into master dataset (596 units total across 5 towers!)
+// Combine all units into master dataset (596 units total across towers A, B, C, D, F)
 export const initialUnitsData = [
   ...towerAUnits,
   ...towerBUnits,
   ...towerCUnits,
   ...towerDUnits,
-  ...towerEUnits
+  ...towerFUnits
 ];
 
 // Calculate dynamic tower summary stats based on actual generated units
@@ -245,13 +245,13 @@ export const initialTowersData = [
     description: 'Tower Diamond Suite 18 lantai dekat clubhouse dan kolam olimpiade'
   },
   {
-    id: 'tower-e',
-    name: 'Tower E',
+    id: 'tower-f',
+    name: 'Tower F',
     siteName: 'Paladian Park',
-    totalUnits: towerEUnits.length,
-    occupiedUnits: towerEUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length,
-    vacantUnits: towerEUnits.filter(u => u.status === UNIT_STATUS.VACANT).length,
-    occupancyRate: Math.round((towerEUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length / towerEUnits.length) * 100),
-    description: 'Tower Emerald Executive 12 lantai dengan sky garden dan private lounge'
+    totalUnits: towerFUnits.length,
+    occupiedUnits: towerFUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length,
+    vacantUnits: towerFUnits.filter(u => u.status === UNIT_STATUS.VACANT).length,
+    occupancyRate: Math.round((towerFUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length / towerFUnits.length) * 100),
+    description: 'Tower Floral Suite 12 lantai dengan sky garden dan private lounge'
   }
 ];
