@@ -55,6 +55,8 @@ export function useHomeController() {
       setActiveTab('fit_out_permit');
     } else if (item.id === 'work_request') {
       setActiveTab('work_request');
+    } else if (item.id === 'tenant_unit') {
+      setActiveTab('tenant_unit');
     } else {
       setSelectedMenuItem(item);
     }

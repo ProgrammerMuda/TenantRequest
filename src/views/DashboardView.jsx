@@ -17,6 +17,7 @@ import { GoodsInOutView } from './GoodsInOutView';
 import { WorkRequestView } from './WorkRequestView';
 import { WorkPermitView } from './WorkPermitView';
 import { FitOutPermitDetailView } from './FitOutPermitDetailView';
+import { TenantUnitView } from './TenantUnitView';
 import { AllServicesBottomSheet } from '../components/home/AllServicesBottomSheet';
 
 export function DashboardView({ homeController, themeController }) {
@@ -40,6 +41,8 @@ export function DashboardView({ homeController, themeController }) {
         return <WorkRequestView controller={homeController} />;
       case 'goods_in_out':
         return <GoodsInOutView controller={homeController} />;
+      case 'tenant_unit':
+        return <TenantUnitView controller={homeController} />;
       case 'showcase':
         return (
           <Box sx={{ p: 2, pb: 10, overflowY: 'auto', flexGrow: 1 }}>
@@ -65,7 +68,7 @@ export function DashboardView({ homeController, themeController }) {
         </Box>
 
         {/* Custom Bottom Navigation Bar */}
-        {!['role_select', 'fit_out_permit', 'permit_detail', 'work_order', 'work_request', 'goods_in_out', 'work_permit'].includes(activeTab) && (
+        {!['role_select', 'fit_out_permit', 'permit_detail', 'work_order', 'work_request', 'goods_in_out', 'work_permit', 'tenant_unit'].includes(activeTab) && (
           <CustomBottomNav
             activeTab={activeTab}
             onSelectTab={setActiveTab}
