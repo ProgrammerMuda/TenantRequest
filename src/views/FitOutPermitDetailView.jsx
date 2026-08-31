@@ -78,6 +78,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const [selectedDailyInspection, setSelectedDailyInspection] = useState(null);
   const [selectedWorker, setSelectedWorker] = useState(null);
   const [previewDoc, setPreviewDoc] = useState(null);
+  const [previewPhoto, setPreviewPhoto] = useState(null);
 
   // 1. Tenant Relation (TR) Extension Form State
   const dateInputRef = useRef(null);
@@ -237,8 +238,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
   const handleEngSubmit = () => {
     const formattedEnd = formatDisplayDate(engNewEndDate);
-    
+    const finalPhotos = engPhotos.length > 0 ? engPhotos : [
+      'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80'
+    ];
+    const finalNotes = engNotes.trim() || 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 3 hari sebelum inspeksi serah terima.';
+
     setExtensionSubmittedData({
+      submittedBy: 'engineering',
       startDate: '13 Feb 2026',
       endDate: formattedEnd,
       extendedDays: engExtendedDaysCount || 3,
@@ -249,9 +256,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
       dueDate: '13 Feb 2026, 23:59',
       permitNo: data.permitNumber || '#PRO/FP/122025/000032',
       status: 'FREE_OF_CHARGE',
-      reason: engNotes,
-      photos: engPhotos,
-      photoCount: engPhotos.length,
+      reason: finalNotes,
+      notes: finalNotes,
+      photos: finalPhotos,
+      photoCount: finalPhotos.length,
       authorizedBy: 'Engineering Lead'
     });
 
@@ -774,6 +782,159 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 >
                   Detail Invoice
                 </Button>
+              </Box>
+            )}
+
+            {/* Notes & Technical Remarks (Shown especially for Engineering request) */}
+            {(extensionSubmittedData.notes || extensionSubmittedData.reason) && (
+              <Box sx={{ mt: 2.2 }}>
+                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Box
+                    sx={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '8px',
+                      backgroundColor: '#ecfdf5',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                  >
+                    <FileText size={16} weight="fill" color="#27b29b" />
+                  </Box>
+                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
+                    Notes & Remarks
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    backgroundColor: '#f8fafc',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '12px',
+                    p: 1.6
+                  }}
+                >
+                  <Typography sx={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
+                    {extensionSubmittedData.notes || extensionSubmittedData.reason}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
+            {/* Site Progress Documentation Photos */}
+            {extensionSubmittedData.photos && extensionSubmittedData.photos.length > 0 && (
+              <Box sx={{ mt: 2.2 }}>
+                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
+
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '8px',
+                        backgroundColor: '#ecfdf5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}
+                    >
+                      <Camera size={16} weight="fill" color="#27b29b" />
+                    </Box>
+                    <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
+                      Progress Photos
+                    </Typography>
+                  </Box>
+
+                  <Chip
+                    label={`${extensionSubmittedData.photos.length} Photo${extensionSubmittedData.photos.length > 1 ? 's' : ''}`}
+                    size="small"
+                    sx={{
+                      height: 22,
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      backgroundColor: '#ecfdf5',
+                      color: '#059669'
+                    }}
+                  />
+                </Box>
+
+                {/* Horizontal Scrollable Thumbnail Row */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 1.2,
+                    overflowX: 'auto',
+                    py: 0.5,
+                    px: 0.2,
+                    '&::-webkit-scrollbar': { display: 'none' },
+                    scrollbarWidth: 'none'
+                  }}
+                >
+                  {extensionSubmittedData.photos.map((photoUrl, idx) => (
+                    <Box
+                      key={idx}
+                      onClick={() => setPreviewPhoto(photoUrl)}
+                      sx={{
+                        width: 82,
+                        height: 82,
+                        flexShrink: 0,
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        border: '1.5px solid #cbd5e1',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                          transform: 'scale(1.04)',
+                          borderColor: '#27b29b',
+                          boxShadow: '0 4px 12px rgba(39, 178, 155, 0.2)'
+                        },
+                        '&:active': {
+                          transform: 'scale(0.97)'
+                        }
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={photoUrl}
+                        alt={`Progress Photo ${idx + 1}`}
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                      />
+                      {/* Zoom Eye Badge */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          bottom: 5,
+                          right: 5,
+                          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+                          backdropFilter: 'blur(2px)',
+                          borderRadius: '6px',
+                          p: '3px 6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Eye size={13} color="#ffffff" weight="bold" />
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.8, fontStyle: 'italic' }}>
+                  *Tap foto untuk melihat tampilan penuh
+                </Typography>
               </Box>
             )}
           </Box>
@@ -3095,6 +3256,81 @@ export function FitOutPermitDetailView({ permit, controller }) {
             Close Preview
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Site Photo Lightbox Preview Dialog */}
+      <Dialog
+        open={Boolean(previewPhoto)}
+        onClose={() => setPreviewPhoto(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
+            overflow: 'hidden',
+            backgroundColor: '#0f172a',
+            m: 2
+          }
+        }}
+      >
+        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              zIndex: 10
+            }}
+          >
+            <IconButton
+              onClick={() => setPreviewPhoto(null)}
+              size="small"
+              sx={{
+                color: '#ffffff',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)'
+                }
+              }}
+            >
+              <X size={20} weight="bold" />
+            </IconButton>
+          </Box>
+          {previewPhoto && (
+            <Box
+              component="img"
+              src={previewPhoto}
+              alt="Site Progress Photo"
+              sx={{
+                width: '100%',
+                maxHeight: '65vh',
+                objectFit: 'contain',
+                display: 'block'
+              }}
+            />
+          )}
+          <Box sx={{ p: 2, backgroundColor: 'rgba(15, 23, 42, 0.95)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Camera size={18} color="#27b29b" weight="fill" />
+              <Typography sx={{ color: '#ffffff', fontSize: '0.86rem', fontWeight: 600 }}>
+                Site Progress Photo
+              </Typography>
+            </Box>
+            <Button
+              size="small"
+              onClick={() => setPreviewPhoto(null)}
+              sx={{
+                color: '#94a3b8',
+                fontSize: '0.8rem',
+                textTransform: 'none',
+                fontWeight: 600,
+                '&:hover': { color: '#ffffff' }
+              }}
+            >
+              Close
+            </Button>
+          </Box>
+        </Box>
       </Dialog>
 
       {/* Early Inspection Detail Dialog */}
