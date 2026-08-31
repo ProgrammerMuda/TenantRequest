@@ -4605,7 +4605,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               }
             }}
           >
-            Confirm Work Complete
+            Complete
           </Button>
         </Box>
       </Box>
