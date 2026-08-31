@@ -529,7 +529,7 @@ export function TenantUnitView({ controller }) {
             </Box>
 
             {/* Stats Row */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, pt: 1, borderTop: '1px solid #f1f5f9' }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, pt: 1.5, mt: 0.5, borderTop: '1.5px solid #e2e8f0' }}>
               <Box sx={{ textAlign: 'center' }}>
                 <Typography sx={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
                   {siteStats.total}
@@ -538,7 +538,7 @@ export function TenantUnitView({ controller }) {
                   Total Unit
                 </Typography>
               </Box>
-              <Box sx={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9' }}>
+              <Box sx={{ textAlign: 'center', borderLeft: '1.5px solid #e2e8f0', borderRight: '1.5px solid #e2e8f0' }}>
                 <Typography sx={{ fontSize: '1.25rem', fontWeight: 800, color: '#059669' }}>
                   {siteStats.occupied}
                 </Typography>
