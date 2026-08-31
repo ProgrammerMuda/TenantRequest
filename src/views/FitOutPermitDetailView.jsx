@@ -670,13 +670,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     </Typography>
                     <Box 
                       sx={{ 
-                        px: 0.9, 
-                        py: 0.25, 
+                        px: 1.1, 
+                        py: 0.3, 
                         backgroundColor: '#eff6ff', 
-                        borderRadius: '6px', 
+                        borderRadius: '100px', 
                         color: '#2563eb', 
-                        fontWeight: 800, 
-                        fontSize: '0.72rem' 
+                        fontWeight: 700, 
+                        fontSize: '0.72rem',
+                        lineHeight: 1.2
                       }} 
                     >
                       + {extensionSubmittedData.extendedDays} Day
@@ -813,18 +814,22 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     Progress Photos
                   </Typography>
 
-                  <Chip
-                    label={`${extensionSubmittedData.photos.length} Photo${extensionSubmittedData.photos.length > 1 ? 's' : ''}`}
-                    size="small"
+                  <Box
                     sx={{
-                      height: 22,
+                      px: 1.1,
+                      py: 0.3,
+                      borderRadius: '100px',
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       backgroundColor: '#f1f5f9',
                       color: '#475569',
-                      border: '1px solid #e2e8f0'
+                      border: '1px solid #e2e8f0',
+                      lineHeight: 1.2,
+                      display: 'inline-block'
                     }}
-                  />
+                  >
+                    {extensionSubmittedData.photos.length} Photo{extensionSubmittedData.photos.length > 1 ? 's' : ''}
+                  </Box>
                 </Box>
 
                 {/* Horizontal Scrollable Thumbnail Row */}
