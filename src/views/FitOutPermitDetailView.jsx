@@ -628,17 +628,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   color: '#ea580c', 
                   border: '1px solid #ffedd5',
                   borderRadius: '100px', 
-                  px: 1.3, 
+                  px: 1.4, 
                   py: 0.35, 
                   fontSize: '0.72rem', 
                   fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.6,
+                  display: 'inline-block',
                   letterSpacing: '0.01em'
                 }}
               >
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#f97316' }} />
                 Waiting for Approval
               </Box>
             </Box>
