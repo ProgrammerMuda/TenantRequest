@@ -113,13 +113,15 @@ export function FitOutPermitDetailView({ permit, controller }) {
   // Derived properties for active and historic requests
   const latestExtension = extensionRequests.length > 0 ? extensionRequests[extensionRequests.length - 1] : null;
   const extensionSubmittedData = latestExtension;
-  const canRequestExtension = !latestExtension || latestExtension.status === 'REJECTED';
-  const showExtensionCard = Boolean(
-    latestExtension &&
-    !(activePov === 'tenant_relation' && latestExtension.status === 'REJECTED')
-  );
-  const visibleHistoryRequests = extensionRequests
-    .slice(0, -1)
+  const isLatestRejected = latestExtension?.status === 'REJECTED';
+  const canRequestExtension = !latestExtension || isLatestRejected;
+  // Main card hidden when: no extension, rejected (any POV), or TR viewing rejected
+  const showExtensionCard = Boolean(latestExtension && !isLatestRejected);
+  // History: all except latest, UNLESS latest is rejected (then include it too in Engineering)
+  const historyBase = isLatestRejected
+    ? extensionRequests // include the rejected one in history
+    : extensionRequests.slice(0, -1); // normal: exclude latest (shown as main card)
+  const visibleHistoryRequests = historyBase
     .filter(req => !(activePov === 'tenant_relation' && req.status === 'REJECTED'));
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
   const [depositInvoiceOpen, setDepositInvoiceOpen] = useState(false);
@@ -738,7 +740,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     fontSize: '0.72rem', 
                     fontWeight: 700,
                     display: 'inline-block',
-                    letterSpacing: '0.01em'
+                    letterSpacing: '0.01em',
+                    flexShrink: 0,
+                    alignSelf: 'flex-start',
+                    mt: 0.2
                   }}
                 >
                   {latestExtension.status === 'REJECTED' ? 'Rejected' : latestExtension.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
@@ -1122,13 +1127,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     </Box>
                   </Box>
                 ) : (
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1.4, backgroundColor: '#fff7ed', borderRadius: '10px', border: '1px solid #ffedd5' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Clock size={16} color="#ea580c" weight="bold" />
-                      <Typography sx={{ fontSize: '0.76rem', color: '#9a3412', fontWeight: 600 }}>
-                        Waiting for Tenant Relation review
-                      </Typography>
-                    </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button
                       size="small"
                       onClick={() => {
@@ -1138,14 +1137,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
                       sx={{
                         fontSize: '0.72rem',
                         textTransform: 'none',
-                        color: '#dc2626',
-                        fontWeight: 700,
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #fca5a5',
-                        borderRadius: '6px',
+                        color: '#94a3b8',
+                        fontWeight: 600,
+                        backgroundColor: 'transparent',
+                        border: 'none',
                         py: 0.3,
-                        px: 1,
-                        minWidth: 0
+                        px: 0.5,
+                        minWidth: 0,
+                        textDecoration: 'underline'
                       }}
                     >
                       Simulate TR Rejection
@@ -1183,20 +1182,6 @@ export function FitOutPermitDetailView({ permit, controller }) {
               onClick={() => setHistorySectionOpen(prev => !prev)}
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
-                <Box
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: '8px',
-                    backgroundColor: '#f1f5f9',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <ClockCounterClockwise size={20} color="#475569" weight="bold" />
-                </Box>
                 <Box>
                   <Typography sx={{ fontWeight: 800, fontSize: '0.92rem', color: '#1e293b' }}>
                     Extension Request History
@@ -1205,7 +1190,6 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     {visibleHistoryRequests.length} Previous Request{visibleHistoryRequests.length > 1 ? 's' : ''}
                   </Typography>
                 </Box>
-              </Box>
               <IconButton size="small" sx={{ color: '#64748b' }}>
                 {historySectionOpen ? <CaretUp size={18} weight="bold" /> : <CaretDown size={18} weight="bold" />}
               </IconButton>
