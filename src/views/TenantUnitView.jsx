@@ -502,8 +502,7 @@ export function TenantUnitView({ controller }) {
               backgroundColor: '#ffffff',
               borderRadius: '8px',
               p: 2,
-              mb: 2,
-              border: '1px solid #e2e8f0'
+              mb: 2
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
@@ -563,7 +562,6 @@ export function TenantUnitView({ controller }) {
             sx={{
               backgroundColor: '#ffffff',
               borderRadius: '8px',
-              border: '1px solid #e2e8f0',
               px: 1.8,
               py: 1,
               display: 'flex',
@@ -609,14 +607,13 @@ export function TenantUnitView({ controller }) {
                       backgroundColor: '#ffffff',
                       borderRadius: '8px',
                       p: 1.5,
-                      border: '1px solid #e2e8f0',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       transition: 'all 0.15s ease',
                       '&:hover': {
-                        borderColor: '#27b29b'
+                        backgroundColor: '#f1f5f9'
                       }
                     }}
                   >
@@ -661,11 +658,9 @@ export function TenantUnitView({ controller }) {
                     backgroundColor: '#ffffff',
                     borderRadius: '8px',
                     p: 2,
-                    border: '1.5px solid #e2e8f0',
                     cursor: 'pointer',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      borderColor: '#27b29b',
                       transform: 'translateY(-2px)'
                     },
                     '&:active': {
@@ -762,7 +757,6 @@ export function TenantUnitView({ controller }) {
             sx={{
               backgroundColor: '#ffffff',
               borderRadius: '8px',
-              border: '1px solid #e2e8f0',
               px: 1.8,
               py: 1,
               display: 'flex',
@@ -897,15 +891,14 @@ export function TenantUnitView({ controller }) {
                     backgroundColor: '#ffffff',
                     borderRadius: '8px',
                     p: 1.8,
-                    border: '1px solid #e2e8f0',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     transition: 'all 0.15s ease',
                     '&:hover': {
-                      borderColor: '#27b29b',
-                      transform: 'translateY(-1px)'
+                      transform: 'translateY(-1px)',
+                      backgroundColor: '#f8fafc'
                     },
                     '&:active': {
                       transform: 'scale(0.99)'
@@ -1013,7 +1006,6 @@ export function TenantUnitView({ controller }) {
               <Box
                 sx={{
                   backgroundColor: '#f8fafc',
-                  border: '1px solid #e2e8f0',
                   borderRadius: '8px',
                   p: 1.4
                 }}
@@ -1038,7 +1030,6 @@ export function TenantUnitView({ controller }) {
                   onClick={handleOpenAssignDrawer}
                   sx={{
                     backgroundColor: '#fff7ed',
-                    border: '1.5px dashed #fdba74',
                     borderRadius: '8px',
                     p: 1.4,
                     cursor: 'pointer',
@@ -1049,8 +1040,7 @@ export function TenantUnitView({ controller }) {
                     textAlign: 'center',
                     transition: 'all 0.2s ease',
                     '&:hover': {
-                      backgroundColor: '#ffedd5',
-                      borderColor: '#f97316'
+                      backgroundColor: '#ffedd5'
                     }
                   }}
                 >
@@ -1066,7 +1056,6 @@ export function TenantUnitView({ controller }) {
                 <Box
                   sx={{
                     backgroundColor: '#ecfdf5',
-                    border: '1.5px solid #a7f3d0',
                     borderRadius: '8px',
                     p: 1.4,
                     position: 'relative'
@@ -1182,7 +1171,7 @@ export function TenantUnitView({ controller }) {
             <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
               
               {/* Unit Specifications Card */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2 }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.5 }}>
                   Informasi Fisik & Legal Unit
                 </Typography>
@@ -1232,7 +1221,7 @@ export function TenantUnitView({ controller }) {
               </Box>
 
               {/* Utilities & Meter Section (Merged into Overview per prompt instructions) */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                   <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b' }}>
                     Utilities & Meter Unit
@@ -1343,7 +1332,7 @@ export function TenantUnitView({ controller }) {
 
               {/* Members List or Empty State */}
               {displayedTenantMembers.length === 0 ? (
-                <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 4, textAlign: 'center', border: '1px solid #e2e8f0' }}>
+                <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 4, textAlign: 'center' }}>
                   <Users size={44} color="#cbd5e1" weight="duotone" />
                   <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1e293b', mt: 1 }}>
                     Belum Ada Anggota Terdaftar
@@ -1377,7 +1366,6 @@ export function TenantUnitView({ controller }) {
                         backgroundColor: '#ffffff',
                         borderRadius: '8px',
                         p: 1.6,
-                        border: '1px solid #e2e8f0',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between'
@@ -1488,7 +1476,7 @@ export function TenantUnitView({ controller }) {
 
               {/* Vehicles List or Empty State */}
               {selectedUnit.vehicles.length === 0 ? (
-                <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 4, textAlign: 'center', border: '1px solid #e2e8f0' }}>
+                <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 4, textAlign: 'center' }}>
                   <Car size={44} color="#cbd5e1" weight="duotone" />
                   <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1e293b', mt: 1 }}>
                     Belum Ada Kendaraan Terdaftar
@@ -1522,7 +1510,6 @@ export function TenantUnitView({ controller }) {
                         backgroundColor: '#ffffff',
                         borderRadius: '8px',
                         p: 1.8,
-                        border: '1px solid #e2e8f0',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between'
@@ -1588,7 +1575,7 @@ export function TenantUnitView({ controller }) {
             <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
               
               {/* Utility to Invoice Toggles */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2 }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.8 }}>
                   Pengaturan Masuk Tagihan (Invoicing)
                 </Typography>
@@ -1676,7 +1663,7 @@ export function TenantUnitView({ controller }) {
               </Box>
 
               {/* IPL Parameters Card */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2 }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.5 }}>
                   Target & Parameter IPL
                 </Typography>
@@ -1704,7 +1691,7 @@ export function TenantUnitView({ controller }) {
               </Box>
 
               {/* Barcode & QR Meters Download Card */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2 }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.5 }}>
                   Barcode & QR Scanner Meter
                 </Typography>
@@ -2221,8 +2208,7 @@ export function TenantUnitView({ controller }) {
               width: 180,
               height: 180,
               mx: 'auto',
-              backgroundColor: '#ffffff',
-              border: '2px solid #e2e8f0',
+              backgroundColor: '#f8fafc',
               borderRadius: '8px',
               p: 2,
               display: 'flex',
