@@ -251,7 +251,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
   const handleTrSubmit = () => {
     if (!trNewEndDate) {
-      setSuccessMessage('Silakan pilih tanggal perpanjangan terlebih dahulu!');
+      setSuccessMessage('Please select an extension date first!');
       setExtensionSuccessOpen(true);
       return;
     }
@@ -1032,7 +1032,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   ))}
                 </Box>
                 <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.8, fontStyle: 'italic' }}>
-                  *Tap foto untuk memperbesar tampilan
+                  *Tap photo to enlarge preview
                 </Typography>
               </Box>
             )}
@@ -2606,7 +2606,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   />
 
                   <Typography sx={{ fontSize: '0.9rem', color: trNewEndDate ? '#334155' : '#94a3b8', fontWeight: trNewEndDate ? 600 : 400 }}>
-                    {trNewEndDate || 'Pilih Tanggal Selesai (DD/MM/YYYY)'}
+                    {trNewEndDate || 'Select End Date (DD/MM/YYYY)'}
                   </Typography>
                   <CalendarBlank size={22} color={trNewEndDate ? '#27b29b' : '#94a3b8'} weight="bold" />
                 </Box>
