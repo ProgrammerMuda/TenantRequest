@@ -785,47 +785,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               </Box>
             )}
 
-            {/* Notes & Technical Remarks (Shown especially for Engineering request) */}
-            {(extensionSubmittedData.notes || extensionSubmittedData.reason) && (
-              <Box sx={{ mt: 2.2 }}>
-                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
-                
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <Box
-                    sx={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '8px',
-                      backgroundColor: '#ecfdf5',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}
-                  >
-                    <FileText size={16} weight="fill" color="#27b29b" />
-                  </Box>
-                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
-                    Notes & Remarks
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    backgroundColor: '#f8fafc',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '12px',
-                    p: 1.6
-                  }}
-                >
-                  <Typography sx={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
-                    {extensionSubmittedData.notes || extensionSubmittedData.reason}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            {/* Site Progress Documentation Photos */}
+            {/* 1. Site Progress Documentation Photos (Visual Proof First) */}
             {extensionSubmittedData.photos && extensionSubmittedData.photos.length > 0 && (
               <Box sx={{ mt: 2.2 }}>
                 <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
@@ -933,8 +893,48 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   ))}
                 </Box>
                 <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.8, fontStyle: 'italic' }}>
-                  *Tap foto untuk melihat tampilan penuh
+                  *Tap foto untuk memperbesar tampilan
                 </Typography>
+              </Box>
+            )}
+
+            {/* 2. Notes & Technical Remarks (Elaboration / Narrative below photos) */}
+            {(extensionSubmittedData.notes || extensionSubmittedData.reason) && (
+              <Box sx={{ mt: 2.2 }}>
+                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Box
+                    sx={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '8px',
+                      backgroundColor: '#ecfdf5',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                  >
+                    <FileText size={16} weight="fill" color="#27b29b" />
+                  </Box>
+                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
+                    Notes & Remarks
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    backgroundColor: '#f8fafc',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '12px',
+                    p: 1.6
+                  }}
+                >
+                  <Typography sx={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
+                    {extensionSubmittedData.notes || extensionSubmittedData.reason}
+                  </Typography>
+                </Box>
               </Box>
             )}
           </Box>
