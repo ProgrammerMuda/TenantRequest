@@ -218,6 +218,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
     const amountVal = trChargeableAmount || '2.000.000';
     
     setExtensionSubmittedData({
+      submittedBy: 'tenant_relation',
       startDate: '10 Aug 2026',
       endDate: formattedEnd,
       extendedDays: trExtendedDaysCount || 3,
@@ -622,22 +623,24 @@ export function FitOutPermitDetailView({ permit, controller }) {
               <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
                 Extension Information
               </Typography>
-              <Box 
-                sx={{ 
-                  backgroundColor: '#fff7ed', 
-                  color: '#ea580c', 
-                  border: '1px solid #ffedd5',
-                  borderRadius: '100px', 
-                  px: 1.4, 
-                  py: 0.35, 
-                  fontSize: '0.72rem', 
-                  fontWeight: 700,
-                  display: 'inline-block',
-                  letterSpacing: '0.01em'
-                }}
-              >
-                Waiting for Approval
-              </Box>
+              {extensionSubmittedData.submittedBy === 'engineering' && (
+                <Box 
+                  sx={{ 
+                    backgroundColor: '#fff7ed', 
+                    color: '#ea580c', 
+                    border: '1px solid #ffedd5',
+                    borderRadius: '100px', 
+                    px: 1.4, 
+                    py: 0.35, 
+                    fontSize: '0.72rem', 
+                    fontWeight: 700,
+                    display: 'inline-block',
+                    letterSpacing: '0.01em'
+                  }}
+                >
+                  Waiting for Approval
+                </Box>
+              )}
             </Box>
 
             <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', my: 1.8 }} />
