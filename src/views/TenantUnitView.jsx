@@ -20,7 +20,6 @@ import {
   Box,
   Typography,
   IconButton,
-  InputBase,
   Button,
   Chip,
   Switch,
@@ -36,7 +35,6 @@ import {
 } from '@mui/material';
 import {
   CaretLeft,
-  MagnifyingGlass,
   Building,
   Door,
   User,
@@ -81,9 +79,7 @@ export function TenantUnitView({ controller }) {
   // Unit Detail Tab: 'overview' | 'members' | 'vehicles' | 'bill_settings'
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Search & Filter States
-  const [towerSearchQuery, setTowerSearchQuery] = useState('');
-  const [unitSearchQuery, setUnitSearchQuery] = useState('');
+  // Filter States
   const [unitStatusFilter, setUnitStatusFilter] = useState('All'); // 'All' | 'Occupied' | 'Vacant' | 'Disewakan'
   const [floorFilter, setFloorFilter] = useState('All'); // 'All' | '01' | '02' ...
   const [displayLimit, setDisplayLimit] = useState(25); // Progressive load limit for hundreds of units
@@ -133,27 +129,6 @@ export function TenantUnitView({ controller }) {
     return ['All', ...floors];
   }, [units, selectedTower]);
 
-  // Filtered Towers (with cross-tower search support for towers or direct units)
-  const filteredTowers = useMemo(() => {
-    const q = towerSearchQuery.toLowerCase().trim();
-    if (!q) return initialTowersData;
-    return initialTowersData.filter(t => 
-      t.name.toLowerCase().includes(q) ||
-      units.some(u => u.tower_id === t.id && (u.unit_name.toLowerCase().includes(q) || u.owner.name.toLowerCase().includes(q)))
-    );
-  }, [towerSearchQuery, units]);
-
-  // Direct Unit search results on Tower screen
-  const crossTowerMatchingUnits = useMemo(() => {
-    const q = towerSearchQuery.toLowerCase().trim();
-    if (!q || q.length < 2) return [];
-    return units.filter(u => 
-      u.unit_name.toLowerCase().includes(q) || 
-      u.owner.name.toLowerCase().includes(q) ||
-      u.members.some(m => m.name.toLowerCase().includes(q))
-    );
-  }, [towerSearchQuery, units]);
-
   // Filtered Units in Selected Tower (supporting hundreds of units)
   const filteredUnits = useMemo(() => {
     if (!selectedTower) return [];
@@ -161,23 +136,17 @@ export function TenantUnitView({ controller }) {
       if (u.tower_id !== selectedTower.id) return false;
       if (unitStatusFilter !== 'All' && u.status !== unitStatusFilter) return false;
       if (floorFilter !== 'All' && u.floor !== floorFilter) return false;
-      const q = unitSearchQuery.toLowerCase().trim();
-      if (!q) return true;
-      return (
-        u.unit_name.toLowerCase().includes(q) ||
-        u.owner.name.toLowerCase().includes(q) ||
-        u.members.some(m => m.name.toLowerCase().includes(q))
-      );
+      return true;
     });
-  }, [units, selectedTower, unitStatusFilter, floorFilter, unitSearchQuery]);
+  }, [units, selectedTower, unitStatusFilter, floorFilter]);
 
   // Displayed Units (with progressive pagination when browsing hundreds of units)
   const displayedUnits = useMemo(() => {
-    if (unitSearchQuery || floorFilter !== 'All') {
+    if (floorFilter !== 'All') {
       return filteredUnits;
     }
     return filteredUnits.slice(0, displayLimit);
-  }, [filteredUnits, unitSearchQuery, floorFilter, displayLimit]);
+  }, [filteredUnits, floorFilter, displayLimit]);
 
   // -------------------------------------------------------------
   // HANDLERS
@@ -198,7 +167,6 @@ export function TenantUnitView({ controller }) {
     setUnitStatusFilter('All');
     setFloorFilter('All');
     setDisplayLimit(25);
-    setUnitSearchQuery('');
     setNavLevel('units');
   };
 
@@ -557,93 +525,13 @@ export function TenantUnitView({ controller }) {
             </Box>
           </Box>
 
-          {/* Cross-Tower Search Bar */}
-          <Box
-            sx={{
-              backgroundColor: '#ffffff',
-              borderRadius: '8px',
-              px: 1.8,
-              py: 1,
-              display: 'flex',
-              alignItems: 'center',
-              mb: 2.2
-            }}
-          >
-            <MagnifyingGlass size={18} color="#94a3b8" weight="bold" />
-            <InputBase
-              fullWidth
-              placeholder="Cari tower atau nomor unit langsung..."
-              value={towerSearchQuery}
-              onChange={(e) => setTowerSearchQuery(e.target.value)}
-              sx={{
-                ml: 1.2,
-                fontSize: '0.86rem',
-                color: '#1e293b',
-                '& .MuiInputBase-input::placeholder': {
-                  color: '#94a3b8',
-                  opacity: 1
-                }
-              }}
-            />
-            {towerSearchQuery && (
-              <IconButton size="small" onClick={() => setTowerSearchQuery('')} sx={{ p: 0.3 }}>
-                <X size={16} />
-              </IconButton>
-            )}
-          </Box>
-
-          {/* Cross-Tower Unit Quick Results (When searching for specific units) */}
-          {crossTowerMatchingUnits.length > 0 && (
-            <Box sx={{ mb: 2.5 }}>
-              <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', mb: 1, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Hasil Pencarian Unit Langsung ({crossTowerMatchingUnits.length})
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {crossTowerMatchingUnits.map(unit => (
-                  <Box
-                    key={unit.id}
-                    onClick={() => handleSelectUnit(unit)}
-                    sx={{
-                      backgroundColor: '#ffffff',
-                      borderRadius: '8px',
-                      p: 1.5,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      transition: 'all 0.15s ease',
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9'
-                      }
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
-                      <Box sx={{ width: 34, height: 34, borderRadius: '8px', backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Door size={18} color="#27b29b" weight="fill" />
-                      </Box>
-                      <Box>
-                        <Typography sx={{ fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>
-                          {unit.unit_name}
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.74rem', color: '#64748b' }}>
-                          {unit.tower} • Pemilik: {unit.owner.name}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    {renderStatusBadge(unit.status)}
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          )}
-
           {/* Section: Tower List */}
-          <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b', mb: 1.4 }}>
+          <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b', mb: 1.4, mt: 0.5 }}>
             Daftar Tower
           </Typography>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {filteredTowers.map((tower) => {
+            {initialTowersData.map((tower) => {
               const towerUnits = units.filter(u => u.tower_id === tower.id);
               const occCount = towerUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length;
               const totalCount = towerUnits.length;
@@ -750,41 +638,6 @@ export function TenantUnitView({ controller }) {
             <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: '#27b29b' }}>
               {filteredUnits.length} Unit
             </Typography>
-          </Box>
-
-          {/* Search Bar inside Tower */}
-          <Box
-            sx={{
-              backgroundColor: '#ffffff',
-              borderRadius: '8px',
-              px: 1.8,
-              py: 1,
-              display: 'flex',
-              alignItems: 'center',
-              mb: 1.5
-            }}
-          >
-            <MagnifyingGlass size={18} color="#94a3b8" weight="bold" />
-            <InputBase
-              fullWidth
-              placeholder={`Cari nomor unit atau pemilik di ${selectedTower?.name}...`}
-              value={unitSearchQuery}
-              onChange={(e) => setUnitSearchQuery(e.target.value)}
-              sx={{
-                ml: 1.2,
-                fontSize: '0.86rem',
-                color: '#1e293b',
-                '& .MuiInputBase-input::placeholder': {
-                  color: '#94a3b8',
-                  opacity: 1
-                }
-              }}
-            />
-            {unitSearchQuery && (
-              <IconButton size="small" onClick={() => setUnitSearchQuery('')} sx={{ p: 0.3 }}>
-                <X size={16} />
-              </IconButton>
-            )}
           </Box>
 
           {/* Status Filter Chips (Horizontal Scrollable) */}
