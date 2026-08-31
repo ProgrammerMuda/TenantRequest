@@ -4412,140 +4412,140 @@ export function FitOutPermitDetailView({ permit, controller }) {
             </Typography>
           </Box>
 
-          {/* 1. Upload Completion Photos */}
-          <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-              <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
-                Completion Photos <span style={{ color: '#ef4444' }}>*</span>
+          {/* 1. Upload Completion Photos (Max 5 Photos - Matching Request Extension Design) */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
+                Upload Completion Photos <span style={{ color: '#ef4444' }}>*</span>
               </Typography>
-              <Typography sx={{ fontSize: '0.72rem', color: '#64748b' }}>
-                {completePhotos.length} Photo{completePhotos.length > 1 ? 's' : ''} Attached
+              <Typography sx={{ fontSize: '0.74rem', color: completePhotos.length > 0 ? '#27b29b' : '#94a3b8', fontWeight: 600 }}>
+                {completePhotos.length}/5 Photos
               </Typography>
             </Box>
 
-            {/* Hidden native file input */}
-            <input
-              type="file"
-              ref={completeFileInputRef}
-              multiple
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleCompletePhotoUpload}
-            />
-
-            {/* Photos Grid & Add Tile */}
-            <Box sx={{ display: 'flex', gap: 1.2, flexWrap: 'wrap', alignItems: 'center' }}>
-              {completePhotos.map((photoUrl, idx) => (
-                <Box
-                  key={idx}
-                  sx={{
-                    width: 82,
-                    height: 82,
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    border: '1.5px solid #e2e8f0',
-                    position: 'relative',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={photoUrl}
-                    alt={`Completion photo ${idx + 1}`}
-                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                  {/* Delete Badge */}
-                  <Box
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeCompletePhoto(idx);
-                    }}
-                    sx={{
-                      position: 'absolute',
-                      top: 4,
-                      right: 4,
-                      width: 20,
-                      height: 20,
-                      borderRadius: '50%',
-                      backgroundColor: 'rgba(15, 23, 42, 0.75)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      '&:hover': { backgroundColor: '#ef4444' }
-                    }}
-                  >
-                    <X size={12} color="#ffffff" weight="bold" />
-                  </Box>
-                  {/* Preview Eye */}
-                  <Box
-                    onClick={() => setPreviewPhoto(photoUrl)}
-                    sx={{
-                      position: 'absolute',
-                      bottom: 4,
-                      right: 4,
-                      borderRadius: '4px',
-                      backgroundColor: 'rgba(15, 23, 42, 0.65)',
-                      p: '2px 5px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <Eye size={12} color="#ffffff" weight="bold" />
-                  </Box>
-                </Box>
-              ))}
-
-              {/* Add Photo Button Tile */}
+            {/* Permanent Dropzone Box */}
+            <Box
+              component="label"
+              sx={{
+                width: '100%',
+                height: 145,
+                borderRadius: '12px',
+                border: completePhotos.length >= 5 ? '1.5px dashed #e2e8f0' : '1.5px dashed #cbd5e1',
+                backgroundColor: '#f8fafc',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: completePhotos.length >= 5 ? 'not-allowed' : 'pointer',
+                opacity: completePhotos.length >= 5 ? 0.7 : 1,
+                transition: 'all 0.2s',
+                p: 2,
+                '&:hover': completePhotos.length < 5 ? {
+                  borderColor: '#27b29b',
+                  backgroundColor: '#f0fdf4'
+                } : {}
+              }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                disabled={completePhotos.length >= 5}
+                hidden
+                onChange={handleCompletePhotoUpload}
+              />
               <Box
-                onClick={() => completeFileInputRef.current?.click()}
                 sx={{
-                  width: 82,
-                  height: 82,
-                  borderRadius: '10px',
-                  border: '1.5px dashed #22c55e',
-                  backgroundColor: '#f0fdf4',
+                  width: 46,
+                  height: 46,
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(39, 178, 155, 0.12)',
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 0.4,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    backgroundColor: '#dcfce7',
-                    borderColor: '#16a34a'
-                  }
+                  color: '#27b29b',
+                  mb: 1.2
                 }}
               >
-                <Camera size={24} color="#22c55e" weight="bold" />
-                <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#15803d' }}>
-                  + Photo
-                </Typography>
+                <Camera size={24} weight="bold" />
               </Box>
+              <Typography sx={{ fontSize: '0.86rem', fontWeight: 600, color: '#1e293b' }}>
+                {completePhotos.length >= 5 ? 'Maximum 5 Photos Reached' : 'Choose or Take Completion Photos'}
+              </Typography>
+              <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.4 }}>
+                {completePhotos.length >= 5 ? 'Delete a photo below to add another' : 'Max 5 photos, JPG or PNG format (Max 5MB each)'}
+              </Typography>
+            </Box>
 
-              {/* Sample Photo Auto-Fill if empty */}
-              {completePhotos.length === 0 && (
+            {/* Quick Sample Photos Button if empty */}
+            {completePhotos.length === 0 && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: -0.5 }}>
                 <Button
                   size="small"
                   onClick={() => setCompletePhotos(['/renovasi_kamar_1.jpg', '/renovasi_kamar_2.jpg'])}
                   sx={{
                     fontSize: '0.72rem',
                     textTransform: 'none',
-                    color: '#22c55e',
+                    color: '#27b29b',
                     fontWeight: 600,
                     backgroundColor: 'transparent',
                     border: 'none',
-                    py: 0.3,
+                    py: 0.2,
                     px: 0.5
                   }}
                 >
-                  (Use Sample Photos)
+                  + Use Sample Photos
                 </Button>
-              )}
-            </Box>
-            <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8', mt: 0.8, fontStyle: 'italic' }}>
-              *Attach photos showing the completed work condition and handover status
-            </Typography>
+              </Box>
+            )}
+
+            {/* Uploaded Photos Thumbnails (Placed BELOW the Dropzone) */}
+            {completePhotos.length > 0 && (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2, mt: 0.2 }}>
+                {completePhotos.map((photoSrc, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      position: 'relative',
+                      width: 72,
+                      height: 72,
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                      border: '1.5px solid #e2e8f0',
+                      flexShrink: 0
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={photoSrc}
+                      alt={`completion photo ${idx + 1}`}
+                      sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        removeCompletePhoto(idx);
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        top: 3,
+                        right: 3,
+                        width: 20,
+                        height: 20,
+                        backgroundColor: 'rgba(15, 23, 42, 0.75)',
+                        color: '#ffffff',
+                        p: 0,
+                        '&:hover': { backgroundColor: 'rgba(15, 23, 42, 0.95)' }
+                      }}
+                    >
+                      <X size={12} weight="bold" />
+                    </IconButton>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </Box>
 
           {/* 2. Completion Notes & Remarks */}
