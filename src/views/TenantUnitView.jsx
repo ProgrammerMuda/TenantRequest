@@ -476,7 +476,7 @@ export function TenantUnitView({ controller }) {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
               <Box>
-                <Typography sx={{ fontSize: '0.74rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <Typography sx={{ fontSize: '0.74rem', fontWeight: 600, color: '#94a3b8' }}>
                   Site
                 </Typography>
                 <Typography sx={{ fontSize: '1.1rem', fontWeight: 800, color: '#1e293b' }}>
