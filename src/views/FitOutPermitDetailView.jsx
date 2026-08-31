@@ -4404,14 +4404,6 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
         {/* Scrollable Body */}
         <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2.2 }}>
-          {/* Info callout */}
-          <Box sx={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', p: 1.5, display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <Info size={18} color="#16a34a" weight="fill" style={{ flexShrink: 0, marginTop: 2 }} />
-            <Typography sx={{ fontSize: '0.78rem', color: '#15803d', lineHeight: 1.45, fontWeight: 500 }}>
-              Upload final completion photos and provide handover remarks before closing this fit out permit.
-            </Typography>
-          </Box>
-
           {/* 1. Upload Completion Photos (Max 5 Photos - Matching Request Extension Design) */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
