@@ -76,7 +76,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const [completeSuccessOpen, setCompleteSuccessOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Extension Requests with History & Rejection State
+  // Extension Requests with History & Multi-Extension State
   const [extensionRequests, setExtensionRequests] = useState([
     {
       id: 'EXT-REQ-1',
@@ -104,6 +104,32 @@ export function FitOutPermitDetailView({ permit, controller }) {
       ],
       photoCount: 2,
       authorizedBy: 'Engineering Lead'
+    },
+    {
+      id: 'EXT-REQ-2',
+      requestNumber: 2,
+      submittedBy: 'engineering',
+      submittedAt: '12/02/2026 16:15',
+      startDate: '13 Feb 2026',
+      endDate: '15 Feb 2026',
+      extendedDays: 2,
+      feePolicy: 'CHARGEABLE',
+      amount: '2.000.000',
+      invoiceNo: 'PRO/INV/082026/000033',
+      issuedDate: '12/02/2026 16:20',
+      dueDate: '13 Feb 2026, 23:59',
+      permitNo: data.permitNumber || '#PRO/FP/122025/000032',
+      status: 'APPROVED',
+      approvedBy: 'Tenant Relation',
+      approvedAt: '12/02/2026, 05:00 PM',
+      reason: 'Re-submitted with 2 days extension and coordinate daily supervision fee.',
+      notes: 'Re-submitted with 2 days extension and coordinate daily supervision fee.',
+      photos: [
+        '/renovasi_kamar_1.jpg',
+        '/renovasi_kamar_2.jpg'
+      ],
+      photoCount: 2,
+      authorizedBy: 'Tenant Relation Lead - Management'
     }
   ]);
 
@@ -120,13 +146,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
   // Only locked when currently WAITING_FOR_APPROVAL
   const canRequestExtension = !latestExtension || isLatestRejected || isLatestApproved;
   const showBottomBar = canRequestExtension || (activePov === 'tenant_relation' && latestExtension?.status === 'WAITING_FOR_APPROVAL');
-  // Main card hidden when: no extension, or latest is rejected (moved to history)
-  const showExtensionCard = Boolean(latestExtension && !isLatestRejected);
-  // History: all except latest, UNLESS latest is rejected (then include it too in Engineering)
-  const historyBase = isLatestRejected
-    ? extensionRequests // include the rejected one in history
-    : extensionRequests.slice(0, -1); // normal: exclude latest (shown as main card)
-  const visibleHistoryRequests = historyBase; // TR can see rejected log in history
+  // Unified card visibility: hidden only if TR has only 1 rejected request
+  const showExtensionCard = Boolean(
+    latestExtension &&
+    !(activePov === 'tenant_relation' && latestExtension.status === 'REJECTED' && extensionRequests.length === 1)
+  );
+  // History inside the unified card: all requests except the latest active one
+  const visibleHistoryRequests = extensionRequests.slice(0, -1);
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
   const [depositInvoiceOpen, setDepositInvoiceOpen] = useState(false);
   const [earlyInspectionDetailOpen, setEarlyInspectionDetailOpen] = useState(false);
@@ -271,25 +297,26 @@ export function FitOutPermitDetailView({ permit, controller }) {
     
     const formattedEnd = formatDisplayDate(trNewEndDate);
     const amountVal = trChargeableAmount || '2.000.000';
-    const nextReqNum = extensionRequests.length + 1;
+    const maxReqNum = extensionRequests.reduce((max, r) => Math.max(max, r.requestNumber || 0), 0);
+    const nextReqNum = maxReqNum + 1;
     
     const newReq = {
       id: `EXT-REQ-${nextReqNum}`,
       requestNumber: nextReqNum,
       submittedBy: 'tenant_relation',
-      submittedAt: '10/08/2026, 03:55 PM',
-      startDate: '10 Aug 2026',
+      submittedAt: '12/02/2026 17:30',
+      startDate: latestExtension?.endDate || '15 Feb 2026',
       endDate: formattedEnd,
       extendedDays: trExtendedDaysCount || 3,
       feePolicy: trFeePolicy,
       amount: amountVal,
-      invoiceNo: 'PRO/INV/082026/000032',
-      issuedDate: '10/08/2026, 03:55 PM',
-      dueDate: '11/08/2026, 11:59 PM',
-      permitNo: '#PRO/FP/082026/000104',
+      invoiceNo: `PRO/INV/082026/00003${nextReqNum}`,
+      issuedDate: '12/02/2026 17:30',
+      dueDate: '13 Feb 2026, 23:59',
+      permitNo: data.permitNumber || '#PRO/FP/122025/000032',
       status: 'APPROVED', // TR auto-approved
       approvedBy: 'Tenant Relation',
-      approvedAt: '10/08/2026, 03:55 PM',
+      approvedAt: '12/02/2026, 17:30',
       authorizedBy: 'Tenant Relation Lead - Management'
     };
 
@@ -306,7 +333,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
       '/renovasi_kamar_2.jpg'
     ];
     const finalNotes = engNotes.trim() || 'Finishing of gypsum partition and MEP cable tray installation requires an additional 2 days before final handover inspection.';
-    const nextReqNum = extensionRequests.length + 1;
+    const maxReqNum = extensionRequests.reduce((max, r) => Math.max(max, r.requestNumber || 0), 0);
+    const nextReqNum = maxReqNum + 1;
 
     const newReq = {
       id: `EXT-REQ-${nextReqNum}`,
@@ -1118,155 +1146,149 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 </Typography>
               </Box>
             )}
-          </Box>
-        )}
 
-        {/* Card: Extension Request History (Hidden on TR if only rejected) */}
-        {visibleHistoryRequests.length > 0 && (
-          <Box
-            sx={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              border: '1.5px solid #e2e8f0',
-              p: 2,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
-            }}
-          >
-            {/* Accordion Header */}
-            <Box
-              onClick={() => setHistorySectionOpen(prev => !prev)}
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-            >
-                <Box>
-                  <Typography sx={{ fontWeight: 800, fontSize: '0.92rem', color: '#1e293b' }}>
-                    Extension Request History
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.74rem', color: '#64748b' }}>
-                    {visibleHistoryRequests.length} Previous Request{visibleHistoryRequests.length > 1 ? 's' : ''}
-                  </Typography>
-                </Box>
-              <IconButton size="small" sx={{ color: '#64748b' }}>
-                {historySectionOpen ? <CaretUp size={18} weight="bold" /> : <CaretDown size={18} weight="bold" />}
-              </IconButton>
-            </Box>
+            {/* Nested Extension Request History (Unified inside this single card) */}
+            {visibleHistoryRequests.length > 0 && (
+              <Box sx={{ mt: 2.5 }}>
+                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
 
-            <Collapse in={historySectionOpen}>
-              <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1.8 }}>
-                {visibleHistoryRequests.slice().reverse().map((req) => (
-                  <Box
-                    key={req.id}
-                    sx={{
-                      backgroundColor: '#f8fafc',
-                      borderRadius: '10px',
-                      border: '1px solid #e2e8f0',
-                      p: 1.8
-                    }}
-                  >
-                    {/* Header of historic request */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
-                      <Box>
-                        <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#1e293b' }}>
-                          Request #{req.requestNumber}
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                          {req.submittedAt} • by {req.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
-                        </Typography>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          backgroundColor: req.status === 'REJECTED' ? '#fef2f2' : req.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed',
-                          color: req.status === 'REJECTED' ? '#ef4444' : req.status === 'APPROVED' ? '#059669' : '#ea580c',
-                          border: `1px solid ${req.status === 'REJECTED' ? '#fecaca' : req.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
-                          borderRadius: '100px',
-                          px: 1.2,
-                          py: 0.25,
-                          fontSize: '0.7rem',
-                          fontWeight: 700
-                        }}
-                      >
-                        {req.status === 'REJECTED' ? 'Rejected' : req.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
-                      </Box>
-                    </Box>
-
-                    {/* Rejection Note in History if Rejected */}
-                    {req.status === 'REJECTED' && req.rejectionReason && (
-                      <Box
-                        sx={{
-                          backgroundColor: '#ffffff',
-                          border: '1px solid #fecaca',
-                          borderRadius: '8px',
-                          p: 1.2,
-                          mb: 1.2
-                        }}
-                      >
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', mb: 0.3 }}>
-                          TR Rejection Reason:
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.76rem', color: '#991b1b', lineHeight: 1.4 }}>
-                          "{req.rejectionReason}"
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.68rem', color: '#b91c1c', mt: 0.4 }}>
-                          Rejected on {req.rejectedAt}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {/* Schedule Info */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <CalendarBlank size={16} color="#64748b" />
-                      <Typography sx={{ fontSize: '0.78rem', color: '#334155' }}>
-                        {req.startDate} → {req.endDate}
-                      </Typography>
-                      <Box sx={{ backgroundColor: '#eff6ff', color: '#2563eb', px: 0.8, py: 0.2, borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
-                        +{req.extendedDays} Days
-                      </Box>
-                    </Box>
-
-                    {/* Attached Progress Photos in History */}
-                    {req.photos && req.photos.length > 0 && (
-                      <Box sx={{ mt: 1.2, mb: 1 }}>
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b', mb: 0.6 }}>
-                          Attached Progress Photos ({req.photos.length}):
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5 }}>
-                          {req.photos.map((photoUrl, pIdx) => (
-                            <Box
-                              key={pIdx}
-                              onClick={() => setPreviewPhoto(photoUrl)}
-                              sx={{
-                                width: 58,
-                                height: 58,
-                                borderRadius: '8px',
-                                overflow: 'hidden',
-                                flexShrink: 0,
-                                border: '1px solid #e2e8f0',
-                                cursor: 'pointer',
-                                position: 'relative'
-                              }}
-                            >
-                              <Box
-                                component="img"
-                                src={photoUrl}
-                                alt={`History Photo ${pIdx + 1}`}
-                                sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              />
-                            </Box>
-                          ))}
-                        </Box>
-                      </Box>
-                    )}
-
-                    {/* Reason Notes */}
-                    {req.notes && (
-                      <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.4, mt: 0.5 }}>
-                        Technical Remarks: "{req.notes}"
-                      </Typography>
-                    )}
+                {/* Accordion Header */}
+                <Box
+                  onClick={() => setHistorySectionOpen(prev => !prev)}
+                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                >
+                  <Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: '#1e293b' }}>
+                      Extension Request History
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.74rem', color: '#64748b' }}>
+                      {visibleHistoryRequests.length} Previous Request{visibleHistoryRequests.length > 1 ? 's' : ''}
+                    </Typography>
                   </Box>
-                ))}
+                  <IconButton size="small" sx={{ color: '#64748b' }}>
+                    {historySectionOpen ? <CaretUp size={18} weight="bold" /> : <CaretDown size={18} weight="bold" />}
+                  </IconButton>
+                </Box>
+
+                <Collapse in={historySectionOpen}>
+                  <Box sx={{ mt: 1.8, display: 'flex', flexDirection: 'column', gap: 1.6 }}>
+                    {visibleHistoryRequests.slice().reverse().map((req) => (
+                      <Box
+                        key={req.id}
+                        sx={{
+                          backgroundColor: '#f8fafc',
+                          borderRadius: '10px',
+                          border: '1px solid #e2e8f0',
+                          p: 1.8
+                        }}
+                      >
+                        {/* Header of historic request */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                          <Box>
+                            <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#1e293b' }}>
+                              Request #{req.requestNumber}
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                              {req.submittedAt} • by {req.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                            </Typography>
+                          </Box>
+
+                          <Box
+                            sx={{
+                              backgroundColor: req.status === 'REJECTED' ? '#fef2f2' : req.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed',
+                              color: req.status === 'REJECTED' ? '#ef4444' : req.status === 'APPROVED' ? '#059669' : '#ea580c',
+                              border: `1px solid ${req.status === 'REJECTED' ? '#fecaca' : req.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
+                              borderRadius: '100px',
+                              px: 1.2,
+                              py: 0.25,
+                              fontSize: '0.7rem',
+                              fontWeight: 700
+                            }}
+                          >
+                            {req.status === 'REJECTED' ? 'Rejected' : req.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
+                          </Box>
+                        </Box>
+
+                        {/* Rejection Note in History if Rejected */}
+                        {req.status === 'REJECTED' && req.rejectionReason && (
+                          <Box
+                            sx={{
+                              backgroundColor: '#ffffff',
+                              border: '1px solid #fecaca',
+                              borderRadius: '8px',
+                              p: 1.2,
+                              mb: 1.2
+                            }}
+                          >
+                            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', mb: 0.3 }}>
+                              TR Rejection Reason:
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.76rem', color: '#991b1b', lineHeight: 1.4 }}>
+                              "{req.rejectionReason}"
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.68rem', color: '#b91c1c', mt: 0.4 }}>
+                              Rejected on {req.rejectedAt}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Schedule Info */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <CalendarBlank size={16} color="#64748b" />
+                          <Typography sx={{ fontSize: '0.78rem', color: '#334155' }}>
+                            {req.startDate} → {req.endDate}
+                          </Typography>
+                          <Box sx={{ backgroundColor: '#eff6ff', color: '#2563eb', px: 0.8, py: 0.2, borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                            +{req.extendedDays} Days
+                          </Box>
+                        </Box>
+
+                        {/* Attached Progress Photos in History */}
+                        {req.photos && req.photos.length > 0 && (
+                          <Box sx={{ mt: 1.2, mb: 1 }}>
+                            <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b', mb: 0.6 }}>
+                              Attached Progress Photos ({req.photos.length}):
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5 }}>
+                              {req.photos.map((photoUrl, pIdx) => (
+                                <Box
+                                  key={pIdx}
+                                  onClick={() => setPreviewPhoto(photoUrl)}
+                                  sx={{
+                                    width: 58,
+                                    height: 58,
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    flexShrink: 0,
+                                    border: '1px solid #e2e8f0',
+                                    cursor: 'pointer',
+                                    position: 'relative'
+                                  }}
+                                >
+                                  <Box
+                                    component="img"
+                                    src={photoUrl}
+                                    alt={`History Photo ${pIdx + 1}`}
+                                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  />
+                                </Box>
+                              ))}
+                            </Box>
+                          </Box>
+                        )}
+
+                        {/* Reason Notes */}
+                        {req.notes && (
+                          <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.4, mt: 0.5 }}>
+                            Technical Remarks: "{req.notes}"
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                </Collapse>
               </Box>
-            </Collapse>
+            )}
           </Box>
         )}
 
