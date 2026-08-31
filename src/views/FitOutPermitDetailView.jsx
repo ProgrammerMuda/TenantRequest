@@ -819,44 +819,75 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
             <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', my: 1.8 }} />
 
-            {/* Schedule Extension */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box 
-                sx={{ 
-                  width: 40, 
-                  height: 40, 
-                  borderRadius: '10px', 
-                  backgroundColor: '#ecfdf5', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  flexShrink: 0 
-                }} 
-              >
-                <CalendarBlank size={22} color="#27b29b" weight="fill" />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#94a3b8' }}>
-                  Schedule Extension
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.2 }}>
-                  <Typography sx={{ fontSize: '0.88rem', fontWeight: 500, color: '#1e293b' }}>
-                    {extensionSubmittedData.startDate} → {extensionSubmittedData.endDate}
+            {/* Top 2 Items: Schedule Extension & Extension Scheme */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8 }}>
+              {/* Left Item: Schedule Extension */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box 
+                  sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '10px', 
+                    backgroundColor: '#ecfdf5', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    flexShrink: 0 
+                  }} 
+                >
+                  <CalendarBlank size={22} color="#27b29b" weight="fill" />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#94a3b8' }}>
+                    Schedule Extension
                   </Typography>
-                  <Box 
-                    sx={{ 
-                      px: 1.1, 
-                      py: 0.3, 
-                      backgroundColor: '#eff6ff', 
-                      borderRadius: '100px', 
-                      color: '#2563eb', 
-                      fontWeight: 700, 
-                      fontSize: '0.72rem',
-                      lineHeight: 1.2
-                    }} 
-                  >
-                    + {extensionSubmittedData.extendedDays} Day
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.2 }}>
+                    <Typography sx={{ fontSize: '0.88rem', fontWeight: 500, color: '#1e293b' }}>
+                      {extensionSubmittedData.startDate} → {extensionSubmittedData.endDate}
+                    </Typography>
+                    <Box 
+                      sx={{ 
+                        px: 1.1, 
+                        py: 0.3, 
+                        backgroundColor: '#eff6ff', 
+                        borderRadius: '100px', 
+                        color: '#2563eb', 
+                        fontWeight: 700, 
+                        fontSize: '0.72rem',
+                        lineHeight: 1.2
+                      }} 
+                    >
+                      + {extensionSubmittedData.extendedDays} Day
+                    </Box>
                   </Box>
+                </Box>
+              </Box>
+
+              {/* Right Item: Extension Scheme */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box 
+                  sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '10px', 
+                    backgroundColor: '#ecfdf5', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    flexShrink: 0 
+                  }} 
+                >
+                  <ShieldCheck size={22} color="#27b29b" weight="fill" />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#94a3b8' }}>
+                    Extension Scheme
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.88rem', fontWeight: 500, color: '#1e293b', mt: 0.2 }}>
+                    {extensionSubmittedData.feePolicy === 'CHARGEABLE' 
+                      ? 'Chargeable Daily Supervision' 
+                      : 'Free of Charge (Grace Period)'}
+                  </Typography>
                 </Box>
               </Box>
             </Box>
