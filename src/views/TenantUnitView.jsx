@@ -461,36 +461,34 @@ export function TenantUnitView({ controller }) {
           backgroundColor: '#ffffff',
           px: 2,
           pt: 4,
-          pb: 1.8,
+          pb: 2,
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           borderBottom: '1px solid #f1f5f9',
           position: 'relative',
           zIndex: 10
         }}
       >
-        <IconButton onClick={handleBack} sx={{ color: '#334155', p: 0.6, mr: 1.5 }}>
+        <IconButton onClick={handleBack} sx={{ color: '#334155', p: 0.6, width: 40, height: 40 }}>
           <CaretLeft size={24} weight="bold" />
         </IconButton>
 
-        <Box sx={{ flexGrow: 1 }}>
-          <Typography sx={{ fontWeight: 800, color: '#1e293b', fontSize: '1.05rem', lineHeight: 1.2 }}>
+        <Box sx={{ flexGrow: 1, textAlign: 'center', px: 1 }}>
+          <Typography sx={{ fontWeight: 700, color: '#1e293b', fontSize: '1.05rem', lineHeight: 1.2 }}>
             {navLevel === 'towers' && 'Tenant Unit'}
             {navLevel === 'units' && selectedTower?.name}
             {navLevel === 'unit_detail' && selectedUnit?.unit_name}
           </Typography>
-          <Typography sx={{ fontSize: '0.74rem', color: '#94a3b8', mt: 0.2 }}>
-            {navLevel === 'towers' && 'Paladian Park • All Towers'}
-            {navLevel === 'units' && `Paladian Park • ${selectedTower?.totalUnits || 0} Units`}
-            {navLevel === 'unit_detail' && `${selectedUnit?.tower} • ${selectedUnit?.type}`}
-          </Typography>
         </Box>
 
-        {navLevel === 'unit_detail' && selectedUnit && (
-          <Box sx={{ flexShrink: 0 }}>
-            {renderStatusBadge(selectedUnit.status)}
-          </Box>
-        )}
+        <Box sx={{ width: navLevel === 'unit_detail' ? 'auto' : 40, minWidth: 40, display: 'flex', justifyContent: 'flex-end' }}>
+          {navLevel === 'unit_detail' && selectedUnit ? (
+            renderStatusBadge(selectedUnit.status)
+          ) : (
+            <Box sx={{ width: 40 }} />
+          )}
+        </Box>
       </Box>
 
       {/* ========================================================================= */}
