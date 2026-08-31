@@ -49,7 +49,10 @@ import {
   UserCircle,
   Phone,
   IdentificationCard,
-  Camera
+  Camera,
+  ClockCounterClockwise,
+  WarningCircle,
+  XCircle
 } from '@phosphor-icons/react';
 import { getPermitDetailData } from '../models/FitOutPermitModel';
 
@@ -71,7 +74,46 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const [extensionSuccessOpen, setExtensionSuccessOpen] = useState(false);
   const [completeSuccessOpen, setCompleteSuccessOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [extensionSubmittedData, setExtensionSubmittedData] = useState(null);
+
+  // Extension Requests with History & Rejection State
+  const [extensionRequests, setExtensionRequests] = useState([
+    {
+      id: 'EXT-REQ-1',
+      requestNumber: 1,
+      submittedBy: 'engineering',
+      submittedAt: '12/02/2026 14:10',
+      startDate: '13 Feb 2026',
+      endDate: '16 Feb 2026',
+      extendedDays: 3,
+      feePolicy: 'FREE_OF_CHARGE',
+      amount: '0',
+      invoiceNo: 'REQ-ENG-2026-0034',
+      issuedDate: '12/02/2026 14:10',
+      dueDate: '13 Feb 2026, 23:59',
+      permitNo: data.permitNumber || '#PRO/FP/122025/000032',
+      status: 'REJECTED',
+      rejectionReason: 'Durasi perpanjangan 3 hari melebihi batas toleransi pekerjaan minor. Mohon ajukan ulang maksimal 2 hari atau koordinasikan biaya supervisi.',
+      rejectedBy: 'Tenant Relation Lead',
+      rejectedAt: '12/02/2026 15:30',
+      reason: 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 3 hari sebelum inspeksi serah terima.',
+      notes: 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 3 hari sebelum inspeksi serah terima.',
+      photos: [
+        'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80'
+      ],
+      photoCount: 2,
+      authorizedBy: 'Engineering Lead'
+    }
+  ]);
+
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [historySectionOpen, setHistorySectionOpen] = useState(true);
+
+  // Derived properties for active and historic requests
+  const latestExtension = extensionRequests.length > 0 ? extensionRequests[extensionRequests.length - 1] : null;
+  const extensionSubmittedData = latestExtension;
+  const canRequestExtension = !latestExtension || latestExtension.status === 'REJECTED';
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
   const [depositInvoiceOpen, setDepositInvoiceOpen] = useState(false);
   const [earlyInspectionDetailOpen, setEarlyInspectionDetailOpen] = useState(false);
@@ -216,9 +258,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
     
     const formattedEnd = formatDisplayDate(trNewEndDate);
     const amountVal = trChargeableAmount || '2.000.000';
+    const nextReqNum = extensionRequests.length + 1;
     
-    setExtensionSubmittedData({
+    const newReq = {
+      id: `EXT-REQ-${nextReqNum}`,
+      requestNumber: nextReqNum,
       submittedBy: 'tenant_relation',
+      submittedAt: '10/08/2026, 03:55 PM',
       startDate: '10 Aug 2026',
       endDate: formattedEnd,
       extendedDays: trExtendedDaysCount || 3,
@@ -228,10 +274,11 @@ export function FitOutPermitDetailView({ permit, controller }) {
       issuedDate: '10/08/2026, 03:55 PM',
       dueDate: '11/08/2026, 11:59 PM',
       permitNo: '#PRO/FP/082026/000104',
-      status: 'UNPAID',
+      status: trFeePolicy === 'FREE_OF_CHARGE' ? 'FREE_OF_CHARGE' : 'UNPAID',
       authorizedBy: 'Tenant Relation Lead - Management'
-    });
+    };
 
+    setExtensionRequests(prev => [...prev, newReq]);
     setExtensionModalOpen(false);
     setSuccessMessage(`Fitout Schedule Extension (+${trExtendedDaysCount} Days until ${trNewEndDate}) successfully submitted!`);
     setExtensionSuccessOpen(true);
@@ -243,29 +290,73 @@ export function FitOutPermitDetailView({ permit, controller }) {
       'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80'
     ];
-    const finalNotes = engNotes.trim() || 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 3 hari sebelum inspeksi serah terima.';
+    const finalNotes = engNotes.trim() || 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 2 hari sebelum inspeksi serah terima.';
+    const nextReqNum = extensionRequests.length + 1;
 
-    setExtensionSubmittedData({
+    const newReq = {
+      id: `EXT-REQ-${nextReqNum}`,
+      requestNumber: nextReqNum,
       submittedBy: 'engineering',
+      submittedAt: '12/02/2026 16:20',
       startDate: '13 Feb 2026',
       endDate: formattedEnd,
-      extendedDays: engExtendedDaysCount || 3,
+      extendedDays: engExtendedDaysCount || 2,
       feePolicy: 'FREE_OF_CHARGE',
       amount: '0',
-      invoiceNo: 'REQ-ENG-2026-0034',
+      invoiceNo: `REQ-ENG-2026-00${34 + nextReqNum}`,
       issuedDate: '12/02/2026 16:20',
       dueDate: '13 Feb 2026, 23:59',
       permitNo: data.permitNumber || '#PRO/FP/122025/000032',
-      status: 'FREE_OF_CHARGE',
+      status: 'WAITING_FOR_APPROVAL',
       reason: finalNotes,
       notes: finalNotes,
       photos: finalPhotos,
       photoCount: finalPhotos.length,
       authorizedBy: 'Engineering Lead'
-    });
+    };
 
+    setExtensionRequests(prev => [...prev, newReq]);
     setExtensionModalOpen(false);
-    setSuccessMessage(`Extension request (+${engExtendedDaysCount} Days until ${engNewEndDate}) has been submitted successfully as requested by tenant.`);
+    setSuccessMessage(`Pengajuan Extension #${nextReqNum} (+${engExtendedDaysCount} Hari s/d ${engNewEndDate}) berhasil diajukan!`);
+    setExtensionSuccessOpen(true);
+  };
+
+  const handleApproveExtension = () => {
+    setExtensionRequests(prev => {
+      const updated = [...prev];
+      const lastIdx = updated.length - 1;
+      if (lastIdx >= 0) {
+        updated[lastIdx] = {
+          ...updated[lastIdx],
+          status: 'APPROVED',
+          approvedAt: '12/02/2026, 17:15',
+          approvedBy: 'Tenant Relation Lead'
+        };
+      }
+      return updated;
+    });
+    setSuccessMessage(`Pengajuan Extension #${latestExtension?.requestNumber || 1} telah disetujui.`);
+    setExtensionSuccessOpen(true);
+  };
+
+  const handleConfirmReject = () => {
+    const finalReason = rejectReason.trim() || 'Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang dengan durasi maksimal 2 hari.';
+    setExtensionRequests(prev => {
+      const updated = [...prev];
+      const lastIdx = updated.length - 1;
+      if (lastIdx >= 0) {
+        updated[lastIdx] = {
+          ...updated[lastIdx],
+          status: 'REJECTED',
+          rejectionReason: finalReason,
+          rejectedBy: 'Tenant Relation Lead',
+          rejectedAt: '12/02/2026, 17:10'
+        };
+      }
+      return updated;
+    });
+    setRejectModalOpen(false);
+    setSuccessMessage(`Pengajuan Extension #${latestExtension?.requestNumber || 1} telah ditolak.`);
     setExtensionSuccessOpen(true);
   };
 
@@ -362,7 +453,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
       </Box>
 
       {/* Scrollable Content */}
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, pb: extensionSubmittedData ? 3 : 12, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, pb: canRequestExtension ? 12 : 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
         
         {/* Card 1: Permit Document Card */}
         <Box sx={{ backgroundColor: '#ffffff', borderRadius: '12px', p: 2, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
@@ -620,15 +711,20 @@ export function FitOutPermitDetailView({ permit, controller }) {
           >
             {/* Header: Extension Information & Status Badge */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
-                Extension Information
-              </Typography>
-              {extensionSubmittedData.submittedBy === 'engineering' && (
+              <Box>
+                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
+                  Extension Information {extensionRequests.length > 1 ? `(Pengajuan #${latestExtension?.requestNumber})` : ''}
+                </Typography>
+                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                  {latestExtension?.submittedAt} • oleh {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                </Typography>
+              </Box>
+              {latestExtension && (
                 <Box 
                   sx={{ 
-                    backgroundColor: '#fff7ed', 
-                    color: '#ea580c', 
-                    border: '1px solid #ffedd5',
+                    backgroundColor: latestExtension.status === 'REJECTED' ? '#fef2f2' : latestExtension.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed', 
+                    color: latestExtension.status === 'REJECTED' ? '#ef4444' : latestExtension.status === 'APPROVED' ? '#059669' : '#ea580c', 
+                    border: `1px solid ${latestExtension.status === 'REJECTED' ? '#fecaca' : latestExtension.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
                     borderRadius: '100px', 
                     px: 1.4, 
                     py: 0.35, 
@@ -638,10 +734,42 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     letterSpacing: '0.01em'
                   }}
                 >
-                  Waiting for Approval
+                  {latestExtension.status === 'REJECTED' ? 'Rejected' : latestExtension.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
                 </Box>
               )}
             </Box>
+
+            {/* Prominent Red Banner if Status is Rejected */}
+            {latestExtension?.status === 'REJECTED' && (
+              <Box 
+                sx={{ 
+                  backgroundColor: '#fef2f2', 
+                  border: '1.5px solid #fecaca', 
+                  borderRadius: '10px', 
+                  p: 1.6, 
+                  mt: 1.5,
+                  mb: 0.5
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.6 }}>
+                  <XCircle size={18} weight="fill" />
+                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 800 }}>
+                    Pengajuan #{latestExtension.requestNumber} Ditolak
+                  </Typography>
+                </Box>
+                <Typography sx={{ fontSize: '0.8rem', color: '#7f1d1d', lineHeight: 1.5, mb: 0.8 }}>
+                  "{latestExtension.rejectionReason}"
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                  <Typography sx={{ fontSize: '0.72rem', color: '#991b1b', fontWeight: 600 }}>
+                    Ditolak oleh {latestExtension.rejectedBy || 'Tenant Relation'} • {latestExtension.rejectedAt || '12/02/2026 15:30'}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: '#dc2626', fontWeight: 700 }}>
+                    *Dapat diajukan ulang
+                  </Typography>
+                </Box>
+              </Box>
+            )}
 
             <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', my: 1.8 }} />
 
@@ -927,11 +1055,238 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   }}
                 >
                   <Typography sx={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
-                    {extensionSubmittedData.notes || extensionSubmittedData.reason}
+                    {latestExtension.notes || latestExtension.reason}
                   </Typography>
                 </Box>
               </Box>
             )}
+
+            {/* 3. Status Action / Guidance Footer */}
+            {latestExtension?.status === 'WAITING_FOR_APPROVAL' && (
+              <Box sx={{ mt: 2.2 }}>
+                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
+
+                {activePov === 'tenant_relation' ? (
+                  <Box sx={{ backgroundColor: '#fffaf5', border: '1.5px dashed #fed7aa', borderRadius: '10px', p: 1.8 }}>
+                    <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, color: '#9a3412', mb: 0.5 }}>
+                      Review Pengajuan Extension #{latestExtension.requestNumber} (Tenant Relation)
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.74rem', color: '#c2410c', mb: 1.5 }}>
+                      Sebagai Tenant Relation, tentukan persetujuan terhadap perpanjangan jadwal yang diajukan oleh Engineering.
+                    </Typography>
+
+                    <Box sx={{ display: 'flex', gap: 1.2 }}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={handleApproveExtension}
+                        sx={{
+                          backgroundColor: '#27b29b !important',
+                          color: '#ffffff !important',
+                          borderRadius: '8px',
+                          py: 1,
+                          fontWeight: 700,
+                          fontSize: '0.82rem',
+                          textTransform: 'none'
+                        }}
+                      >
+                        Setujui Extension
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        onClick={() => {
+                          setRejectReason('Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang dengan durasi maksimal 2 hari.');
+                          setRejectModalOpen(true);
+                        }}
+                        sx={{
+                          borderColor: '#ef4444 !important',
+                          color: '#ef4444 !important',
+                          backgroundColor: '#ffffff',
+                          borderRadius: '8px',
+                          py: 1,
+                          fontWeight: 700,
+                          fontSize: '0.82rem',
+                          textTransform: 'none'
+                        }}
+                      >
+                        Tolak Request
+                      </Button>
+                    </Box>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1.4, backgroundColor: '#fff7ed', borderRadius: '10px', border: '1px solid #ffedd5' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Clock size={16} color="#ea580c" weight="bold" />
+                      <Typography sx={{ fontSize: '0.76rem', color: '#9a3412', fontWeight: 600 }}>
+                        Menunggu review dari Tenant Relation
+                      </Typography>
+                    </Box>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        setRejectReason('Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang dengan durasi maksimal 2 hari.');
+                        setRejectModalOpen(true);
+                      }}
+                      sx={{
+                        fontSize: '0.72rem',
+                        textTransform: 'none',
+                        color: '#dc2626',
+                        fontWeight: 700,
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #fca5a5',
+                        borderRadius: '6px',
+                        py: 0.3,
+                        px: 1,
+                        minWidth: 0
+                      }}
+                    >
+                      Simulasi Tolak TR
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            )}
+
+            {/* Guidance for Rejected State */}
+            {latestExtension?.status === 'REJECTED' && (
+              <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Info size={16} color="#2563eb" weight="fill" />
+                <Typography sx={{ fontSize: '0.74rem', color: '#2563eb', fontWeight: 600 }}>
+                  Gunakan tombol "Request Extension" di bawah untuk mengajukan perpanjangan ulang.
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+
+        {/* Card: Riwayat Pengajuan Extension (Extension History) */}
+        {extensionRequests.length > 1 && (
+          <Box
+            sx={{
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1.5px solid #e2e8f0',
+              p: 2,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+            }}
+          >
+            {/* Accordion Header */}
+            <Box
+              onClick={() => setHistorySectionOpen(prev => !prev)}
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <ClockCounterClockwise size={20} color="#475569" weight="bold" />
+                </Box>
+                <Box>
+                  <Typography sx={{ fontWeight: 800, fontSize: '0.92rem', color: '#1e293b' }}>
+                    Riwayat Pengajuan Extension
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.74rem', color: '#64748b' }}>
+                    {extensionRequests.length - 1} Pengajuan Sebelumnya
+                  </Typography>
+                </Box>
+              </Box>
+              <IconButton size="small" sx={{ color: '#64748b' }}>
+                {historySectionOpen ? <CaretUp size={18} weight="bold" /> : <CaretDown size={18} weight="bold" />}
+              </IconButton>
+            </Box>
+
+            <Collapse in={historySectionOpen}>
+              <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1.8 }}>
+                {extensionRequests.slice(0, -1).reverse().map((req) => (
+                  <Box
+                    key={req.id}
+                    sx={{
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '10px',
+                      border: '1px solid #e2e8f0',
+                      p: 1.8
+                    }}
+                  >
+                    {/* Header of historic request */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                      <Box>
+                        <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#1e293b' }}>
+                          Pengajuan #{req.requestNumber}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                          {req.submittedAt} • oleh {req.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          backgroundColor: req.status === 'REJECTED' ? '#fef2f2' : req.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed',
+                          color: req.status === 'REJECTED' ? '#ef4444' : req.status === 'APPROVED' ? '#059669' : '#ea580c',
+                          border: `1px solid ${req.status === 'REJECTED' ? '#fecaca' : req.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
+                          borderRadius: '100px',
+                          px: 1.2,
+                          py: 0.25,
+                          fontSize: '0.7rem',
+                          fontWeight: 700
+                        }}
+                      >
+                        {req.status === 'REJECTED' ? 'Rejected' : req.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
+                      </Box>
+                    </Box>
+
+                    {/* Rejection Note in History if Rejected */}
+                    {req.status === 'REJECTED' && req.rejectionReason && (
+                      <Box
+                        sx={{
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #fecaca',
+                          borderRadius: '8px',
+                          p: 1.2,
+                          mb: 1.2
+                        }}
+                      >
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', mb: 0.3 }}>
+                          Alasan Penolakan TR:
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.76rem', color: '#991b1b', lineHeight: 1.4 }}>
+                          "{req.rejectionReason}"
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.68rem', color: '#b91c1c', mt: 0.4 }}>
+                          Ditolak pada {req.rejectedAt}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* Schedule Info */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <CalendarBlank size={16} color="#64748b" />
+                      <Typography sx={{ fontSize: '0.78rem', color: '#334155' }}>
+                        {req.startDate} → {req.endDate}
+                      </Typography>
+                      <Box sx={{ backgroundColor: '#eff6ff', color: '#2563eb', px: 0.8, py: 0.2, borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                        +{req.extendedDays} Hari
+                      </Box>
+                    </Box>
+
+                    {/* Reason Notes */}
+                    {req.notes && (
+                      <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.4 }}>
+                        Catatan: "{req.notes}"
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            </Collapse>
           </Box>
         )}
 
@@ -2008,8 +2363,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
       </Box>
 
-      {/* Fixed Bottom Action: 2 Buttons (Extension & Work Complete) - Hidden after extension submission */}
-      {!extensionSubmittedData && (
+      {/* Fixed Bottom Action: 2 Buttons (Extension & Work Complete) - Visible when canRequestExtension */}
+      {canRequestExtension && (
         <Box 
           sx={{ 
             position: 'absolute', 
@@ -2473,6 +2828,24 @@ export function FitOutPermitDetailView({ permit, controller }) {
           {/* ========================================================================================= */}
           {activePov === 'engineering' && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.2 }}>
+              {/* Previous Rejection Alert if applicable */}
+              {latestExtension?.status === 'REJECTED' && (
+                <Box sx={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', p: 1.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.4 }}>
+                    <XCircle size={16} weight="fill" />
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 800 }}>
+                      Pengajuan #{latestExtension.requestNumber} Sebelumnya Ditolak
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: '0.75rem', color: '#991b1b', lineHeight: 1.4 }}>
+                    Catatan TR: "{latestExtension.rejectionReason}"
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.7rem', color: '#dc2626', mt: 0.5, fontStyle: 'italic' }}>
+                    *Silakan sesuaikan kembali estimasi jadwal atau lengkapi foto dan keterangan teknis.
+                  </Typography>
+                </Box>
+              )}
+
               {/* Info: Current Schedule */}
               <Box sx={{ backgroundColor: '#f8fafc', p: 1.5, borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                 <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 500 }}>
@@ -3600,6 +3973,118 @@ export function FitOutPermitDetailView({ permit, controller }) {
             }}
           >
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* DIALOG: TOLAK PENGAJUAN EXTENSION */}
+      {/* ========================================================================= */}
+      <Dialog
+        open={rejectModalOpen}
+        onClose={() => setRejectModalOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            p: 1
+          }
+        }}
+      >
+        <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 34, height: 34, borderRadius: '8px', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <XCircle size={22} color="#ef4444" weight="fill" />
+            </Box>
+            <Box>
+              <Typography sx={{ fontWeight: 800, fontSize: '0.96rem', color: '#1e293b' }}>
+                Tolak Pengajuan Extension
+              </Typography>
+              <Typography sx={{ fontSize: '0.72rem', color: '#64748b' }}>
+                Pengajuan #{latestExtension?.requestNumber || 1} oleh {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton size="small" onClick={() => setRejectModalOpen(false)}>
+            <X size={18} />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ py: 1.5 }}>
+          <Typography sx={{ fontSize: '0.78rem', color: '#64748b', mb: 1.5, lineHeight: 1.45 }}>
+            Masukkan alasan penolakan untuk pengajuan ini. Feedback ini akan ditampilkan kepada tim Engineering agar mereka dapat mengajukan revisi jadwal yang sesuai.
+          </Typography>
+
+          <Typography sx={{ fontSize: '0.76rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
+            Alasan Penolakan <span style={{ color: '#ef4444' }}>*</span>
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            placeholder="Contoh: Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang maksimal 2 hari."
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '0.84rem' } }}
+          />
+
+          {/* Quick template chips */}
+          <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 1.5, mb: 0.8, fontWeight: 600 }}>
+            Pilihan Alasan Cepat:
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+            {[
+              'Durasi melebihi batas toleransi gratis',
+              'Jadwal bentrok dengan maintenance gedung',
+              'Dokumentasi foto belum cukup lengkap'
+            ].map(template => (
+              <Chip
+                key={template}
+                label={template}
+                size="small"
+                onClick={() => setRejectReason(template)}
+                sx={{
+                  fontSize: '0.7rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  backgroundColor: rejectReason === template ? '#fee2e2' : '#f1f5f9',
+                  color: rejectReason === template ? '#b91c1c' : '#475569',
+                  fontWeight: 600
+                }}
+              />
+            ))}
+          </Box>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2, pt: 1, gap: 1 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => setRejectModalOpen(false)}
+            sx={{
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 700,
+              color: '#64748b',
+              borderColor: '#cbd5e1'
+            }}
+          >
+            Batal
+          </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleConfirmReject}
+            sx={{
+              backgroundColor: '#ef4444 !important',
+              color: '#ffffff !important',
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 700
+            }}
+          >
+            Konfirmasi Tolak
           </Button>
         </DialogActions>
       </Dialog>
