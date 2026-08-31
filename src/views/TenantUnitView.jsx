@@ -547,10 +547,6 @@ export function TenantUnitView({ controller }) {
                     borderRadius: '8px',
                     p: 2,
                     cursor: 'pointer',
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'translateY(-2px)'
-                    },
                     '&:active': {
                       transform: 'scale(0.99)'
                     }
@@ -668,10 +664,7 @@ export function TenantUnitView({ controller }) {
                     backgroundColor: isSelected ? '#27b29b' : '#ffffff',
                     color: isSelected ? '#ffffff' : '#64748b',
                     border: `1px solid ${isSelected ? '#27b29b' : '#cbd5e1'}`,
-                    cursor: 'pointer',
-                    '&:hover': {
-                      backgroundColor: isSelected ? '#20b29a' : '#f8fafc'
-                    }
+                    cursor: 'pointer'
                   }}
                 />
               );
@@ -712,10 +705,7 @@ export function TenantUnitView({ controller }) {
                       backgroundColor: isSelected ? '#0f172a' : '#ffffff',
                       color: isSelected ? '#ffffff' : '#64748b',
                       border: `1px solid ${isSelected ? '#0f172a' : '#e2e8f0'}`,
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: isSelected ? '#1e293b' : '#f8fafc'
-                      }
+                      cursor: 'pointer'
                     }}
                   />
                 );
@@ -748,11 +738,6 @@ export function TenantUnitView({ controller }) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    transition: 'all 0.15s ease',
-                    '&:hover': {
-                      transform: 'translateY(-1px)',
-                      backgroundColor: '#f8fafc'
-                    },
                     '&:active': {
                       transform: 'scale(0.99)'
                     }
@@ -814,8 +799,7 @@ export function TenantUnitView({ controller }) {
                         fontWeight: 700,
                         textTransform: 'none',
                         py: 0.8,
-                        px: 2,
-                        '&:hover': { backgroundColor: '#f8fafc', borderColor: '#94a3b8' }
+                        px: 2
                       }}
                     >
                       Muat 25 Unit Lagi
@@ -891,9 +875,8 @@ export function TenantUnitView({ controller }) {
                     justifyContent: 'center',
                     alignItems: 'center',
                     textAlign: 'center',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      backgroundColor: '#ffedd5'
+                    '&:active': {
+                      transform: 'scale(0.99)'
                     }
                   }}
                 >
@@ -1165,8 +1148,7 @@ export function TenantUnitView({ controller }) {
                     fontSize: '0.76rem',
                     fontWeight: 700,
                     textTransform: 'none',
-                    px: 1.5,
-                    '&:hover': { backgroundColor: '#20b29a' }
+                    px: 1.5
                   }}
                 >
                   Tambah Anggota
@@ -1203,8 +1185,7 @@ export function TenantUnitView({ controller }) {
                       color: '#27b29b',
                       borderRadius: '8px',
                       textTransform: 'none',
-                      fontWeight: 700,
-                      '&:hover': { backgroundColor: '#ecfdf5', borderColor: '#20b29a' }
+                      fontWeight: 700
                     }}
                   >
                     Tambah Anggota Pertama
@@ -1319,8 +1300,7 @@ export function TenantUnitView({ controller }) {
                     fontSize: '0.76rem',
                     fontWeight: 700,
                     textTransform: 'none',
-                    px: 1.5,
-                    '&:hover': { backgroundColor: '#1d4ed8' }
+                    px: 1.5
                   }}
                 >
                   Tambah Kendaraan
@@ -1347,8 +1327,7 @@ export function TenantUnitView({ controller }) {
                       color: '#2563eb',
                       borderRadius: '8px',
                       textTransform: 'none',
-                      fontWeight: 700,
-                      '&:hover': { backgroundColor: '#eff6ff', borderColor: '#1d4ed8' }
+                      fontWeight: 700
                     }}
                   >
                     Daftarkan Kendaraan
@@ -1561,8 +1540,7 @@ export function TenantUnitView({ controller }) {
                       textTransform: 'none',
                       fontWeight: 600,
                       fontSize: '0.78rem',
-                      py: 1,
-                      '&:hover': { backgroundColor: '#f8fafc', borderColor: '#94a3b8' }
+                      py: 1
                     }}
                   >
                     QR Meter Listrik
@@ -1579,8 +1557,7 @@ export function TenantUnitView({ controller }) {
                       textTransform: 'none',
                       fontWeight: 600,
                       fontSize: '0.78rem',
-                      py: 1,
-                      '&:hover': { backgroundColor: '#f8fafc', borderColor: '#94a3b8' }
+                      py: 1
                     }}
                   >
                     QR Meter Air
@@ -1744,8 +1721,7 @@ export function TenantUnitView({ controller }) {
               fontWeight: 700,
               py: 1.2,
               textTransform: 'none',
-              mt: 1,
-              '&:hover': { backgroundColor: '#20b29a' }
+              mt: 1
             }}
           >
             Simpan Penghuni
@@ -1850,8 +1826,7 @@ export function TenantUnitView({ controller }) {
               fontWeight: 700,
               py: 1.2,
               textTransform: 'none',
-              mt: 1,
-              '&:hover': { backgroundColor: '#20b29a' }
+              mt: 1
             }}
           >
             {editingMember ? 'Simpan Perubahan' : 'Tambah Anggota'}
@@ -2022,8 +1997,7 @@ export function TenantUnitView({ controller }) {
               fontWeight: 700,
               py: 1.2,
               textTransform: 'none',
-              mt: 1,
-              '&:hover': { backgroundColor: '#1d4ed8' }
+              mt: 1
             }}
           >
             Daftarkan Kendaraan
@@ -2093,8 +2067,7 @@ export function TenantUnitView({ controller }) {
               borderRadius: '8px',
               fontWeight: 700,
               textTransform: 'none',
-              py: 1.1,
-              '&:hover': { backgroundColor: '#20b29a' }
+              py: 1.1
             }}
           >
             Download Barcode
