@@ -503,8 +503,7 @@ export function TenantUnitView({ controller }) {
               borderRadius: '8px',
               p: 2,
               mb: 2,
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+              border: '1px solid #e2e8f0'
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
@@ -569,8 +568,7 @@ export function TenantUnitView({ controller }) {
               py: 1,
               display: 'flex',
               alignItems: 'center',
-              mb: 2.2,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+              mb: 2.2
             }}
           >
             <MagnifyingGlass size={18} color="#94a3b8" weight="bold" />
@@ -618,8 +616,7 @@ export function TenantUnitView({ controller }) {
                       justifyContent: 'space-between',
                       transition: 'all 0.15s ease',
                       '&:hover': {
-                        borderColor: '#27b29b',
-                        boxShadow: '0 2px 8px rgba(39, 178, 155, 0.1)'
+                        borderColor: '#27b29b'
                       }
                     }}
                   >
@@ -667,11 +664,9 @@ export function TenantUnitView({ controller }) {
                     border: '1.5px solid #e2e8f0',
                     cursor: 'pointer',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
                     '&:hover': {
                       borderColor: '#27b29b',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 6px 16px rgba(39, 178, 155, 0.12)'
+                      transform: 'translateY(-2px)'
                     },
                     '&:active': {
                       transform: 'scale(0.99)'
@@ -772,8 +767,7 @@ export function TenantUnitView({ controller }) {
               py: 1,
               display: 'flex',
               alignItems: 'center',
-              mb: 1.5,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+              mb: 1.5
             }}
           >
             <MagnifyingGlass size={18} color="#94a3b8" weight="bold" />
@@ -909,11 +903,9 @@ export function TenantUnitView({ controller }) {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     transition: 'all 0.15s ease',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
                     '&:hover': {
                       borderColor: '#27b29b',
-                      transform: 'translateY(-1px)',
-                      boxShadow: '0 4px 12px rgba(39, 178, 155, 0.1)'
+                      transform: 'translateY(-1px)'
                     },
                     '&:active': {
                       transform: 'scale(0.99)'
@@ -1190,7 +1182,7 @@ export function TenantUnitView({ controller }) {
             <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
               
               {/* Unit Specifications Card */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.5 }}>
                   Informasi Fisik & Legal Unit
                 </Typography>
@@ -1240,7 +1232,7 @@ export function TenantUnitView({ controller }) {
               </Box>
 
               {/* Utilities & Meter Section (Merged into Overview per prompt instructions) */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                   <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b' }}>
                     Utilities & Meter Unit
@@ -1388,8 +1380,7 @@ export function TenantUnitView({ controller }) {
                         border: '1px solid #e2e8f0',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+                        justifyContent: 'space-between'
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
@@ -1534,8 +1525,7 @@ export function TenantUnitView({ controller }) {
                         border: '1px solid #e2e8f0',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+                        justifyContent: 'space-between'
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -1598,7 +1588,7 @@ export function TenantUnitView({ controller }) {
             <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
               
               {/* Utility to Invoice Toggles */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.8 }}>
                   Pengaturan Masuk Tagihan (Invoicing)
                 </Typography>
@@ -1686,7 +1676,7 @@ export function TenantUnitView({ controller }) {
               </Box>
 
               {/* IPL Parameters Card */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.5 }}>
                   Target & Parameter IPL
                 </Typography>
@@ -1714,7 +1704,7 @@ export function TenantUnitView({ controller }) {
               </Box>
 
               {/* Barcode & QR Meters Download Card */}
-              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <Box sx={{ backgroundColor: '#ffffff', borderRadius: '8px', p: 2, border: '1px solid #e2e8f0' }}>
                 <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: '#1e293b', mb: 1.5 }}>
                   Barcode & QR Scanner Meter
                 </Typography>
@@ -2238,8 +2228,7 @@ export function TenantUnitView({ controller }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+              justifyContent: 'center'
             }}
           >
             <QrCode size={130} weight="fill" color="#0f172a" />
