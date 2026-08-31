@@ -85,6 +85,8 @@ export function TenantUnitView({ controller }) {
   const [towerSearchQuery, setTowerSearchQuery] = useState('');
   const [unitSearchQuery, setUnitSearchQuery] = useState('');
   const [unitStatusFilter, setUnitStatusFilter] = useState('All'); // 'All' | 'Occupied' | 'Vacant' | 'Disewakan'
+  const [floorFilter, setFloorFilter] = useState('All'); // 'All' | '01' | '02' ...
+  const [displayLimit, setDisplayLimit] = useState(25); // Progressive load limit for hundreds of units
 
   // Drawers & Modals State
   const [assignDrawerOpen, setAssignDrawerOpen] = useState(false);
@@ -123,6 +125,14 @@ export function TenantUnitView({ controller }) {
     return { total, occupied, vacant, rate };
   }, [units]);
 
+  // Unique Floors for selected tower
+  const availableFloors = useMemo(() => {
+    if (!selectedTower) return [];
+    const towerUnits = units.filter(u => u.tower_id === selectedTower.id);
+    const floors = [...new Set(towerUnits.map(u => u.floor))].sort((a, b) => parseInt(a) - parseInt(b));
+    return ['All', ...floors];
+  }, [units, selectedTower]);
+
   // Filtered Towers (with cross-tower search support for towers or direct units)
   const filteredTowers = useMemo(() => {
     const q = towerSearchQuery.toLowerCase().trim();
@@ -144,12 +154,13 @@ export function TenantUnitView({ controller }) {
     );
   }, [towerSearchQuery, units]);
 
-  // Filtered Units in Selected Tower
+  // Filtered Units in Selected Tower (supporting hundreds of units)
   const filteredUnits = useMemo(() => {
     if (!selectedTower) return [];
     return units.filter(u => {
       if (u.tower_id !== selectedTower.id) return false;
       if (unitStatusFilter !== 'All' && u.status !== unitStatusFilter) return false;
+      if (floorFilter !== 'All' && u.floor !== floorFilter) return false;
       const q = unitSearchQuery.toLowerCase().trim();
       if (!q) return true;
       return (
@@ -158,7 +169,15 @@ export function TenantUnitView({ controller }) {
         u.members.some(m => m.name.toLowerCase().includes(q))
       );
     });
-  }, [units, selectedTower, unitStatusFilter, unitSearchQuery]);
+  }, [units, selectedTower, unitStatusFilter, floorFilter, unitSearchQuery]);
+
+  // Displayed Units (with progressive pagination when browsing hundreds of units)
+  const displayedUnits = useMemo(() => {
+    if (unitSearchQuery || floorFilter !== 'All') {
+      return filteredUnits;
+    }
+    return filteredUnits.slice(0, displayLimit);
+  }, [filteredUnits, unitSearchQuery, floorFilter, displayLimit]);
 
   // -------------------------------------------------------------
   // HANDLERS
@@ -177,6 +196,8 @@ export function TenantUnitView({ controller }) {
   const handleSelectTower = (tower) => {
     setSelectedTower(tower);
     setUnitStatusFilter('All');
+    setFloorFilter('All');
+    setDisplayLimit(25);
     setUnitSearchQuery('');
     setNavLevel('units');
   };
@@ -785,8 +806,8 @@ export function TenantUnitView({ controller }) {
               display: 'flex',
               gap: 1,
               overflowX: 'auto',
-              pb: 1.5,
-              mb: 1,
+              pb: 1,
+              mb: 0.5,
               '&::-webkit-scrollbar': { display: 'none' },
               scrollbarWidth: 'none'
             }}
@@ -817,6 +838,51 @@ export function TenantUnitView({ controller }) {
             })}
           </Box>
 
+          {/* Floor Quick Jump Filter (For towers with hundreds of units) */}
+          {availableFloors.length > 2 && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.8,
+                overflowX: 'auto',
+                pb: 1.5,
+                mb: 1,
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none'
+              }}
+            >
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', flexShrink: 0 }}>
+                Lantai:
+              </Typography>
+              {availableFloors.map((floor) => {
+                const isSelected = floorFilter === floor;
+                return (
+                  <Chip
+                    key={floor}
+                    label={floor === 'All' ? 'Semua Lt.' : `Lt. ${parseInt(floor)}`}
+                    size="small"
+                    onClick={() => setFloorFilter(floor)}
+                    sx={{
+                      borderRadius: '8px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      height: 26,
+                      px: 0.4,
+                      backgroundColor: isSelected ? '#0f172a' : '#ffffff',
+                      color: isSelected ? '#ffffff' : '#64748b',
+                      border: `1px solid ${isSelected ? '#0f172a' : '#e2e8f0'}`,
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: isSelected ? '#1e293b' : '#f8fafc'
+                      }
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          )}
+
           {/* Units List */}
           {filteredUnits.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
@@ -830,7 +896,7 @@ export function TenantUnitView({ controller }) {
             </Box>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-              {filteredUnits.map((unit) => (
+              {displayedUnits.map((unit) => (
                 <Box
                   key={unit.id}
                   onClick={() => handleSelectUnit(unit)}
@@ -891,6 +957,48 @@ export function TenantUnitView({ controller }) {
                   </Box>
                 </Box>
               ))}
+
+              {/* Progressive Load / Pagination for hundreds of units */}
+              {displayedUnits.length < filteredUnits.length && (
+                <Box sx={{ textAlign: 'center', pt: 1.5, pb: 2 }}>
+                  <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mb: 1 }}>
+                    Menampilkan {displayedUnits.length} dari {filteredUnits.length} Unit di {selectedTower?.name}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setDisplayLimit(prev => prev + 25)}
+                      sx={{
+                        borderRadius: '10px',
+                        borderColor: '#cbd5e1',
+                        color: '#334155',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        textTransform: 'none',
+                        py: 0.8,
+                        px: 2,
+                        '&:hover': { backgroundColor: '#f8fafc', borderColor: '#94a3b8' }
+                      }}
+                    >
+                      Muat 25 Unit Lagi
+                    </Button>
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setDisplayLimit(filteredUnits.length)}
+                      sx={{
+                        color: '#27b29b',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Tampilkan Semua ({filteredUnits.length})
+                    </Button>
+                  </Box>
+                </Box>
+              )}
             </Box>
           )}
         </Box>

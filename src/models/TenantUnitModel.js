@@ -1,7 +1,7 @@
 /**
  * [M] MODEL: TenantUnitModel.js
- * Comprehensive mock data and helpers for Tenant Unit management in ProApps.
- * Supports:
+ * Comprehensive mock data and generator for Tenant Unit management in ProApps.
+ * Supports hundreds of units per tower across multiple floors with:
  * - Towers with occupancy calculations
  * - Units with legal owners, tenant members, vehicles, and bill settings
  * - Status logic: Occupied (Owner), Disewakan (Tenant), Vacant
@@ -21,400 +21,211 @@ export const MEMBER_ROLES = [
   'Kerabat'
 ];
 
+const INDONESIAN_NAMES = [
+  'Budi Santoso', 'Hendrawan Kusuma', 'Maya Indah Permata', 'Dr. Gunawan Wibowo',
+  'Iwan Setiawan', 'Farhan Maulana', 'Stephanie Tan', 'Kurniawan Hidayat',
+  'Cindy Claudia', 'Ahmad Fauzi', 'Siti Nurhaliza', 'Bambang Sutrisno',
+  'Dewi Sartika', 'Eko Prasetyo', 'Ratna Sari', 'Agus Haryanto',
+  'Sri Wahyuni', 'Tri Wibowo', 'Indah Permata', 'Hadi Wijaya',
+  'Lestari Handayani', 'Rizky Ramadhan', 'Nurul Aini', 'Bayu Pratama',
+  'Yulia Citra', 'Fajar Nugroho', 'Dina Mariana', 'Aris Munandar'
+];
+
+const CAR_MODELS = [
+  { brand: 'Toyota Fortuner GR', type: 'Mobil', color: 'Hitam Metalik' },
+  { brand: 'Honda CR-V Turbo', type: 'Mobil', color: 'Abu-abu Metalik' },
+  { brand: 'BMW 530i M Sport', type: 'Mobil', color: 'Sophisto Grey' },
+  { brand: 'Hyundai Ioniq 5', type: 'Mobil', color: 'Gravity Gold' },
+  { brand: 'Mazda CX-5 Elite', type: 'Mobil', color: 'Soul Red Crystal' },
+  { brand: 'Mitsubishi Pajero Sport', type: 'Mobil', color: 'Putih Mutiara' },
+  { brand: 'Honda HR-V RS', type: 'Mobil', color: 'Sand Khaki Pearl' },
+  { brand: 'Toyota Innova Zenix', type: 'Mobil', color: 'Attitude Black' },
+  { brand: 'Honda PCX 160', type: 'Motor', color: 'Putih Mutiara' },
+  { brand: 'Yamaha Fazzio', type: 'Motor', color: 'Tosca Blue' },
+  { brand: 'Vespa Sprint S', type: 'Motor', color: 'Yellow Sole' }
+];
+
+const UNIT_SPECS = [
+  { type: 'Studio Compact', beds: 1, area: '34 m²', cap: '1300 VA' },
+  { type: '1BR Deluxe', beds: 1, area: '48 m²', cap: '2200 VA' },
+  { type: '2BR Standard', beds: 2, area: '68 m²', cap: '3500 VA' },
+  { type: '2BR Suite', beds: 2, area: '74 m²', cap: '3500 VA' },
+  { type: '3BR Family', beds: 3, area: '96 m²', cap: '4400 VA' },
+  { type: '3BR Executive', beds: 3, area: '108 m²', cap: '5500 VA' }
+];
+
+/**
+ * Generate programmatic realistic units for a tower with hundreds of units
+ */
+function generateTowerUnits(towerLetter, towerId, totalFloors, unitsPerFloor) {
+  const result = [];
+
+  for (let f = 1; f <= totalFloors; f++) {
+    const floorStr = f < 10 ? `0${f}` : `${f}`;
+
+    for (let u = 1; u <= unitsPerFloor; u++) {
+      const unitNumStr = u < 10 ? `0${u}` : `${u}`;
+      const unitName = `Unit ${towerLetter}-${floorStr}${unitNumStr}`;
+      const unitId = `unit-${towerLetter.toLowerCase()}-${floorStr}${unitNumStr}`;
+
+      // Pseudo-random deterministic assignment based on floor and unit number
+      const hash = (f * 17 + u * 31) % 100;
+      const nameIndex = (f * 3 + u * 5) % INDONESIAN_NAMES.length;
+      const ownerName = INDONESIAN_NAMES[nameIndex];
+      const spec = UNIT_SPECS[(f + u) % UNIT_SPECS.length];
+
+      let status = UNIT_STATUS.OCCUPIED;
+      let members = [];
+      let vehicles = [];
+
+      if (hash < 20) {
+        // ~20% Vacant
+        status = UNIT_STATUS.VACANT;
+        members = [];
+        vehicles = [];
+      } else if (hash < 55) {
+        // ~35% Disewakan (Rented)
+        status = UNIT_STATUS.RENTED;
+        const tenantNameIndex = (nameIndex + 7) % INDONESIAN_NAMES.length;
+        const tenantName = INDONESIAN_NAMES[tenantNameIndex];
+        const memberId1 = `m-${unitId}-1`;
+        const memberId2 = `m-${unitId}-2`;
+
+        members = [
+          { id: memberId1, name: tenantName, role: 'Penyewa', is_occupant: true, since: '15 Jan 2025' },
+          { id: memberId2, name: `Keluarga ${tenantName.split(' ')[0]}`, role: 'Suami/Istri', is_occupant: false, since: '15 Jan 2025' }
+        ];
+
+        const car = CAR_MODELS[(f + u) % CAR_MODELS.length];
+        vehicles = [
+          {
+            id: `v-${unitId}-1`,
+            plate_number: `B ${1000 + f * 40 + u} ${towerLetter}${String.fromCharCode(65 + (u % 26))}`,
+            brand_model: car.brand,
+            color: car.color,
+            type: car.type,
+            member_id: memberId1,
+            member_name: tenantName
+          }
+        ];
+      } else {
+        // ~45% Occupied by Owner
+        status = UNIT_STATUS.OCCUPIED;
+        const memberId1 = `m-${unitId}-own`;
+        members = [
+          { id: memberId1, name: ownerName, role: 'Pemilik', is_occupant: true, since: '10 Feb 2021' }
+        ];
+
+        if (f % 2 === 0) {
+          members.push({
+            id: `m-${unitId}-spouse`,
+            name: `Ibu ${ownerName.split(' ')[0]}`,
+            role: 'Suami/Istri',
+            is_occupant: false,
+            since: '10 Feb 2021'
+          });
+        }
+
+        const car = CAR_MODELS[(f + u) % CAR_MODELS.length];
+        vehicles = [
+          {
+            id: `v-${unitId}-1`,
+            plate_number: `B ${2000 + f * 50 + u} ${towerLetter}P`,
+            brand_model: car.brand,
+            color: car.color,
+            type: car.type,
+            member_id: memberId1,
+            member_name: ownerName
+          }
+        ];
+      }
+
+      result.push({
+        id: unitId,
+        unit_name: unitName,
+        tower: `Tower ${towerLetter}`,
+        tower_id: towerId,
+        floor: floorStr,
+        type: spec.type,
+        bedroom_count: spec.beds,
+        area: spec.area,
+        npp: `NPP-PLD-${towerLetter}${floorStr}${unitNumStr}`,
+        description: `Unit ${spec.type} lantai ${floorStr} Tower ${towerLetter} dengan fasilitas lengkap dan akses lift pribadi.`,
+        ownership_letter: `SHM Sarusun No. ${1000 + f * 10 + u}/PLD/2021`,
+        status: status,
+        owner: {
+          id: `own-${towerLetter}-${floorStr}${unitNumStr}`,
+          name: ownerName,
+          phone: `+62 812-${1000 + f * 10}-${2000 + u * 10}`,
+          email: `${ownerName.toLowerCase().replace(/[^a-z]/g, '.')}@property.com`
+        },
+        members: members,
+        vehicles: vehicles,
+        electric_capacity: spec.cap,
+        water_meter_no: `PAM-TW${towerLetter}-${floorStr}${unitNumStr}`,
+        electric_meter_no: `PLN-TW${towerLetter}-${floorStr}${unitNumStr}`,
+        water_meter_initial: `${(f * 12 + u * 3.5).toFixed(1)} m³`,
+        electric_meter_initial: `${f * 150 + u * 45} kWh`,
+        bill_settings: {
+          insert_electric: status !== UNIT_STATUS.VACANT,
+          insert_water: status !== UNIT_STATUS.VACANT,
+          insert_ipl: true,
+          ipl_target: status === UNIT_STATUS.RENTED ? 'Penyewa' : 'Pemilik',
+          ipl_interval: 'Bulanan',
+          last_ipl_bill: `Rp ${(850000 + spec.beds * 250000).toLocaleString('id-ID')} (Jan 2026)`
+        }
+      });
+    }
+  }
+
+  return result;
+}
+
+// Generate hundreds of units per tower:
+// Tower A: 20 floors x 9 units = 180 units!
+const towerAUnits = generateTowerUnits('A', 'tower-a', 20, 9);
+// Tower B: 15 floors x 8 units = 120 units!
+const towerBUnits = generateTowerUnits('B', 'tower-b', 15, 8);
+// Tower C: 10 floors x 8 units = 80 units!
+const towerCUnits = generateTowerUnits('C', 'tower-c', 10, 8);
+
+// Combine all units into master dataset (380 units total!)
+export const initialUnitsData = [
+  ...towerAUnits,
+  ...towerBUnits,
+  ...towerCUnits
+];
+
+// Calculate dynamic tower summary stats based on actual generated units
 export const initialTowersData = [
   {
     id: 'tower-a',
     name: 'Tower A',
     siteName: 'Paladian Park',
-    totalUnits: 48,
-    occupiedUnits: 41,
-    vacantUnits: 7,
-    occupancyRate: 85,
-    description: 'Tower residensial utama dengan fasilitas lobby concierge'
+    totalUnits: towerAUnits.length,
+    occupiedUnits: towerAUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length,
+    vacantUnits: towerAUnits.filter(u => u.status === UNIT_STATUS.VACANT).length,
+    occupancyRate: Math.round((towerAUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length / towerAUnits.length) * 100),
+    description: 'Tower residensial utama 20 lantai dengan fasilitas lobby concierge'
   },
   {
     id: 'tower-b',
     name: 'Tower B',
     siteName: 'Paladian Park',
-    totalUnits: 36,
-    occupiedUnits: 26,
-    vacantUnits: 10,
-    occupancyRate: 72,
-    description: 'Tower residensial barat dekat area taman dan gym'
+    totalUnits: towerBUnits.length,
+    occupiedUnits: towerBUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length,
+    vacantUnits: towerBUnits.filter(u => u.status === UNIT_STATUS.VACANT).length,
+    occupancyRate: Math.round((towerBUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length / towerBUnits.length) * 100),
+    description: 'Tower residensial barat 15 lantai dekat area taman dan gym'
   },
   {
     id: 'tower-c',
     name: 'Tower C',
     siteName: 'Paladian Park',
-    totalUnits: 24,
-    occupiedUnits: 12,
-    vacantUnits: 12,
-    occupancyRate: 50,
-    description: 'Tower residensial timur dekat playground dan tennis court'
-  }
-];
-
-export const initialUnitsData = [
-  // ==========================================
-  // TOWER A UNITS
-  // ==========================================
-  {
-    id: 'unit-a-1201',
-    unit_name: 'Unit A-1201',
-    tower: 'Tower A',
-    tower_id: 'tower-a',
-    floor: '12',
-    type: '3BR Penthouse',
-    bedroom_count: 3,
-    area: '108 m²',
-    npp: 'NPP-PLD-001201',
-    description: 'Unit lantai 12 dengan balkon hadap utara dan pemandangan kolam renang.',
-    ownership_letter: 'SHM Sarusun No. 0482/PLD/2021',
-    status: UNIT_STATUS.RENTED, // Disewakan
-    owner: {
-      id: 'own-001',
-      name: 'Budi Santoso',
-      phone: '+62 812-3456-7890',
-      email: 'budi.santoso@email.com'
-    },
-    // Karena disewakan: Pemilik TIDAK masuk ke members, Penyewa (Rendra Pratama) adalah is_occupant: true
-    members: [
-      { id: 'm-1', name: 'Rendra Pratama', role: 'Penyewa', is_occupant: true, since: '01 Jan 2025' },
-      { id: 'm-2', name: 'Siti Rahma', role: 'Suami/Istri', is_occupant: false, since: '01 Jan 2025' },
-      { id: 'm-3', name: 'Dimas Pratama', role: 'Keluarga', is_occupant: false, since: '01 Jan 2025' }
-    ],
-    vehicles: [
-      { id: 'v-1', plate_number: 'B 1234 KLR', brand_model: 'Toyota Fortuner GR', color: 'Hitam Metalik', type: 'Mobil', member_id: 'm-1', member_name: 'Rendra Pratama' },
-      { id: 'v-2', plate_number: 'B 5678 SMR', brand_model: 'Honda PCX 160', color: 'Putih Mutiara', type: 'Motor', member_id: 'm-2', member_name: 'Siti Rahma' }
-    ],
-    electric_capacity: '4400 VA',
-    water_meter_no: 'PAM-TWA-1201-99',
-    electric_meter_no: 'PLN-TWA-1201-44',
-    water_meter_initial: '124.5 m³',
-    electric_meter_initial: '3412 kWh',
-    bill_settings: {
-      insert_electric: true,
-      insert_water: true,
-      insert_ipl: true,
-      ipl_target: 'Penyewa',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 1.450.000 (Jan 2026)'
-    }
-  },
-  {
-    id: 'unit-a-0805',
-    unit_name: 'Unit A-0805',
-    tower: 'Tower A',
-    tower_id: 'tower-a',
-    floor: '08',
-    type: '2BR Corner',
-    bedroom_count: 2,
-    area: '74 m²',
-    npp: 'NPP-PLD-000805',
-    description: 'Unit sudut lantai 8 dengan pencahayaan alami maksimal.',
-    ownership_letter: 'SHM Sarusun No. 0319/PLD/2020',
-    status: UNIT_STATUS.OCCUPIED, // Dihuni Pemilik Sendiri
-    owner: {
-      id: 'own-002',
-      name: 'Hendrawan Kusuma',
-      phone: '+62 811-9876-5432',
-      email: 'hendrawan.k@gmail.com'
-    },
-    // Karena dihuni sendiri: Pemilik masuk ke members sebagai kepala penghuni
-    members: [
-      { id: 'm-4', name: 'Hendrawan Kusuma', role: 'Pemilik', is_occupant: true, since: '15 Mei 2021' },
-      { id: 'm-5', name: 'Dewi Lestari', role: 'Suami/Istri', is_occupant: false, since: '15 Mei 2021' }
-    ],
-    vehicles: [
-      { id: 'v-3', plate_number: 'B 8899 HK', brand_model: 'Honda CR-V Turbo', color: 'Abu-abu Metalik', type: 'Mobil', member_id: 'm-4', member_name: 'Hendrawan Kusuma' }
-    ],
-    electric_capacity: '3500 VA',
-    water_meter_no: 'PAM-TWA-0805-12',
-    electric_meter_no: 'PLN-TWA-0805-88',
-    water_meter_initial: '98.2 m³',
-    electric_meter_initial: '2870 kWh',
-    bill_settings: {
-      insert_electric: true,
-      insert_water: true,
-      insert_ipl: true,
-      ipl_target: 'Pemilik',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 980.000 (Jan 2026)'
-    }
-  },
-  {
-    id: 'unit-a-0302',
-    unit_name: 'Unit A-0302',
-    tower: 'Tower A',
-    tower_id: 'tower-a',
-    floor: '03',
-    type: '1BR Deluxe',
-    bedroom_count: 1,
-    area: '48 m²',
-    npp: 'NPP-PLD-000302',
-    description: 'Unit 1 kamar tidur dekat dengan fasilitas lift dan tangga darurat.',
-    ownership_letter: 'SHM Sarusun No. 0112/PLD/2022',
-    status: UNIT_STATUS.VACANT, // Vacant (belum berpenghuni)
-    owner: {
-      id: 'own-003',
-      name: 'Maya Indah Permata',
-      phone: '+62 813-1122-3344',
-      email: 'maya.indah@permatagroup.com'
-    },
-    members: [],
-    vehicles: [],
-    electric_capacity: '2200 VA',
-    water_meter_no: 'PAM-TWA-0302-05',
-    electric_meter_no: 'PLN-TWA-0302-21',
-    water_meter_initial: '15.0 m³',
-    electric_meter_initial: '450 kWh',
-    bill_settings: {
-      insert_electric: false,
-      insert_water: false,
-      insert_ipl: true,
-      ipl_target: 'Pemilik',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 650.000 (Jan 2026)'
-    }
-  },
-  {
-    id: 'unit-a-1503',
-    unit_name: 'Unit A-1503',
-    tower: 'Tower A',
-    tower_id: 'tower-a',
-    floor: '15',
-    type: '3BR Executive',
-    bedroom_count: 3,
-    area: '115 m²',
-    npp: 'NPP-PLD-001503',
-    description: 'Unit lantai tinggi dengan pemandangan cakrawala kota 180 derajat.',
-    ownership_letter: 'SHM Sarusun No. 0599/PLD/2019',
-    status: UNIT_STATUS.OCCUPIED,
-    owner: {
-      id: 'own-004',
-      name: 'Dr. Gunawan Wibowo',
-      phone: '+62 815-5566-7788',
-      email: 'dr.gunawan@hospital.co.id'
-    },
-    members: [
-      { id: 'm-6', name: 'Dr. Gunawan Wibowo', role: 'Pemilik', is_occupant: true, since: '10 Nov 2019' },
-      { id: 'm-7', name: 'Anindya Wibowo', role: 'Suami/Istri', is_occupant: false, since: '10 Nov 2019' },
-      { id: 'm-8', name: 'Mba Sumi', role: 'Karyawan', is_occupant: false, since: '01 Feb 2020' }
-    ],
-    vehicles: [
-      { id: 'v-4', plate_number: 'B 1980 GW', brand_model: 'BMW 530i M Sport', color: 'Sophisto Grey', type: 'Mobil', member_id: 'm-6', member_name: 'Dr. Gunawan Wibowo' }
-    ],
-    electric_capacity: '5500 VA',
-    water_meter_no: 'PAM-TWA-1503-60',
-    electric_meter_no: 'PLN-TWA-1503-77',
-    water_meter_initial: '310.4 m³',
-    electric_meter_initial: '6890 kWh',
-    bill_settings: {
-      insert_electric: true,
-      insert_water: true,
-      insert_ipl: true,
-      ipl_target: 'Pemilik',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 1.600.000 (Jan 2026)'
-    }
-  },
-
-  // ==========================================
-  // TOWER B UNITS
-  // ==========================================
-  {
-    id: 'unit-b-0601',
-    unit_name: 'Unit B-0601',
-    tower: 'Tower B',
-    tower_id: 'tower-b',
-    floor: '06',
-    type: '2BR Suite',
-    bedroom_count: 2,
-    area: '72 m²',
-    npp: 'NPP-PLD-002601',
-    description: 'Unit tower B dengan pemandangan taman tengah asri.',
-    ownership_letter: 'SHM Sarusun No. 0288/PLD/2021',
-    status: UNIT_STATUS.RENTED,
-    owner: {
-      id: 'own-005',
-      name: 'Iwan Setiawan',
-      phone: '+62 817-4433-2211',
-      email: 'iwan.setiawan@property.id'
-    },
-    members: [
-      { id: 'm-9', name: 'Kevin Wijaya', role: 'Penyewa', is_occupant: true, since: '15 Mar 2025' },
-      { id: 'm-10', name: 'Agus Santoso', role: 'Kerabat', is_occupant: false, since: '01 Apr 2025' }
-    ],
-    vehicles: [
-      { id: 'v-5', plate_number: 'B 2345 KW', brand_model: 'Hyundai Ioniq 5', color: 'Gravity Gold Matte', type: 'Mobil', member_id: 'm-9', member_name: 'Kevin Wijaya' }
-    ],
-    electric_capacity: '3500 VA',
-    water_meter_no: 'PAM-TWB-0601-33',
-    electric_meter_no: 'PLN-TWB-0601-55',
-    water_meter_initial: '88.0 m³',
-    electric_meter_initial: '2100 kWh',
-    bill_settings: {
-      insert_electric: true,
-      insert_water: true,
-      insert_ipl: true,
-      ipl_target: 'Penyewa',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 950.000 (Jan 2026)'
-    }
-  },
-  {
-    id: 'unit-b-0904',
-    unit_name: 'Unit B-0904',
-    tower: 'Tower B',
-    tower_id: 'tower-b',
-    floor: '09',
-    type: '2BR Standard',
-    bedroom_count: 2,
-    area: '68 m²',
-    npp: 'NPP-PLD-002904',
-    description: 'Unit 2 kamar tidur siap huni lengkap dengan perabotan built-in.',
-    ownership_letter: 'SHM Sarusun No. 0344/PLD/2020',
-    status: UNIT_STATUS.OCCUPIED,
-    owner: {
-      id: 'own-006',
-      name: 'Farhan Maulana',
-      phone: '+62 818-7766-5544',
-      email: 'farhan.m@techdev.com'
-    },
-    members: [
-      { id: 'm-11', name: 'Farhan Maulana', role: 'Pemilik', is_occupant: true, since: '20 Jul 2022' },
-      { id: 'm-12', name: 'Nadia Az-Zahra', role: 'Suami/Istri', is_occupant: false, since: '20 Jul 2022' }
-    ],
-    vehicles: [
-      { id: 'v-6', plate_number: 'B 3456 FM', brand_model: 'Mazda CX-5 Elite', color: 'Soul Red Crystal', type: 'Mobil', member_id: 'm-11', member_name: 'Farhan Maulana' },
-      { id: 'v-7', plate_number: 'B 6789 NA', brand_model: 'Yamaha Fazzio', color: 'Tosca Blue', type: 'Motor', member_id: 'm-12', member_name: 'Nadia Az-Zahra' }
-    ],
-    electric_capacity: '3500 VA',
-    water_meter_no: 'PAM-TWB-0904-77',
-    electric_meter_no: 'PLN-TWB-0904-90',
-    water_meter_initial: '142.1 m³',
-    electric_meter_initial: '3150 kWh',
-    bill_settings: {
-      insert_electric: true,
-      insert_water: true,
-      insert_ipl: true,
-      ipl_target: 'Pemilik',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 890.000 (Jan 2026)'
-    }
-  },
-  {
-    id: 'unit-b-0201',
-    unit_name: 'Unit B-0201',
-    tower: 'Tower B',
-    tower_id: 'tower-b',
-    floor: '02',
-    type: 'Studio Compact',
-    bedroom_count: 1,
-    area: '34 m²',
-    npp: 'NPP-PLD-002201',
-    description: 'Unit studio praktis lantai rendah dekat lobby dan drop-off.',
-    ownership_letter: 'SHM Sarusun No. 0098/PLD/2023',
-    status: UNIT_STATUS.VACANT,
-    owner: {
-      id: 'own-007',
-      name: 'Stephanie Tan',
-      phone: '+62 819-0099-8877',
-      email: 'stephanie.tan@capital.sg'
-    },
-    members: [],
-    vehicles: [],
-    electric_capacity: '1300 VA',
-    water_meter_no: 'PAM-TWB-0201-11',
-    electric_meter_no: 'PLN-TWB-0201-18',
-    water_meter_initial: '5.2 m³',
-    electric_meter_initial: '120 kWh',
-    bill_settings: {
-      insert_electric: false,
-      insert_water: false,
-      insert_ipl: true,
-      ipl_target: 'Pemilik',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 450.000 (Jan 2026)'
-    }
-  },
-
-  // ==========================================
-  // TOWER C UNITS
-  // ==========================================
-  {
-    id: 'unit-c-0502',
-    unit_name: 'Unit C-0502',
-    tower: 'Tower C',
-    tower_id: 'tower-c',
-    floor: '05',
-    type: '3BR Family',
-    bedroom_count: 3,
-    area: '96 m²',
-    npp: 'NPP-PLD-003502',
-    description: 'Unit keluarga luas dekat playground anak-anak.',
-    ownership_letter: 'SHM Sarusun No. 0411/PLD/2021',
-    status: UNIT_STATUS.OCCUPIED,
-    owner: {
-      id: 'own-008',
-      name: 'Kurniawan Hidayat',
-      phone: '+62 812-9988-7766',
-      email: 'kurniawan.h@hidayat.id'
-    },
-    members: [
-      { id: 'm-13', name: 'Kurniawan Hidayat', role: 'Pemilik', is_occupant: true, since: '01 Sep 2021' },
-      { id: 'm-14', name: 'Rina Marlina', role: 'Suami/Istri', is_occupant: false, since: '01 Sep 2021' }
-    ],
-    vehicles: [
-      { id: 'v-8', plate_number: 'B 7788 KH', brand_model: 'Mitsubishi Pajero Sport', color: 'Hitam', type: 'Mobil', member_id: 'm-13', member_name: 'Kurniawan Hidayat' }
-    ],
-    electric_capacity: '4400 VA',
-    water_meter_no: 'PAM-TWC-0502-45',
-    electric_meter_no: 'PLN-TWC-0502-67',
-    water_meter_initial: '165.0 m³',
-    electric_meter_initial: '4120 kWh',
-    bill_settings: {
-      insert_electric: true,
-      insert_water: true,
-      insert_ipl: true,
-      ipl_target: 'Pemilik',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 1.250.000 (Jan 2026)'
-    }
-  },
-  {
-    id: 'unit-c-1001',
-    unit_name: 'Unit C-1001',
-    tower: 'Tower C',
-    tower_id: 'tower-c',
-    floor: '10',
-    type: '2BR Sky',
-    bedroom_count: 2,
-    area: '78 m²',
-    npp: 'NPP-PLD-003001',
-    description: 'Unit lantai 10 dengan balkon luas hadap timur.',
-    ownership_letter: 'SHM Sarusun No. 0520/PLD/2022',
-    status: UNIT_STATUS.VACANT,
-    owner: {
-      id: 'own-009',
-      name: 'Cindy Claudia',
-      phone: '+62 811-2233-4455',
-      email: 'cindy.claudia@invest.co.id'
-    },
-    members: [],
-    vehicles: [],
-    electric_capacity: '3500 VA',
-    water_meter_no: 'PAM-TWC-1001-89',
-    electric_meter_no: 'PLN-TWC-1001-92',
-    water_meter_initial: '8.0 m³',
-    electric_meter_initial: '210 kWh',
-    bill_settings: {
-      insert_electric: false,
-      insert_water: false,
-      insert_ipl: true,
-      ipl_target: 'Pemilik',
-      ipl_interval: 'Bulanan',
-      last_ipl_bill: 'Rp 980.000 (Jan 2026)'
-    }
+    totalUnits: towerCUnits.length,
+    occupiedUnits: towerCUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length,
+    vacantUnits: towerCUnits.filter(u => u.status === UNIT_STATUS.VACANT).length,
+    occupancyRate: Math.round((towerCUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length / towerCUnits.length) * 100),
+    description: 'Tower residensial timur 10 lantai dekat playground dan tennis court'
   }
 ];
