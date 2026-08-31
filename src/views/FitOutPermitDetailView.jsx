@@ -115,8 +115,11 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const latestExtension = extensionRequests.length > 0 ? extensionRequests[extensionRequests.length - 1] : null;
   const extensionSubmittedData = latestExtension;
   const isLatestRejected = latestExtension?.status === 'REJECTED';
-  const canRequestExtension = !latestExtension || isLatestRejected;
-  // Main card hidden when: no extension, rejected (any POV), or TR viewing rejected
+  const isLatestApproved = latestExtension?.status === 'APPROVED';
+  // Multi-extension: new request can be made if no extension, rejected, or already approved!
+  // Only locked when currently WAITING_FOR_APPROVAL
+  const canRequestExtension = !latestExtension || isLatestRejected || isLatestApproved;
+  // Main card hidden when: no extension, or latest is rejected (moved to history)
   const showExtensionCard = Boolean(latestExtension && !isLatestRejected);
   // History: all except latest, UNLESS latest is rejected (then include it too in Engineering)
   const historyBase = isLatestRejected
@@ -757,29 +760,42 @@ export function FitOutPermitDetailView({ permit, controller }) {
             {latestExtension?.status === 'REJECTED' && (
               <Box 
                 sx={{ 
-                  backgroundColor: '#fef2f2', 
-                  border: '1.5px solid #fecaca', 
-                  borderRadius: '10px', 
-                  p: 1.6, 
+                  backgroundColor: '#fff5f5', 
+                  border: '1px solid #fecaca', 
+                  borderLeft: '4px solid #ef4444', 
+                  borderRadius: '12px', 
+                  p: 1.8, 
                   mt: 1.5,
                   mb: 0.5
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.6 }}>
-                  <XCircle size={18} weight="fill" />
-                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 800 }}>
-                    Request #{latestExtension.requestNumber} Rejected
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <XCircle size={18} color="#ef4444" weight="fill" />
+                    <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, color: '#b91c1c', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                      TR Rejection Decision (Request #{latestExtension.requestNumber})
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: '0.7rem', color: '#991b1b', fontWeight: 600 }}>
+                    {latestExtension.rejectedAt || '12/02/2026, 03:30 PM'}
                   </Typography>
                 </Box>
-                <Typography sx={{ fontSize: '0.8rem', color: '#7f1d1d', lineHeight: 1.5, mb: 0.8 }}>
-                  "{latestExtension.rejectionReason}"
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                  <Typography sx={{ fontSize: '0.72rem', color: '#991b1b', fontWeight: 600 }}>
-                    Rejected by {latestExtension.rejectedBy || 'Tenant Relation'} • {latestExtension.rejectedAt || '12/02/2026, 03:30 PM'}
+
+                <Box sx={{ backgroundColor: '#ffffff', border: '1px solid #fee2e2', borderRadius: '8px', p: 1.4, mb: 1 }}>
+                  <Typography sx={{ fontSize: '0.84rem', color: '#7f1d1d', lineHeight: 1.55, fontWeight: 500 }}>
+                    {latestExtension.rejectionReason}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: '#dc2626', fontWeight: 700 }}>
-                    *Resubmission permitted
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                    <ShieldCheck size={14} color="#dc2626" weight="bold" />
+                    <Typography sx={{ fontSize: '0.72rem', color: '#991b1b', fontWeight: 600 }}>
+                      Authorized by {latestExtension.rejectedBy || 'Tenant Relation Management'}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: '0.72rem', color: '#dc2626', fontWeight: 700, backgroundColor: '#fee2e2', px: 1, py: 0.2, borderRadius: '6px' }}>
+                    Resubmission Allowed
                   </Typography>
                 </Box>
               </Box>
@@ -1051,24 +1067,36 @@ export function FitOutPermitDetailView({ permit, controller }) {
               </Box>
             )}
 
-            {/* 2. Notes & Technical Remarks (Elaboration / Narrative below photos - No Icon) */}
+            {/* 2. Notes & Technical Remarks */}
             {(extensionSubmittedData.notes || extensionSubmittedData.reason) && (
               <Box sx={{ mt: 2.2 }}>
                 <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
                 
-                <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b', mb: 1 }}>
-                  Notes & Remarks
-                </Typography>
-
                 <Box
                   sx={{
                     backgroundColor: '#f8fafc',
-                    border: '1.5px solid #e2e8f0',
+                    border: '1px solid #e2e8f0',
+                    borderLeft: '4px solid #27b29b',
                     borderRadius: '12px',
-                    p: 1.6
+                    p: 1.8
                   }}
                 >
-                  <Typography sx={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                      <FileText size={16} color="#27b29b" weight="bold" />
+                      <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: '#1e293b', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                        Technical Notes & Remarks
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Wrench size={12} color="#64748b" weight="bold" />
+                      <Typography sx={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>
+                        Engineering
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Typography sx={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.6, whiteSpace: 'pre-line', pl: 0.2 }}>
                     {latestExtension.notes || latestExtension.reason}
                   </Typography>
                 </Box>
@@ -1185,26 +1213,47 @@ export function FitOutPermitDetailView({ permit, controller }) {
                       </Box>
                     </Box>
 
-                    {/* Rejection Note in History if Rejected */}
+                    {/* TR Rejection Decision Card in History */}
                     {req.status === 'REJECTED' && req.rejectionReason && (
                       <Box
                         sx={{
-                          backgroundColor: '#ffffff',
+                          backgroundColor: '#fff5f5',
                           border: '1px solid #fecaca',
-                          borderRadius: '8px',
-                          p: 1.2,
-                          mb: 1.2
+                          borderLeft: '4px solid #ef4444',
+                          borderRadius: '10px',
+                          p: 1.6,
+                          mb: 1.5
                         }}
                       >
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', mb: 0.3 }}>
-                          TR Rejection Reason:
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.76rem', color: '#991b1b', lineHeight: 1.4 }}>
-                          "{req.rejectionReason}"
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.68rem', color: '#b91c1c', mt: 0.4 }}>
-                          Rejected on {req.rejectedAt}
-                        </Typography>
+                        {/* Header: Badge & Timestamp */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
+                            <XCircle size={16} color="#dc2626" weight="fill" />
+                            <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: '#b91c1c', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                              TR Rejection Decision
+                            </Typography>
+                          </Box>
+                          <Typography sx={{ fontSize: '0.68rem', color: '#991b1b', fontWeight: 600 }}>
+                            {req.rejectedAt ? `Rejected on ${req.rejectedAt}` : 'Decision Final'}
+                          </Typography>
+                        </Box>
+
+                        {/* Decision Reason Content */}
+                        <Box sx={{ backgroundColor: '#ffffff', border: '1px solid #fee2e2', borderRadius: '8px', p: 1.2, mb: 0.8 }}>
+                          <Typography sx={{ fontSize: '0.8rem', color: '#7f1d1d', lineHeight: 1.5, fontWeight: 500 }}>
+                            {req.rejectionReason}
+                          </Typography>
+                        </Box>
+
+                        {/* Reviewer / Authority Attribution */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                          <Box sx={{ width: 18, height: 18, borderRadius: '50%', backgroundColor: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <ShieldCheck size={12} color="#dc2626" weight="bold" />
+                          </Box>
+                          <Typography sx={{ fontSize: '0.7rem', color: '#991b1b', fontWeight: 600 }}>
+                            Reviewed & authorized by Tenant Relation Management
+                          </Typography>
+                        </Box>
                       </Box>
                     )}
 
@@ -1253,11 +1302,34 @@ export function FitOutPermitDetailView({ permit, controller }) {
                       </Box>
                     )}
 
-                    {/* Reason Notes */}
+                    {/* Technical Notes Card in History */}
                     {req.notes && (
-                      <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.4, mt: 0.5 }}>
-                        Technical Remarks: "{req.notes}"
-                      </Typography>
+                      <Box
+                        sx={{
+                          backgroundColor: '#f8fafc',
+                          border: '1px solid #e2e8f0',
+                          borderLeft: '4px solid #0284c7',
+                          borderRadius: '10px',
+                          p: 1.4,
+                          mt: 1.4
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.8 }}>
+                          <FileText size={15} color="#0284c7" weight="bold" />
+                          <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: '#0369a1', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                            Technical Notes
+                          </Typography>
+                        </Box>
+                        <Typography sx={{ fontSize: '0.8rem', color: '#334155', lineHeight: 1.5, pl: 0.2 }}>
+                          {req.notes}
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, mt: 0.8, pt: 0.6, borderTop: '1px dashed #e2e8f0' }}>
+                          <Wrench size={12} color="#64748b" weight="bold" />
+                          <Typography sx={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>
+                            Documented by Engineering Team
+                          </Typography>
+                        </Box>
+                      </Box>
                     )}
                   </Box>
                 ))}
@@ -2517,11 +2589,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
           {/* Notes / Reason */}
           {(latestExtension?.notes || latestExtension?.reason) && (
             <Box>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', mb: 0.8 }}>
-                Engineering Notes
-              </Typography>
-              <Box sx={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', p: 1.6 }}>
-                <Typography sx={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.55 }}>
+              <Box sx={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderLeft: '4px solid #0284c7', borderRadius: '12px', p: 1.6 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.8 }}>
+                  <FileText size={15} color="#0284c7" weight="bold" />
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#0369a1', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                    Engineering Technical Notes
+                  </Typography>
+                </Box>
+                <Typography sx={{ fontSize: '0.82rem', color: '#334155', lineHeight: 1.55 }}>
                   {latestExtension?.notes || latestExtension?.reason}
                 </Typography>
               </Box>
@@ -3000,18 +3075,20 @@ export function FitOutPermitDetailView({ permit, controller }) {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.2 }}>
               {/* Previous Rejection Alert if applicable */}
               {latestExtension?.status === 'REJECTED' && (
-                <Box sx={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', p: 1.5 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.4 }}>
-                    <XCircle size={16} weight="fill" />
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 800 }}>
-                      Previous Request #{latestExtension.requestNumber} Was Rejected
+                <Box sx={{ backgroundColor: '#fff5f5', border: '1px solid #fecaca', borderLeft: '4px solid #ef4444', borderRadius: '12px', p: 1.8 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.8 }}>
+                    <XCircle size={17} weight="fill" />
+                    <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                      Previous Request #{latestExtension.requestNumber} Rejection Decision
                     </Typography>
                   </Box>
-                  <Typography sx={{ fontSize: '0.75rem', color: '#991b1b', lineHeight: 1.4 }}>
-                    TR Feedback: "{latestExtension.rejectionReason}"
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.7rem', color: '#dc2626', mt: 0.5, fontStyle: 'italic' }}>
-                    *Please adjust the schedule duration or provide updated progress photos and technical remarks.
+                  <Box sx={{ backgroundColor: '#ffffff', border: '1px solid #fee2e2', borderRadius: '8px', p: 1.2, mb: 0.8 }}>
+                    <Typography sx={{ fontSize: '0.78rem', color: '#7f1d1d', lineHeight: 1.5, fontWeight: 500 }}>
+                      {latestExtension.rejectionReason}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: '0.7rem', color: '#dc2626', fontWeight: 600 }}>
+                    *Please adjust duration or provide updated progress photos and technical remarks before submitting.
                   </Typography>
                 </Box>
               )}
