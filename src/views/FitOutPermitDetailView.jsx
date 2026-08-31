@@ -92,14 +92,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
       dueDate: '13 Feb 2026, 23:59',
       permitNo: data.permitNumber || '#PRO/FP/122025/000032',
       status: 'REJECTED',
-      rejectionReason: 'Durasi perpanjangan 3 hari melebihi batas toleransi pekerjaan minor. Mohon ajukan ulang maksimal 2 hari atau koordinasikan biaya supervisi.',
+      rejectionReason: 'Duration of 3 days exceeds minor fitout grace period. Please resubmit with maximum 2 days or coordinate daily supervision fee policy.',
       rejectedBy: 'Tenant Relation Lead',
-      rejectedAt: '12/02/2026 15:30',
-      reason: 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 3 hari sebelum inspeksi serah terima.',
-      notes: 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 3 hari sebelum inspeksi serah terima.',
+      rejectedAt: '12/02/2026, 03:30 PM',
+      reason: 'Finishing of gypsum partition and MEP cable tray installation requires an additional 3 days before final handover inspection.',
+      notes: 'Finishing of gypsum partition and MEP cable tray installation requires an additional 3 days before final handover inspection.',
       photos: [
-        'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80'
+        '/renovasi_kamar_1.jpg',
+        '/renovasi_kamar_2.jpg'
       ],
       photoCount: 2,
       authorizedBy: 'Engineering Lead'
@@ -287,10 +287,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const handleEngSubmit = () => {
     const formattedEnd = formatDisplayDate(engNewEndDate);
     const finalPhotos = engPhotos.length > 0 ? engPhotos : [
-      'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80'
+      '/renovasi_kamar_1.jpg',
+      '/renovasi_kamar_2.jpg'
     ];
-    const finalNotes = engNotes.trim() || 'Pekerjaan perapihan partisi gypsum dan instalasi kabel tray MEP memerlukan tambahan waktu 2 hari sebelum inspeksi serah terima.';
+    const finalNotes = engNotes.trim() || 'Finishing of gypsum partition and MEP cable tray installation requires an additional 2 days before final handover inspection.';
     const nextReqNum = extensionRequests.length + 1;
 
     const newReq = {
@@ -317,7 +317,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
     setExtensionRequests(prev => [...prev, newReq]);
     setExtensionModalOpen(false);
-    setSuccessMessage(`Pengajuan Extension #${nextReqNum} (+${engExtendedDaysCount} Hari s/d ${engNewEndDate}) berhasil diajukan!`);
+    setSuccessMessage(`Extension Request #${nextReqNum} (+${engExtendedDaysCount} Days until ${engNewEndDate}) successfully submitted!`);
     setExtensionSuccessOpen(true);
   };
 
@@ -329,18 +329,18 @@ export function FitOutPermitDetailView({ permit, controller }) {
         updated[lastIdx] = {
           ...updated[lastIdx],
           status: 'APPROVED',
-          approvedAt: '12/02/2026, 17:15',
+          approvedAt: '12/02/2026, 05:15 PM',
           approvedBy: 'Tenant Relation Lead'
         };
       }
       return updated;
     });
-    setSuccessMessage(`Pengajuan Extension #${latestExtension?.requestNumber || 1} telah disetujui.`);
+    setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} has been approved.`);
     setExtensionSuccessOpen(true);
   };
 
   const handleConfirmReject = () => {
-    const finalReason = rejectReason.trim() || 'Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang dengan durasi maksimal 2 hari.';
+    const finalReason = rejectReason.trim() || 'Duration exceeds tolerance grace period. Please resubmit with a maximum 2 days extension.';
     setExtensionRequests(prev => {
       const updated = [...prev];
       const lastIdx = updated.length - 1;
@@ -350,13 +350,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
           status: 'REJECTED',
           rejectionReason: finalReason,
           rejectedBy: 'Tenant Relation Lead',
-          rejectedAt: '12/02/2026, 17:10'
+          rejectedAt: '12/02/2026, 05:10 PM'
         };
       }
       return updated;
     });
     setRejectModalOpen(false);
-    setSuccessMessage(`Pengajuan Extension #${latestExtension?.requestNumber || 1} telah ditolak.`);
+    setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} has been rejected.`);
     setExtensionSuccessOpen(true);
   };
 
@@ -713,10 +713,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
                 <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
-                  Extension Information {extensionRequests.length > 1 ? `(Pengajuan #${latestExtension?.requestNumber})` : ''}
+                  Extension Information {extensionRequests.length > 1 ? `(Request #${latestExtension?.requestNumber})` : ''}
                 </Typography>
                 <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                  {latestExtension?.submittedAt} • oleh {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                  {latestExtension?.submittedAt} • by {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
                 </Typography>
               </Box>
               {latestExtension && (
@@ -754,7 +754,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.6 }}>
                   <XCircle size={18} weight="fill" />
                   <Typography sx={{ fontSize: '0.84rem', fontWeight: 800 }}>
-                    Pengajuan #{latestExtension.requestNumber} Ditolak
+                    Request #{latestExtension.requestNumber} Rejected
                   </Typography>
                 </Box>
                 <Typography sx={{ fontSize: '0.8rem', color: '#7f1d1d', lineHeight: 1.5, mb: 0.8 }}>
@@ -762,10 +762,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
                   <Typography sx={{ fontSize: '0.72rem', color: '#991b1b', fontWeight: 600 }}>
-                    Ditolak oleh {latestExtension.rejectedBy || 'Tenant Relation'} • {latestExtension.rejectedAt || '12/02/2026 15:30'}
+                    Rejected by {latestExtension.rejectedBy || 'Tenant Relation'} • {latestExtension.rejectedAt || '12/02/2026, 03:30 PM'}
                   </Typography>
                   <Typography sx={{ fontSize: '0.72rem', color: '#dc2626', fontWeight: 700 }}>
-                    *Dapat diajukan ulang
+                    *Resubmission permitted
                   </Typography>
                 </Box>
               </Box>
@@ -1069,10 +1069,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 {activePov === 'tenant_relation' ? (
                   <Box sx={{ backgroundColor: '#fffaf5', border: '1.5px dashed #fed7aa', borderRadius: '10px', p: 1.8 }}>
                     <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, color: '#9a3412', mb: 0.5 }}>
-                      Review Pengajuan Extension #{latestExtension.requestNumber} (Tenant Relation)
+                      Review Extension Request #{latestExtension.requestNumber} (Tenant Relation)
                     </Typography>
                     <Typography sx={{ fontSize: '0.74rem', color: '#c2410c', mb: 1.5 }}>
-                      Sebagai Tenant Relation, tentukan persetujuan terhadap perpanjangan jadwal yang diajukan oleh Engineering.
+                      As Tenant Relation, determine approval or rejection for the schedule extension submitted by Engineering.
                     </Typography>
 
                     <Box sx={{ display: 'flex', gap: 1.2 }}>
@@ -1090,13 +1090,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
                           textTransform: 'none'
                         }}
                       >
-                        Setujui Extension
+                        Approve Extension
                       </Button>
                       <Button
                         fullWidth
                         variant="outlined"
                         onClick={() => {
-                          setRejectReason('Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang dengan durasi maksimal 2 hari.');
+                          setRejectReason('Duration exceeds tolerance grace period. Please resubmit with a maximum 2 days extension.');
                           setRejectModalOpen(true);
                         }}
                         sx={{
@@ -1110,7 +1110,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                           textTransform: 'none'
                         }}
                       >
-                        Tolak Request
+                        Reject Request
                       </Button>
                     </Box>
                   </Box>
@@ -1119,13 +1119,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Clock size={16} color="#ea580c" weight="bold" />
                       <Typography sx={{ fontSize: '0.76rem', color: '#9a3412', fontWeight: 600 }}>
-                        Menunggu review dari Tenant Relation
+                        Waiting for Tenant Relation review
                       </Typography>
                     </Box>
                     <Button
                       size="small"
                       onClick={() => {
-                        setRejectReason('Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang dengan durasi maksimal 2 hari.');
+                        setRejectReason('Duration exceeds tolerance grace period. Please resubmit with a maximum 2 days extension.');
                         setRejectModalOpen(true);
                       }}
                       sx={{
@@ -1141,7 +1141,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         minWidth: 0
                       }}
                     >
-                      Simulasi Tolak TR
+                      Simulate TR Rejection
                     </Button>
                   </Box>
                 )}
@@ -1153,7 +1153,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Info size={16} color="#2563eb" weight="fill" />
                 <Typography sx={{ fontSize: '0.74rem', color: '#2563eb', fontWeight: 600 }}>
-                  Gunakan tombol "Request Extension" di bawah untuk mengajukan perpanjangan ulang.
+                  Use the "Request Extension" button below to submit a revised schedule extension.
                 </Typography>
               </Box>
             )}
@@ -1192,10 +1192,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 </Box>
                 <Box>
                   <Typography sx={{ fontWeight: 800, fontSize: '0.92rem', color: '#1e293b' }}>
-                    Riwayat Pengajuan Extension
+                    Extension Request History
                   </Typography>
                   <Typography sx={{ fontSize: '0.74rem', color: '#64748b' }}>
-                    {extensionRequests.length - 1} Pengajuan Sebelumnya
+                    {extensionRequests.length - 1} Previous Request{extensionRequests.length - 1 > 1 ? 's' : ''}
                   </Typography>
                 </Box>
               </Box>
@@ -1220,10 +1220,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
                       <Box>
                         <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#1e293b' }}>
-                          Pengajuan #{req.requestNumber}
+                          Request #{req.requestNumber}
                         </Typography>
                         <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                          {req.submittedAt} • oleh {req.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                          {req.submittedAt} • by {req.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
                         </Typography>
                       </Box>
 
@@ -1255,13 +1255,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         }}
                       >
                         <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', mb: 0.3 }}>
-                          Alasan Penolakan TR:
+                          TR Rejection Reason:
                         </Typography>
                         <Typography sx={{ fontSize: '0.76rem', color: '#991b1b', lineHeight: 1.4 }}>
                           "{req.rejectionReason}"
                         </Typography>
                         <Typography sx={{ fontSize: '0.68rem', color: '#b91c1c', mt: 0.4 }}>
-                          Ditolak pada {req.rejectedAt}
+                          Rejected on {req.rejectedAt}
                         </Typography>
                       </Box>
                     )}
@@ -1273,14 +1273,48 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         {req.startDate} → {req.endDate}
                       </Typography>
                       <Box sx={{ backgroundColor: '#eff6ff', color: '#2563eb', px: 0.8, py: 0.2, borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
-                        +{req.extendedDays} Hari
+                        +{req.extendedDays} Days
                       </Box>
                     </Box>
 
+                    {/* Attached Progress Photos in History */}
+                    {req.photos && req.photos.length > 0 && (
+                      <Box sx={{ mt: 1.2, mb: 1 }}>
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b', mb: 0.6 }}>
+                          Attached Progress Photos ({req.photos.length}):
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5 }}>
+                          {req.photos.map((photoUrl, pIdx) => (
+                            <Box
+                              key={pIdx}
+                              onClick={() => setPreviewPhoto(photoUrl)}
+                              sx={{
+                                width: 58,
+                                height: 58,
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                flexShrink: 0,
+                                border: '1px solid #e2e8f0',
+                                cursor: 'pointer',
+                                position: 'relative'
+                              }}
+                            >
+                              <Box
+                                component="img"
+                                src={photoUrl}
+                                alt={`History Photo ${pIdx + 1}`}
+                                sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              />
+                            </Box>
+                          ))}
+                        </Box>
+                      </Box>
+                    )}
+
                     {/* Reason Notes */}
                     {req.notes && (
-                      <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.4 }}>
-                        Catatan: "{req.notes}"
+                      <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.4, mt: 0.5 }}>
+                        Technical Remarks: "{req.notes}"
                       </Typography>
                     )}
                   </Box>
@@ -2834,14 +2868,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.4 }}>
                     <XCircle size={16} weight="fill" />
                     <Typography sx={{ fontSize: '0.8rem', fontWeight: 800 }}>
-                      Pengajuan #{latestExtension.requestNumber} Sebelumnya Ditolak
+                      Previous Request #{latestExtension.requestNumber} Was Rejected
                     </Typography>
                   </Box>
                   <Typography sx={{ fontSize: '0.75rem', color: '#991b1b', lineHeight: 1.4 }}>
-                    Catatan TR: "{latestExtension.rejectionReason}"
+                    TR Feedback: "{latestExtension.rejectionReason}"
                   </Typography>
                   <Typography sx={{ fontSize: '0.7rem', color: '#dc2626', mt: 0.5, fontStyle: 'italic' }}>
-                    *Silakan sesuaikan kembali estimasi jadwal atau lengkapi foto dan keterangan teknis.
+                    *Please adjust the schedule duration or provide updated progress photos and technical remarks.
                   </Typography>
                 </Box>
               )}
@@ -3999,10 +4033,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
             </Box>
             <Box>
               <Typography sx={{ fontWeight: 800, fontSize: '0.96rem', color: '#1e293b' }}>
-                Tolak Pengajuan Extension
+                Reject Extension Request
               </Typography>
               <Typography sx={{ fontSize: '0.72rem', color: '#64748b' }}>
-                Pengajuan #{latestExtension?.requestNumber || 1} oleh {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                Request #{latestExtension?.requestNumber || 1} by {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
               </Typography>
             </Box>
           </Box>
@@ -4013,11 +4047,11 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
         <DialogContent sx={{ py: 1.5 }}>
           <Typography sx={{ fontSize: '0.78rem', color: '#64748b', mb: 1.5, lineHeight: 1.45 }}>
-            Masukkan alasan penolakan untuk pengajuan ini. Feedback ini akan ditampilkan kepada tim Engineering agar mereka dapat mengajukan revisi jadwal yang sesuai.
+            Provide the rejection reason for this extension request. This feedback will be displayed to the Engineering team so they can submit a revised schedule.
           </Typography>
 
           <Typography sx={{ fontSize: '0.76rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
-            Alasan Penolakan <span style={{ color: '#ef4444' }}>*</span>
+            Rejection Reason <span style={{ color: '#ef4444' }}>*</span>
           </Typography>
           <TextField
             fullWidth
@@ -4025,19 +4059,19 @@ export function FitOutPermitDetailView({ permit, controller }) {
             rows={3}
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Contoh: Durasi perpanjangan melebihi batas toleransi. Silakan ajukan ulang maksimal 2 hari."
+            placeholder="e.g., Duration exceeds tolerance grace period. Please resubmit with maximum 2 days extension."
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '0.84rem' } }}
           />
 
           {/* Quick template chips */}
           <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 1.5, mb: 0.8, fontWeight: 600 }}>
-            Pilihan Alasan Cepat:
+            Quick Options:
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
             {[
-              'Durasi melebihi batas toleransi gratis',
-              'Jadwal bentrok dengan maintenance gedung',
-              'Dokumentasi foto belum cukup lengkap'
+              'Duration exceeds free grace period tolerance',
+              'Schedule conflicts with building maintenance',
+              'Progress documentation photos incomplete'
             ].map(template => (
               <Chip
                 key={template}
@@ -4070,7 +4104,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               borderColor: '#cbd5e1'
             }}
           >
-            Batal
+            Cancel
           </Button>
           <Button
             fullWidth
@@ -4084,7 +4118,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               fontWeight: 700
             }}
           >
-            Konfirmasi Tolak
+            Confirm Rejection
           </Button>
         </DialogActions>
       </Dialog>
