@@ -672,9 +672,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
                       sx={{ 
                         px: 0.9, 
                         py: 0.25, 
-                        backgroundColor: '#fff7ed', 
+                        backgroundColor: '#ecfdf5', 
                         borderRadius: '6px', 
-                        color: '#ea580c', 
+                        color: '#0d9488', 
                         fontWeight: 800, 
                         fontSize: '0.72rem' 
                       }} 
