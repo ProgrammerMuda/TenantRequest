@@ -71,6 +71,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
   // Common Modal / Toast States
   const [extensionModalOpen, setExtensionModalOpen] = useState(false);
+  const [trReviewModalOpen, setTrReviewModalOpen] = useState(false);
   const [extensionSuccessOpen, setExtensionSuccessOpen] = useState(false);
   const [completeSuccessOpen, setCompleteSuccessOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -121,8 +122,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const historyBase = isLatestRejected
     ? extensionRequests // include the rejected one in history
     : extensionRequests.slice(0, -1); // normal: exclude latest (shown as main card)
-  const visibleHistoryRequests = historyBase
-    .filter(req => !(activePov === 'tenant_relation' && req.status === 'REJECTED'));
+  const visibleHistoryRequests = historyBase; // TR can see rejected log in history
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
   const [depositInvoiceOpen, setDepositInvoiceOpen] = useState(false);
   const [earlyInspectionDetailOpen, setEarlyInspectionDetailOpen] = useState(false);
@@ -283,13 +283,15 @@ export function FitOutPermitDetailView({ permit, controller }) {
       issuedDate: '10/08/2026, 03:55 PM',
       dueDate: '11/08/2026, 11:59 PM',
       permitNo: '#PRO/FP/082026/000104',
-      status: trFeePolicy === 'FREE_OF_CHARGE' ? 'FREE_OF_CHARGE' : 'UNPAID',
+      status: 'APPROVED', // TR auto-approved
+      approvedBy: 'Tenant Relation',
+      approvedAt: '10/08/2026, 03:55 PM',
       authorizedBy: 'Tenant Relation Lead - Management'
     };
 
     setExtensionRequests(prev => [...prev, newReq]);
     setExtensionModalOpen(false);
-    setSuccessMessage(`Fitout Schedule Extension (+${trExtendedDaysCount} Days until ${trNewEndDate}) successfully submitted!`);
+    setSuccessMessage(`Fitout Schedule Extension (+${trExtendedDaysCount} Days until ${trNewEndDate}) approved!`);
     setExtensionSuccessOpen(true);
   };
 
@@ -1074,83 +1076,32 @@ export function FitOutPermitDetailView({ permit, controller }) {
             )}
 
             {/* 3. Status Action / Guidance Footer */}
-            {latestExtension?.status === 'WAITING_FOR_APPROVAL' && (
+            {latestExtension?.status === 'WAITING_FOR_APPROVAL' && activePov === 'engineering' && (
               <Box sx={{ mt: 2.2 }}>
                 <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
-
-                {activePov === 'tenant_relation' ? (
-                  <Box sx={{ backgroundColor: '#fffaf5', border: '1.5px dashed #fed7aa', borderRadius: '10px', p: 1.8 }}>
-                    <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, color: '#9a3412', mb: 0.5 }}>
-                      Review Extension Request #{latestExtension.requestNumber} (Tenant Relation)
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.74rem', color: '#c2410c', mb: 1.5 }}>
-                      As Tenant Relation, determine approval or rejection for the schedule extension submitted by Engineering.
-                    </Typography>
-
-                    <Box sx={{ display: 'flex', gap: 1.2 }}>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={handleApproveExtension}
-                        sx={{
-                          backgroundColor: '#27b29b !important',
-                          color: '#ffffff !important',
-                          borderRadius: '8px',
-                          py: 1,
-                          fontWeight: 700,
-                          fontSize: '0.82rem',
-                          textTransform: 'none'
-                        }}
-                      >
-                        Approve Extension
-                      </Button>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        onClick={() => {
-                          setRejectReason('Duration exceeds tolerance grace period. Please resubmit with a maximum 2 days extension.');
-                          setRejectModalOpen(true);
-                        }}
-                        sx={{
-                          borderColor: '#ef4444 !important',
-                          color: '#ef4444 !important',
-                          backgroundColor: '#ffffff',
-                          borderRadius: '8px',
-                          py: 1,
-                          fontWeight: 700,
-                          fontSize: '0.82rem',
-                          textTransform: 'none'
-                        }}
-                      >
-                        Reject Request
-                      </Button>
-                    </Box>
-                  </Box>
-                ) : (
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setRejectReason('Duration exceeds tolerance grace period. Please resubmit with a maximum 2 days extension.');
-                        setRejectModalOpen(true);
-                      }}
-                      sx={{
-                        fontSize: '0.72rem',
-                        textTransform: 'none',
-                        color: '#94a3b8',
-                        fontWeight: 600,
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        py: 0.3,
-                        px: 0.5,
-                        minWidth: 0,
-                        textDecoration: 'underline'
-                      }}
-                    >
-                      Simulate TR Rejection
-                    </Button>
-                  </Box>
-                )}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      setRejectReason('');
+                      setRejectModalOpen(true);
+                    }}
+                    sx={{
+                      fontSize: '0.72rem',
+                      textTransform: 'none',
+                      color: '#94a3b8',
+                      fontWeight: 600,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      py: 0.3,
+                      px: 0.5,
+                      minWidth: 0,
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    Simulate TR Rejection
+                  </Button>
+                </Box>
               </Box>
             )}
 
@@ -2388,89 +2339,283 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
       </Box>
 
-      {/* Fixed Bottom Action: 2 Buttons (Extension & Work Complete) - Visible when canRequestExtension */}
-      {canRequestExtension && (
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            bottom: 0, 
-            left: 0, 
-            right: 0, 
-            p: 2, 
-            pt: 1.5, 
-            pb: { xs: 4, sm: 3 }, 
-            backgroundColor: '#ffffff', 
-            borderTop: '1px solid #e2e8f0', 
-            zIndex: 20,
-            display: 'flex',
-            gap: 1.5
-          }}
-        >
-          {/* Extension Button (Locked Static Style, Zero Hover) */}
+      {/* Fixed Bottom Action Bar */}
+      {(() => {
+        // TR with a pending extension → show Review Extension + Work Complete
+        const trHasPendingReview = activePov === 'tenant_relation' && latestExtension?.status === 'WAITING_FOR_APPROVAL';
+        // Engineering / TR with no active request → show normal Extension + Work Complete
+        const showNormalBar = canRequestExtension || trHasPendingReview;
+        if (!showNormalBar) return null;
+        return (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              p: 2,
+              pt: 1.5,
+              pb: { xs: 4, sm: 3 },
+              backgroundColor: '#ffffff',
+              borderTop: '1px solid #e2e8f0',
+              zIndex: 20,
+              display: 'flex',
+              gap: 1.5
+            }}
+          >
+            {/* Left Button: Review Extension (TR pending) or Extension (normal) */}
+            <Button
+              fullWidth
+              variant="outlined"
+              disableElevation
+              disableRipple
+              disableFocusRipple
+              disableTouchRipple
+              onClick={() => trHasPendingReview ? setTrReviewModalOpen(true) : setExtensionModalOpen(true)}
+              sx={{
+                borderColor: trHasPendingReview ? '#f97316 !important' : '#f97316 !important',
+                color: trHasPendingReview ? '#f97316 !important' : '#f97316 !important',
+                backgroundColor: trHasPendingReview ? '#fff7ed !important' : '#ffffff !important',
+                borderRadius: '10px',
+                py: 1.3,
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                textTransform: 'none',
+                flex: 1,
+                borderWidth: '1.5px !important',
+                boxShadow: 'none !important',
+                transition: 'none !important',
+                '&:hover, &:focus, &:active': {
+                  borderColor: '#f97316 !important',
+                  backgroundColor: trHasPendingReview ? '#fff7ed !important' : '#ffffff !important',
+                  color: '#f97316 !important',
+                  borderWidth: '1.5px !important',
+                  boxShadow: 'none !important'
+                }
+              }}
+            >
+              {trHasPendingReview ? 'Review Extension' : (activePov === 'engineering' ? 'Request Extension' : 'Extension')}
+            </Button>
+
+            {/* Work Complete */}
+            <Button
+              fullWidth
+              variant="contained"
+              disableElevation
+              disableRipple
+              disableFocusRipple
+              disableTouchRipple
+              onClick={() => setCompleteSuccessOpen(true)}
+              sx={{
+                backgroundColor: '#22c55e !important',
+                color: '#ffffff !important',
+                borderRadius: '10px',
+                py: 1.3,
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                textTransform: 'none',
+                flex: 1,
+                boxShadow: 'none !important',
+                transition: 'none !important',
+                '&:hover, &:focus, &:active': {
+                  backgroundColor: '#22c55e !important',
+                  color: '#ffffff !important',
+                  boxShadow: 'none !important'
+                }
+              }}
+            >
+              Work Complete
+            </Button>
+          </Box>
+        );
+      })()}
+
+      {/* TR Review Bottom Sheet Backdrop */}
+      <Box
+        onClick={() => setTrReviewModalOpen(false)}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
+          backdropFilter: 'blur(2px)',
+          zIndex: 40,
+          opacity: trReviewModalOpen ? 1 : 0,
+          pointerEvents: trReviewModalOpen ? 'auto' : 'none',
+          transition: 'opacity 0.25s ease'
+        }}
+      />
+
+      {/* TR Review Bottom Sheet */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          maxHeight: '70%',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#ffffff',
+          borderTopLeftRadius: '24px',
+          borderTopRightRadius: '24px',
+          boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
+          zIndex: 50,
+          overflow: 'hidden',
+          transform: trReviewModalOpen ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          pointerEvents: trReviewModalOpen ? 'auto' : 'none'
+        }}
+      >
+        {/* Handle */}
+        <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9', flexShrink: 0 }}>
+          <Box sx={{ width: 40, height: 4, borderRadius: '4px', backgroundColor: '#cbd5e1', mx: 'auto', mb: 1.5 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography sx={{ fontWeight: 700, fontSize: '1.1rem', color: '#1e293b', letterSpacing: '-0.3px' }}>
+                Review Extension Request
+              </Typography>
+              <Typography sx={{ fontSize: '0.76rem', color: '#94a3b8', mt: 0.2 }}>
+                Request #{latestExtension?.requestNumber} · Submitted by Engineering
+              </Typography>
+            </Box>
+            <Box
+              onClick={() => setTrReviewModalOpen(false)}
+              sx={{ cursor: 'pointer', p: 0.5, color: '#94a3b8', '&:hover': { color: '#334155' } }}
+            >
+              <X size={20} weight="bold" />
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Body */}
+        <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Schedule Info */}
+          <Box sx={{ backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', p: 2 }}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#94a3b8', mb: 0.5, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Extension Details
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.8 }}>
+              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>New End Date</Typography>
+              <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
+                {latestExtension?.newEndDate || '—'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.8 }}>
+              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Duration Added</Typography>
+              <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#f97316' }}>
+                +{latestExtension?.extendedDays || '—'} Day{latestExtension?.extendedDays > 1 ? 's' : ''}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Submitted At</Typography>
+              <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>
+                {latestExtension?.submittedAt || '—'}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Notes / Reason */}
+          {(latestExtension?.notes || latestExtension?.reason) && (
+            <Box>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', mb: 0.8 }}>
+                Engineering Notes
+              </Typography>
+              <Box sx={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', p: 1.6 }}>
+                <Typography sx={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.55 }}>
+                  {latestExtension?.notes || latestExtension?.reason}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
+          {/* Progress Photos */}
+          {latestExtension?.photos && latestExtension.photos.length > 0 && (
+            <Box>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', mb: 0.8 }}>
+                Progress Photos ({latestExtension.photos.length})
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5, '&::-webkit-scrollbar': { display: 'none' } }}>
+                {latestExtension.photos.map((photoUrl, idx) => (
+                  <Box
+                    key={idx}
+                    onClick={() => setPreviewPhoto(photoUrl)}
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      border: '1.5px solid #e2e8f0',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      '&:active': { opacity: 0.85 }
+                    }}
+                  >
+                    <img
+                      src={photoUrl}
+                      alt={`Progress photo ${idx + 1}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+              <Typography sx={{ fontSize: '0.68rem', color: '#94a3b8', mt: 0.5 }}>
+                *Tap photo to enlarge preview
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* Fixed Footer: Action Buttons */}
+        <Box sx={{ p: 2, pt: 1.5, pb: { xs: 4, sm: 2.5 }, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 1.5, flexShrink: 0 }}>
           <Button
             fullWidth
             variant="outlined"
             disableElevation
             disableRipple
-            disableFocusRipple
-            disableTouchRipple
-            onClick={() => setExtensionModalOpen(true)}
+            onClick={() => {
+              setRejectReason('');
+              setTrReviewModalOpen(false);
+              setRejectModalOpen(true);
+            }}
             sx={{
-              borderColor: '#f97316 !important',
-              color: '#f97316 !important',
-              backgroundColor: '#ffffff !important',
+              borderColor: '#ef4444 !important',
+              color: '#ef4444 !important',
+              backgroundColor: '#ffffff',
               borderRadius: '10px',
               py: 1.3,
               fontWeight: 700,
               fontSize: '0.9rem',
               textTransform: 'none',
-              flex: 1,
-              borderWidth: '1.5px !important',
-              boxShadow: 'none !important',
-              transition: 'none !important',
-              '&:hover, &:focus, &:active, &.MuiButton-root:hover, &.MuiButton-root:focus, &.MuiButton-root:active': {
-                borderColor: '#f97316 !important',
-                backgroundColor: '#ffffff !important',
-                color: '#f97316 !important',
-                borderWidth: '1.5px !important',
-                boxShadow: 'none !important'
-              }
+              boxShadow: 'none !important'
             }}
           >
-            {activePov === 'engineering' ? 'Request Extension' : 'Extension'}
+            Reject
           </Button>
-
-          {/* Work Complete Button (Locked Static Style, Zero Hover) */}
           <Button
             fullWidth
             variant="contained"
             disableElevation
             disableRipple
-            disableFocusRipple
-            disableTouchRipple
-            onClick={() => setCompleteSuccessOpen(true)}
+            onClick={() => {
+              handleApproveExtension();
+              setTrReviewModalOpen(false);
+            }}
             sx={{
-              backgroundColor: '#22c55e !important',
+              backgroundColor: '#27b29b !important',
               color: '#ffffff !important',
               borderRadius: '10px',
               py: 1.3,
               fontWeight: 700,
               fontSize: '0.9rem',
               textTransform: 'none',
-              flex: 1,
-              boxShadow: 'none !important',
-              transition: 'none !important',
-              '&:hover, &:focus, &:active, &.MuiButton-root:hover, &.MuiButton-root:focus, &.MuiButton-root:active': {
-                backgroundColor: '#22c55e !important',
-                color: '#ffffff !important',
-                boxShadow: 'none !important'
-              }
+              boxShadow: 'none !important'
             }}
           >
-            Work Complete
+            Approve Extension
           </Button>
         </Box>
-      )}
+      </Box>
 
       {/* In-Frame Backdrop Overlay */}
       <Box
@@ -4003,96 +4148,107 @@ export function FitOutPermitDetailView({ permit, controller }) {
       </Dialog>
 
       {/* ========================================================================= */}
-      {/* DIALOG: TOLAK PENGAJUAN EXTENSION */}
+      {/* BOTTOM SHEET: REJECT EXTENSION REQUEST */}
       {/* ========================================================================= */}
-      <Dialog
-        open={rejectModalOpen}
-        onClose={() => setRejectModalOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: '12px',
-            p: 1
-          }
+
+      {/* Reject Sheet Backdrop */}
+      <Box
+        onClick={() => setRejectModalOpen(false)}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
+          backdropFilter: 'blur(2px)',
+          zIndex: 60,
+          opacity: rejectModalOpen ? 1 : 0,
+          pointerEvents: rejectModalOpen ? 'auto' : 'none',
+          transition: 'opacity 0.25s ease'
+        }}
+      />
+
+      {/* Reject Sheet */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          maxHeight: '85%',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#ffffff',
+          borderTopLeftRadius: '24px',
+          borderTopRightRadius: '24px',
+          boxShadow: '0 -10px 30px rgba(0,0,0,0.18)',
+          zIndex: 70,
+          overflow: 'hidden',
+          transform: rejectModalOpen ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
+          pointerEvents: rejectModalOpen ? 'auto' : 'none'
         }}
       >
-        <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 34, height: 34, borderRadius: '8px', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <XCircle size={22} color="#ef4444" weight="fill" />
+        {/* Handle + Header */}
+        <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9', flexShrink: 0 }}>
+          <Box sx={{ width: 40, height: 4, borderRadius: '4px', backgroundColor: '#cbd5e1', mx: 'auto', mb: 1.5 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+              <Box sx={{ width: 38, height: 38, borderRadius: '9px', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <XCircle size={22} color="#ef4444" weight="fill" />
+              </Box>
+              <Box>
+                <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: '#1e293b' }}>
+                  Reject Extension Request
+                </Typography>
+                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.1 }}>
+                  Request #{latestExtension?.requestNumber || 1} · by {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                </Typography>
+              </Box>
             </Box>
-            <Box>
-              <Typography sx={{ fontWeight: 800, fontSize: '0.96rem', color: '#1e293b' }}>
-                Reject Extension Request
-              </Typography>
-              <Typography sx={{ fontSize: '0.72rem', color: '#64748b' }}>
-                Request #{latestExtension?.requestNumber || 1} by {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
-              </Typography>
+            <Box onClick={() => setRejectModalOpen(false)} sx={{ cursor: 'pointer', p: 0.5, color: '#94a3b8' }}>
+              <X size={20} weight="bold" />
             </Box>
           </Box>
-          <IconButton size="small" onClick={() => setRejectModalOpen(false)}>
-            <X size={18} />
-          </IconButton>
-        </DialogTitle>
+        </Box>
 
-        <DialogContent sx={{ py: 1.5 }}>
-          <Typography sx={{ fontSize: '0.78rem', color: '#64748b', mb: 1.5, lineHeight: 1.45 }}>
+        {/* Scrollable Body */}
+        <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Typography sx={{ fontSize: '0.8rem', color: '#64748b', lineHeight: 1.55 }}>
             Provide the rejection reason for this extension request. This feedback will be displayed to the Engineering team so they can submit a revised schedule.
           </Typography>
 
-          <Typography sx={{ fontSize: '0.76rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
-            Rejection Reason <span style={{ color: '#ef4444' }}>*</span>
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="e.g., Duration exceeds tolerance grace period. Please resubmit with maximum 2 days extension."
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '0.84rem' } }}
-          />
-
-          {/* Quick template chips */}
-          <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 1.5, mb: 0.8, fontWeight: 600 }}>
-            Quick Options:
-          </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
-            {[
-              'Duration exceeds free grace period tolerance',
-              'Schedule conflicts with building maintenance',
-              'Progress documentation photos incomplete'
-            ].map(template => (
-              <Chip
-                key={template}
-                label={template}
-                size="small"
-                onClick={() => setRejectReason(template)}
-                sx={{
-                  fontSize: '0.7rem',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  backgroundColor: rejectReason === template ? '#fee2e2' : '#f1f5f9',
-                  color: rejectReason === template ? '#b91c1c' : '#475569',
-                  fontWeight: 600
-                }}
-              />
-            ))}
+          <Box>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
+              Rejection Reason <span style={{ color: '#ef4444' }}>*</span>
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Enter rejection reason..."
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', fontSize: '0.84rem' }, '& .MuiOutlinedInput-input::placeholder': { color: '#94a3b8', opacity: 1 } }}
+            />
           </Box>
-        </DialogContent>
 
-        <DialogActions sx={{ p: 2, pt: 1, gap: 1 }}>
+        </Box>
+
+        {/* Fixed Footer */}
+        <Box sx={{ p: 2, pt: 1.5, pb: { xs: 4, sm: 2.5 }, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 1.2, flexShrink: 0 }}>
           <Button
             fullWidth
             variant="outlined"
+            disableElevation
+            disableRipple
             onClick={() => setRejectModalOpen(false)}
             sx={{
-              borderRadius: '8px',
+              borderRadius: '10px',
               textTransform: 'none',
               fontWeight: 700,
               color: '#64748b',
-              borderColor: '#cbd5e1'
+              borderColor: '#cbd5e1 !important',
+              py: 1.3,
+              boxShadow: 'none !important'
             }}
           >
             Cancel
@@ -4100,19 +4256,23 @@ export function FitOutPermitDetailView({ permit, controller }) {
           <Button
             fullWidth
             variant="contained"
+            disableElevation
+            disableRipple
             onClick={handleConfirmReject}
             sx={{
               backgroundColor: '#ef4444 !important',
               color: '#ffffff !important',
-              borderRadius: '8px',
+              borderRadius: '10px',
               textTransform: 'none',
-              fontWeight: 700
+              fontWeight: 700,
+              py: 1.3,
+              boxShadow: 'none !important'
             }}
           >
-            Confirm Rejection
+            Reject
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Box>
     </Box>
   );
 }

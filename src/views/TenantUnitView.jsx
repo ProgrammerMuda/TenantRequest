@@ -73,6 +73,7 @@ export function TenantUnitView({ controller }) {
   const [navLevel, setNavLevel] = useState('towers');
   const [selectedTower, setSelectedTower] = useState(null);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [towerSheetTower, setTowerSheetTower] = useState(null); // bottom sheet preview
 
   // Dynamic Units State
   const [units, setUnits] = useState(initialUnitsData);
@@ -164,11 +165,16 @@ export function TenantUnitView({ controller }) {
   };
 
   const handleSelectTower = (tower) => {
+    setTowerSheetTower(tower); // open bottom sheet preview instead of direct navigation
+  };
+
+  const handleEnterTower = (tower) => {
     setSelectedTower(tower);
     setUnitStatusFilter('All');
     setFloorFilter('All');
     setDisplayLimit(25);
     setNavLevel('units');
+    setTowerSheetTower(null);
   };
 
   const handleSelectUnit = (unit) => {
@@ -649,6 +655,128 @@ export function TenantUnitView({ controller }) {
           </Box>
         </Box>
       )}
+
+      {/* Tower Bottom Sheet Backdrop */}
+      <Box
+        onClick={() => setTowerSheetTower(null)}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.45)',
+          backdropFilter: 'blur(2px)',
+          zIndex: 40,
+          opacity: towerSheetTower ? 1 : 0,
+          pointerEvents: towerSheetTower ? 'auto' : 'none',
+          transition: 'opacity 0.25s ease'
+        }}
+      />
+
+      {/* Tower Bottom Sheet */}
+      {(() => {
+        const tw = towerSheetTower;
+        if (!tw) return null;
+        const towerUnits = units.filter(u => u.tower_id === tw.id);
+        const occCount = towerUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length;
+        const vacCount = towerUnits.length - occCount;
+        const rate = towerUnits.length > 0 ? Math.round((occCount / towerUnits.length) * 100) : tw.occupancyRate;
+        return (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: '#ffffff',
+              borderTopLeftRadius: '24px',
+              borderTopRightRadius: '24px',
+              boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
+              zIndex: 50,
+              transform: towerSheetTower ? 'translateY(0)' : 'translateY(100%)',
+              transition: 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
+              pointerEvents: towerSheetTower ? 'auto' : 'none',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Handle */}
+            <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9' }}>
+              <Box sx={{ width: 40, height: 4, borderRadius: '4px', backgroundColor: '#cbd5e1', mx: 'auto', mb: 1.5 }} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                  <Box sx={{ width: 44, height: 44, borderRadius: '10px', backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Building size={24} color="#27b29b" weight="fill" />
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: '1.1rem', color: '#1e293b', letterSpacing: '-0.3px' }}>
+                      {tw.name}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.76rem', color: '#94a3b8', mt: 0.1 }}>
+                      {towerUnits.length} Total Unit
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box
+                  onClick={() => setTowerSheetTower(null)}
+                  sx={{ cursor: 'pointer', p: 0.5, color: '#94a3b8' }}
+                >
+                  <X size={20} weight="bold" />
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Body */}
+            <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {/* Occupancy Rate */}
+              <Box sx={{ backgroundColor: '#f8fafc', borderRadius: '14px', border: '1px solid #e2e8f0', p: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#64748b' }}>Occupancy Rate</Typography>
+                  <Typography sx={{ fontSize: '0.9rem', fontWeight: 800, color: '#2563eb' }}>{rate}%</Typography>
+                </Box>
+                {/* Progress Bar */}
+                <Box sx={{ height: 8, borderRadius: '100px', backgroundColor: '#e2e8f0', overflow: 'hidden' }}>
+                  <Box sx={{ height: '100%', width: `${rate}%`, borderRadius: '100px', backgroundColor: '#2563eb', transition: 'width 0.5s ease' }} />
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mt: 2 }}>
+                  <Box sx={{ backgroundColor: '#ecfdf5', borderRadius: '10px', p: 1.2, textAlign: 'center' }}>
+                    <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: '#059669' }}>{occCount}</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#065f46' }}>Occupied</Typography>
+                  </Box>
+                  <Box sx={{ backgroundColor: '#fff7ed', borderRadius: '10px', p: 1.2, textAlign: 'center' }}>
+                    <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: '#ea580c' }}>{vacCount}</Typography>
+                    <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#9a3412' }}>Vacant</Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Footer CTA */}
+            <Box sx={{ px: 2.5, pb: { xs: 5, sm: 3 }, pt: 0.5 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                disableElevation
+                disableRipple
+                onClick={() => handleEnterTower(tw)}
+                sx={{
+                  backgroundColor: '#27b29b !important',
+                  color: '#ffffff !important',
+                  borderRadius: '12px',
+                  py: 1.4,
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  textTransform: 'none',
+                  boxShadow: 'none !important',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.8
+                }}
+              >
+                Lihat Semua Unit
+                <CaretRight size={18} weight="bold" />
+              </Button>
+            </Box>
+          </Box>
+        );
+      })()}
 
       {/* ========================================================================= */}
       {/* LEVEL 2: UNIT LIST (PER TOWER) */}
