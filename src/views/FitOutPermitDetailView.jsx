@@ -652,8 +652,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     </Typography>
                     <Box 
                       sx={{ 
-                        px: 0.8, 
-                        py: 0.2, 
+                        px: 0.9, 
+                        py: 0.25, 
                         backgroundColor: '#fff7ed', 
                         borderRadius: '6px', 
                         color: '#ea580c', 
@@ -661,7 +661,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         fontSize: '0.72rem' 
                       }} 
                     >
-                      +{extensionSubmittedData.extendedDays}D
+                      + {extensionSubmittedData.extendedDays} Day
                     </Box>
                   </Box>
                 </Box>
