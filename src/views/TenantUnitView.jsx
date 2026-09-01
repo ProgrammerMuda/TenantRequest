@@ -727,20 +727,16 @@ export function TenantUnitView({ controller }) {
                     </Box>
                   </Box>
 
-                  {/* Footer CTA: Site & Action Link */}
+                  {/* Footer CTA: Action Link */}
                   <Box
                     sx={{
                       pt: 1.4,
                       borderTop: '1px solid #f1f5f9',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between'
+                      justifyContent: 'flex-end'
                     }}
                   >
-                    <Typography sx={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 500 }}>
-                      Site: <strong style={{ color: '#64748b' }}>{tower.siteName || 'Paladian Park'}</strong>
-                    </Typography>
-
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7, color: '#0d9488' }}>
                       <Typography sx={{ fontSize: '0.78rem', fontWeight: 700 }}>
                         View Tower Units
