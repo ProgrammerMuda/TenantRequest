@@ -910,15 +910,6 @@ export function TenantUnitView({ controller }) {
       {/* ========================================================================= */}
       {navLevel === 'units' && (
         <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', p: 2, pb: 4 }}>
-          {/* Breadcrumb Info Bar */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexShrink: 0 }}>
-            <Typography sx={{ fontSize: '0.76rem', color: '#64748b' }}>
-              Site: <strong>Paladian Park</strong> / <strong>{selectedTower?.name}</strong>
-            </Typography>
-            <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: '#27b29b' }}>
-              {filteredUnits.length} Unit{filteredUnits.length > 1 ? 's' : ''}
-            </Typography>
-          </Box>
 
           {/* Search Bar + Filter Button Row */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexShrink: 0 }}>
