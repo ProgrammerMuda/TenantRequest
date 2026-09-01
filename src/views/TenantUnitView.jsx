@@ -139,13 +139,15 @@ export function TenantUnitView({ controller }) {
     return ['All', ...floors];
   }, [units, selectedTower]);
 
-  // Filtered Units in Selected Tower (supporting search, status, and floor filters)
+  // Filtered Units in Selected Tower (supporting search, status (Occupied/Vacant), and floor filters)
   const filteredUnits = useMemo(() => {
     if (!selectedTower) return [];
     const query = unitSearchQuery.trim().toLowerCase();
     return units.filter(u => {
       if (u.tower_id !== selectedTower.id) return false;
-      if (unitStatusFilter !== 'All' && u.status !== unitStatusFilter) return false;
+      const isUnitVacant = u.status === UNIT_STATUS.VACANT || u.status === 'Vacant';
+      if (unitStatusFilter === 'Vacant' && !isUnitVacant) return false;
+      if (unitStatusFilter === 'Occupied' && isUnitVacant) return false;
       if (floorFilter !== 'All' && u.floor !== floorFilter) return false;
       if (query) {
         const matchesUnitNumber = u.unit_number?.toLowerCase().includes(query) || u.name?.toLowerCase().includes(query);
@@ -378,25 +380,13 @@ export function TenantUnitView({ controller }) {
     }));
   };
 
-  // Status Badge Component (reusing existing token colors)
+  // Status Badge Component (Only Occupied and Vacant)
   const renderStatusBadge = (status) => {
-    let bg = '#f1f5f9';
-    let text = '#64748b';
-    let border = '#e2e8f0';
-
-    if (status === UNIT_STATUS.OCCUPIED) {
-      bg = '#ecfdf5';
-      text = '#059669';
-      border = '#a7f3d0';
-    } else if (status === UNIT_STATUS.RENTED) {
-      bg = '#eff6ff';
-      text = '#2563eb';
-      border = '#bfdbfe';
-    } else if (status === UNIT_STATUS.VACANT) {
-      bg = '#fff7ed';
-      text = '#ea580c';
-      border = '#ffedd5';
-    }
+    const isVacant = status === UNIT_STATUS.VACANT || status === 'Vacant';
+    const bg = isVacant ? '#fff7ed' : '#ecfdf5';
+    const text = isVacant ? '#ea580c' : '#059669';
+    const border = isVacant ? '#ffedd5' : '#a7f3d0';
+    const label = isVacant ? 'Vacant' : 'Occupied';
 
     return (
       <Box
@@ -415,7 +405,7 @@ export function TenantUnitView({ controller }) {
           lineHeight: 1.2
         }}
       >
-        {status}
+        {label}
       </Box>
     );
   };
@@ -1087,17 +1077,11 @@ export function TenantUnitView({ controller }) {
                       <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
                         Pemilik: <strong>{unit.owner?.name || '-'}</strong>
                       </Typography>
-                      <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                        {unit.type} • Lantai {unit.floor} • {unit.area}
-                      </Typography>
                     </Box>
                   </Box>
 
-                  <Box sx={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     {renderStatusBadge(unit.status)}
-                    <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 500 }}>
-                      {unit.members.length} Penghuni
-                    </Typography>
                   </Box>
                 </Box>
               ))}
@@ -1913,12 +1897,11 @@ export function TenantUnitView({ controller }) {
             <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', mb: 1.2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Status Unit
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
               {[
                 { key: 'All', label: 'All Status' },
-                { key: UNIT_STATUS.OCCUPIED, label: 'Occupied' },
-                { key: UNIT_STATUS.RENTED, label: 'Renter' },
-                { key: UNIT_STATUS.VACANT, label: 'Vacant' }
+                { key: 'Occupied', label: 'Occupied' },
+                { key: 'Vacant', label: 'Vacant' }
               ].map(item => {
                 const isSelected = tempUnitStatusFilter === item.key;
                 return (
