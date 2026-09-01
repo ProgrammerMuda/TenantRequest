@@ -1960,14 +1960,13 @@ export function TenantUnitView({ controller }) {
             </Box>
 
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {/* All Floors Chip (Disabled if any specific floor is selected) */}
+              {/* All Floors Button */}
               {(() => {
                 const isAllDisabled = tempFloorFilter.length > 0;
                 const isAllSelected = tempFloorFilter.length === 0;
 
                 return (
-                  <Chip
-                    label="All Floors"
+                  <Box
                     onClick={() => {
                       if (!isAllDisabled) {
                         setTempFloorFilter([]);
@@ -1978,27 +1977,30 @@ export function TenantUnitView({ controller }) {
                       fontSize: '0.76rem',
                       fontWeight: isAllSelected ? 700 : 500,
                       height: 32,
+                      px: 1.6,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       backgroundColor: isAllSelected ? '#0f172a' : '#f1f5f9',
                       color: isAllSelected ? '#ffffff' : isAllDisabled ? '#94a3b8' : '#334155',
                       border: `1px solid ${isAllSelected ? '#0f172a' : isAllDisabled ? '#e2e8f0' : '#cbd5e1'}`,
                       cursor: isAllDisabled ? 'not-allowed' : 'pointer',
                       opacity: isAllDisabled ? 0.45 : 1,
                       pointerEvents: isAllDisabled ? 'none' : 'auto',
-                      '& .MuiChip-label': {
-                        px: 1.4
-                      }
+                      userSelect: 'none'
                     }}
-                  />
+                  >
+                    All Floors
+                  </Box>
                 );
               })()}
 
-              {/* Individual Floors (Multi-Select) */}
+              {/* Individual Floors (Multi-Select, No Hover Effect) */}
               {availableFloors.filter(f => f !== 'All').map((floor) => {
                 const isSelected = tempFloorFilter.includes(floor);
                 return (
-                  <Chip
+                  <Box
                     key={floor}
-                    label={`Floor ${parseInt(floor)}`}
                     onClick={() => {
                       if (isSelected) {
                         setTempFloorFilter(tempFloorFilter.filter(f => f !== floor));
@@ -2011,16 +2013,19 @@ export function TenantUnitView({ controller }) {
                       fontSize: '0.76rem',
                       fontWeight: isSelected ? 700 : 500,
                       height: 32,
+                      px: 1.6,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       backgroundColor: isSelected ? '#0f172a' : '#f8fafc',
                       color: isSelected ? '#ffffff' : '#334155',
                       border: `1px solid ${isSelected ? '#0f172a' : '#e2e8f0'}`,
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      '& .MuiChip-label': {
-                        px: 1.4
-                      }
+                      userSelect: 'none'
                     }}
-                  />
+                  >
+                    Floor {parseInt(floor)}
+                  </Box>
                 );
               })}
             </Box>
