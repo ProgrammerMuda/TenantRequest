@@ -466,7 +466,7 @@ export function TenantUnitView({ controller }) {
         <Box sx={{ flexGrow: 1, textAlign: 'center', px: 1 }}>
           <Typography sx={{ fontWeight: 700, color: '#1e293b', fontSize: '1.05rem', lineHeight: 1.2 }}>
             {navLevel === 'towers' && 'Tenant Unit'}
-            {navLevel === 'units' && selectedTower?.name}
+            {navLevel === 'units' && `Unit ${selectedTower?.name || 'Tower'}`}
             {navLevel === 'unit_detail' && selectedUnit?.unit_name}
           </Typography>
         </Box>
