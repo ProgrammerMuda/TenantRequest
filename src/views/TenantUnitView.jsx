@@ -68,8 +68,9 @@ import {
   UNIT_STATUS,
   MEMBER_ROLES,
   initialTowersData,
-  initialUnitsData
 } from '../models/TenantUnitModel';
+
+const cleanUnitName = (name) => (!name ? '' : name.replace(/^Unit\s+/i, '').replace(/-/g, ''));
 
 export function TenantUnitView({ controller }) {
   // Navigation levels: 'towers' | 'units' | 'unit_detail'
@@ -78,8 +79,11 @@ export function TenantUnitView({ controller }) {
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [towerSheetTower, setTowerSheetTower] = useState(null); // bottom sheet preview
 
-  // Dynamic Units State
-  const [units, setUnits] = useState(initialUnitsData);
+  // Dynamic Units State (ensuring clean format e.g. A0101)
+  const [units, setUnits] = useState(() => initialUnitsData.map(u => ({
+    ...u,
+    unit_name: cleanUnitName(u.unit_name)
+  })));
 
   // Unit Detail Tab: 'overview' | 'members' | 'vehicles' | 'bill_settings'
   const [activeTab, setActiveTab] = useState('overview');
@@ -464,7 +468,7 @@ export function TenantUnitView({ controller }) {
             <Typography sx={{ fontWeight: 700, color: '#1e293b', fontSize: '1.05rem', lineHeight: 1.2 }}>
               {navLevel === 'towers' && 'Tenant Unit'}
               {navLevel === 'units' && `Unit ${selectedTower?.name || 'Tower'}`}
-              {navLevel === 'unit_detail' && selectedUnit?.unit_name}
+              {navLevel === 'unit_detail' && cleanUnitName(selectedUnit?.unit_name)}
             </Typography>
           </Box>
 
@@ -1074,7 +1078,7 @@ export function TenantUnitView({ controller }) {
                     <Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                         <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1e293b' }}>
-                          {unit.unit_name}
+                          {cleanUnitName(unit.unit_name)}
                         </Typography>
                         <Box
                           sx={{
@@ -1298,7 +1302,7 @@ export function TenantUnitView({ controller }) {
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.6 }}>
                   <Box>
                     <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>Nama Unit</Typography>
-                    <Typography sx={{ fontSize: '0.84rem', color: '#1e293b', fontWeight: 600 }}>{selectedUnit.unit_name}</Typography>
+                    <Typography sx={{ fontSize: '0.84rem', color: '#1e293b', fontWeight: 600 }}>{cleanUnitName(selectedUnit.unit_name)}</Typography>
                   </Box>
                   <Box>
                     <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>Tipe Unit</Typography>
@@ -2151,7 +2155,7 @@ export function TenantUnitView({ controller }) {
             Set / Ganti Penghuni Unit
           </Typography>
           <Typography sx={{ fontSize: '0.76rem', color: '#94a3b8', mt: 0.2 }}>
-            Tentukan siapa yang menempati {selectedUnit?.unit_name} saat ini.
+            Tentukan siapa yang menempati {cleanUnitName(selectedUnit?.unit_name)} saat ini.
           </Typography>
         </Box>
 
@@ -2308,7 +2312,7 @@ export function TenantUnitView({ controller }) {
             {editingMember ? 'Edit Anggota Penghuni' : 'Tambah Anggota Penghuni'}
           </Typography>
           <Typography sx={{ fontSize: '0.76rem', color: '#94a3b8', mt: 0.2 }}>
-            Masukkan data individu yang tinggal di {selectedUnit?.unit_name}.
+            Masukkan data individu yang tinggal di {cleanUnitName(selectedUnit?.unit_name)}.
           </Typography>
         </Box>
 
@@ -2411,7 +2415,7 @@ export function TenantUnitView({ controller }) {
             Daftarkan Kendaraan Baru
           </Typography>
           <Typography sx={{ fontSize: '0.76rem', color: '#94a3b8', mt: 0.2 }}>
-            Link kendaraan ke salah satu tenant member di {selectedUnit?.unit_name}.
+            Link kendaraan ke salah satu tenant member di {cleanUnitName(selectedUnit?.unit_name)}.
           </Typography>
         </Box>
 
@@ -2580,7 +2584,7 @@ export function TenantUnitView({ controller }) {
             {qrModalData?.code}
           </Typography>
           <Typography sx={{ fontSize: '0.76rem', color: '#64748b', mt: 0.3 }}>
-            {qrModalData?.type} • {selectedUnit?.unit_name}
+            {qrModalData?.type} • {cleanUnitName(selectedUnit?.unit_name)}
           </Typography>
         </DialogContent>
 
