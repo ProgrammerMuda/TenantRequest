@@ -112,33 +112,6 @@ export function FitOutPermitDetailView({ permit, controller }) {
       ],
       photoCount: 2,
       authorizedBy: 'Engineering Lead'
-    },
-    {
-      id: 'EXT-REQ-2',
-      requestNumber: 2,
-      submittedBy: 'engineering',
-      submittedAt: '12/02/2026 16:15',
-      startDate: '13 Feb 2026',
-      endDate: '15 Feb 2026',
-      extendedDays: 2,
-      feePolicy: 'CHARGEABLE',
-      amount: '2.000.000',
-      invoiceNo: 'PRO/INV/082026/000033',
-      issuedDate: '12/02/2026 16:20',
-      dueDate: '13 Feb 2026, 23:59',
-      permitNo: data.permitNumber || '#PRO/FP/122025/000032',
-      status: 'WAITING_TENANT_PAYMENT',
-      paymentStatus: 'UNPAID',
-      approvedBy: 'Tenant Relation',
-      approvedAt: '12/02/2026, 05:00 PM',
-      reason: 'Re-submitted with 2 days extension and coordinate daily supervision fee.',
-      notes: 'Re-submitted with 2 days extension and coordinate daily supervision fee.',
-      photos: [
-        '/renovasi_kamar_1.jpg',
-        '/renovasi_kamar_2.jpg'
-      ],
-      photoCount: 2,
-      authorizedBy: 'Tenant Relation Lead - Management'
     }
   ]);
 
