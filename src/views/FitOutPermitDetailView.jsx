@@ -84,36 +84,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const [completedData, setCompletedData] = useState(null);
   const completeFileInputRef = useRef(null);
 
-  // Extension Requests with History & Multi-Extension State
-  const [extensionRequests, setExtensionRequests] = useState([
-    {
-      id: 'EXT-REQ-1',
-      requestNumber: 1,
-      submittedBy: 'engineering',
-      submittedAt: '12/02/2026 14:10',
-      startDate: '13 Feb 2026',
-      endDate: '16 Feb 2026',
-      extendedDays: 3,
-      feePolicy: 'FREE_OF_CHARGE',
-      amount: '0',
-      invoiceNo: 'REQ-ENG-2026-0034',
-      issuedDate: '12/02/2026 14:10',
-      dueDate: '13 Feb 2026, 23:59',
-      permitNo: data.permitNumber || '#PRO/FP/122025/000032',
-      status: 'REJECTED',
-      rejectionReason: 'Duration of 3 days exceeds minor fitout grace period. Please resubmit with maximum 2 days or coordinate daily supervision fee policy.',
-      rejectedBy: 'Brelian - Tenant Relation',
-      rejectedAt: '12/02/2026, 03:30 PM',
-      reason: 'Finishing of gypsum partition and MEP cable tray installation requires an additional 3 days before final handover inspection.',
-      notes: 'Finishing of gypsum partition and MEP cable tray installation requires an additional 3 days before final handover inspection.',
-      photos: [
-        '/renovasi_kamar_1.jpg',
-        '/renovasi_kamar_2.jpg'
-      ],
-      photoCount: 2,
-      authorizedBy: 'Engineering Lead'
-    }
-  ]);
+  // Extension Requests with History & Multi-Extension State (starts empty for fresh prototype test)
+  const [extensionRequests, setExtensionRequests] = useState([]);
 
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
