@@ -152,9 +152,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const isLatestRejected = latestExtension?.status === 'REJECTED';
   const isLatestApproved = latestExtension?.status === 'APPROVED';
   const isLatestWaitingPayment = latestExtension?.status === 'WAITING_TENANT_PAYMENT';
-  // Multi-extension: new request can be made if no extension, rejected, already approved, or waiting payment
-  const canRequestExtension = !latestExtension || isLatestRejected || isLatestApproved || isLatestWaitingPayment;
-  const showBottomBar = canRequestExtension || (activePov === 'tenant_relation' && latestExtension?.status === 'WAITING_FOR_APPROVAL');
+  // Multi-extension: new request can only be made if no extension, rejected, or already approved (locked while waiting payment or waiting approval)
+  const canRequestExtension = (!latestExtension || isLatestRejected || isLatestApproved) && !isLatestWaitingPayment;
+  const showBottomBar = canRequestExtension || (activePov === 'tenant_relation' && latestExtension?.status === 'WAITING_FOR_APPROVAL') || isLatestWaitingPayment;
   const showExtensionCard = extensionRequests.length > 0;
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
   const [depositInvoiceOpen, setDepositInvoiceOpen] = useState(false);
@@ -2331,8 +2331,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
       {(() => {
         // TR with a pending extension → show Review Extension + Work Complete
         const trHasPendingReview = activePov === 'tenant_relation' && latestExtension?.status === 'WAITING_FOR_APPROVAL';
-        // Engineering / TR with no active request → show normal Extension + Work Complete
-        const showNormalBar = canRequestExtension || trHasPendingReview;
+        // When waiting for tenant payment, extension is locked for both TR & Engineering until paid!
+        const isExtensionLocked = isLatestWaitingPayment || (activePov === 'engineering' && latestExtension?.status === 'WAITING_FOR_APPROVAL');
+        const showNormalBar = canRequestExtension || trHasPendingReview || isLatestWaitingPayment;
         if (!showNormalBar) return null;
         return (
           <Box
@@ -2351,7 +2352,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               gap: 1.5
             }}
           >
-            {/* Left Button: Review Extension (TR pending) or Extension (normal) */}
+            {/* Left Button: Review Extension (TR pending) or Extension (normal or locked when waiting payment) */}
             <Button
               fullWidth
               variant="outlined"
@@ -2359,30 +2360,51 @@ export function FitOutPermitDetailView({ permit, controller }) {
               disableRipple
               disableFocusRipple
               disableTouchRipple
-              onClick={() => trHasPendingReview ? handleOpenTrReview() : setExtensionModalOpen(true)}
+              disabled={isExtensionLocked}
+              onClick={() => {
+                if (isExtensionLocked) return;
+                if (trHasPendingReview) {
+                  handleOpenTrReview();
+                } else if (canRequestExtension) {
+                  setExtensionModalOpen(true);
+                }
+              }}
               sx={{
-                borderColor: trHasPendingReview ? '#f97316 !important' : '#f97316 !important',
-                color: trHasPendingReview ? '#f97316 !important' : '#f97316 !important',
-                backgroundColor: trHasPendingReview ? '#fff7ed !important' : '#ffffff !important',
+                borderColor: isExtensionLocked 
+                  ? '#e2e8f0 !important' 
+                  : (trHasPendingReview ? '#f97316 !important' : '#f97316 !important'),
+                color: isExtensionLocked 
+                  ? '#94a3b8 !important' 
+                  : (trHasPendingReview ? '#f97316 !important' : '#f97316 !important'),
+                backgroundColor: isExtensionLocked 
+                  ? '#f8fafc !important' 
+                  : (trHasPendingReview ? '#fff7ed !important' : '#ffffff !important'),
                 borderRadius: '10px',
                 py: 1.3,
                 fontWeight: 700,
-                fontSize: '0.9rem',
+                fontSize: '0.86rem',
                 textTransform: 'none',
                 flex: 1,
                 borderWidth: '1.5px !important',
                 boxShadow: 'none !important',
+                cursor: isExtensionLocked ? 'not-allowed !important' : 'pointer !important',
                 transition: 'none !important',
                 '&:hover, &:focus, &:active': {
-                  borderColor: '#f97316 !important',
-                  backgroundColor: trHasPendingReview ? '#fff7ed !important' : '#ffffff !important',
-                  color: '#f97316 !important',
+                  borderColor: isExtensionLocked ? '#e2e8f0 !important' : '#f97316 !important',
+                  backgroundColor: isExtensionLocked 
+                    ? '#f8fafc !important' 
+                    : (trHasPendingReview ? '#fff7ed !important' : '#ffffff !important'),
+                  color: isExtensionLocked ? '#94a3b8 !important' : '#f97316 !important',
                   borderWidth: '1.5px !important',
                   boxShadow: 'none !important'
                 }
               }}
             >
-              {trHasPendingReview ? 'Review Extension' : (activePov === 'engineering' ? 'Request Extension' : 'Extension')}
+              {trHasPendingReview 
+                ? 'Review Extension' 
+                : isLatestWaitingPayment 
+                  ? 'Waiting Payment' 
+                  : (activePov === 'engineering' ? 'Request Extension' : 'Extension')}
             </Button>
 
             {/* Work Complete */}
