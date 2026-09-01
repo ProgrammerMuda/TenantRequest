@@ -558,7 +558,6 @@ export function TenantUnitView({ controller }) {
                   sx={{
                     backgroundColor: '#ffffff',
                     borderRadius: '16px',
-                    border: '1.5px solid #e2e8f0',
                     p: 2.2,
                     cursor: 'pointer'
                   }}
