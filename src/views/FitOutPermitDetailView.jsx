@@ -930,9 +930,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   <Box
                     key={req.id}
                     sx={{
-                      backgroundColor: req.status === 'APPROVED' ? '#ffffff' : '#f8fafc',
+                      backgroundColor: req.status === 'REJECTED' ? '#fef2f2' : '#ffffff',
                       borderRadius: '14px',
-                      border: req.status === 'APPROVED' ? '1.5px solid #e2e8f0' : '1px solid #e2e8f0',
+                      border: req.status === 'REJECTED' ? '1.5px solid #fecaca' : '1.5px solid #e2e8f0',
                       p: 2,
                       boxShadow: 'none'
                     }}
@@ -982,8 +982,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     {req.status === 'REJECTED' && req.rejectionReason && (
                       <Box
                         sx={{
-                          backgroundColor: '#fef2f2',
-                          border: '1.5px solid #fecaca',
+                          backgroundColor: '#ffffff',
+                          border: '1.5px solid #fca5a5',
                           borderRadius: '10px',
                           p: 1.5,
                           mb: 1.5
