@@ -59,7 +59,8 @@ import {
   Phone,
   Envelope,
   Info,
-  MagnifyingGlass
+  MagnifyingGlass,
+  FunnelSimple
 } from '@phosphor-icons/react';
 
 import {
@@ -87,6 +88,10 @@ export function TenantUnitView({ controller }) {
   const [floorFilter, setFloorFilter] = useState('All'); // 'All' | '01' | '02' ...
   const [unitSearchQuery, setUnitSearchQuery] = useState('');
   const [displayLimit, setDisplayLimit] = useState(25); // Progressive load limit for hundreds of units
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [tempUnitStatusFilter, setTempUnitStatusFilter] = useState('All');
+  const [tempFloorFilter, setTempFloorFilter] = useState('All');
+  const isFilterActive = unitStatusFilter !== 'All' || floorFilter !== 'All';
 
   // Drawers & Modals State
   const [assignDrawerOpen, setAssignDrawerOpen] = useState(false);
@@ -189,6 +194,7 @@ export function TenantUnitView({ controller }) {
     setDisplayLimit(25);
     setNavLevel('units');
     setTowerSheetTower(null);
+    setFilterDrawerOpen(false);
   };
 
   const handleSelectUnit = (unit) => {
@@ -914,135 +920,132 @@ export function TenantUnitView({ controller }) {
             </Typography>
           </Box>
 
-          {/* Search Bar */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#ffffff',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0',
-              px: 1.5,
-              height: 44,
-              minHeight: 44,
-              gap: 1.2,
-              mb: 1.5,
-              flexShrink: 0,
-              boxSizing: 'border-box'
-            }}
-          >
-            <MagnifyingGlass size={19} color="#94a3b8" weight="bold" />
-            <input
-              type="text"
-              placeholder={`Search unit, owner, or renter in ${selectedTower?.name || 'tower'}...`}
-              value={unitSearchQuery}
-              onChange={(e) => setUnitSearchQuery(e.target.value)}
-              style={{
-                border: 'none',
-                outline: 'none',
-                width: '100%',
-                height: '100%',
-                fontSize: '0.86rem',
-                color: '#1e293b',
-                backgroundColor: 'transparent'
-              }}
-            />
-            {unitSearchQuery && (
-              <Box
-                onClick={() => setUnitSearchQuery('')}
-                sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#94a3b8', '&:hover': { color: '#64748b' } }}
-              >
-                <X size={16} weight="bold" />
-              </Box>
-            )}
-          </Box>
-
-          {/* Status Filter Chips (Horizontal Scrollable) */}
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1,
-              overflowX: 'auto',
-              pb: 1,
-              mb: 0.5,
-              flexShrink: 0,
-              '&::-webkit-scrollbar': { display: 'none' },
-              scrollbarWidth: 'none'
-            }}
-          >
-            {['All', UNIT_STATUS.OCCUPIED, UNIT_STATUS.RENTED, UNIT_STATUS.VACANT].map((status) => {
-              const isSelected = unitStatusFilter === status;
-              return (
-                <Chip
-                  key={status}
-                  label={status}
-                  onClick={() => setUnitStatusFilter(status)}
-                  sx={{
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.76rem',
-                    height: 34,
-                    minHeight: 34,
-                    flexShrink: 0,
-                    backgroundColor: isSelected ? '#27b29b' : '#ffffff',
-                    color: isSelected ? '#ffffff' : '#64748b',
-                    border: `1px solid ${isSelected ? '#27b29b' : '#cbd5e1'}`,
-                    cursor: 'pointer',
-                    '& .MuiChip-label': {
-                      px: 1.4,
-                      lineHeight: 1
-                    }
-                  }}
-                />
-              );
-            })}
-          </Box>
-
-          {/* Floor Quick Jump Filter (For towers with hundreds of units) */}
-          {availableFloors.length > 2 && (
+          {/* Search Bar + Filter Button Row */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexShrink: 0 }}>
+            {/* Search Bar */}
             <Box
               sx={{
+                flexGrow: 1,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.8,
-                overflowX: 'auto',
-                pb: 1.5,
-                mb: 1,
-                flexShrink: 0,
-                '&::-webkit-scrollbar': { display: 'none' },
-                scrollbarWidth: 'none'
+                backgroundColor: '#ffffff',
+                borderRadius: '8px',
+                border: '1px solid #e2e8f0',
+                px: 1.5,
+                height: 44,
+                minHeight: 44,
+                gap: 1.2,
+                boxSizing: 'border-box'
               }}
             >
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', flexShrink: 0 }}>
-                Lantai:
+              <MagnifyingGlass size={19} color="#94a3b8" weight="bold" />
+              <input
+                type="text"
+                placeholder={`Search unit, owner, or renter in ${selectedTower?.name || 'tower'}...`}
+                value={unitSearchQuery}
+                onChange={(e) => setUnitSearchQuery(e.target.value)}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  width: '100%',
+                  height: '100%',
+                  fontSize: '0.86rem',
+                  color: '#1e293b',
+                  backgroundColor: 'transparent'
+                }}
+              />
+              {unitSearchQuery && (
+                <Box
+                  onClick={() => setUnitSearchQuery('')}
+                  sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#94a3b8', '&:hover': { color: '#64748b' } }}
+                >
+                  <X size={16} weight="bold" />
+                </Box>
+              )}
+            </Box>
+
+            {/* Filter Button (Opens Bottom Sheet) */}
+            <Box
+              onClick={() => {
+                setTempUnitStatusFilter(unitStatusFilter);
+                setTempFloorFilter(floorFilter);
+                setFilterDrawerOpen(true);
+              }}
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: '8px',
+                backgroundColor: isFilterActive ? '#ecfdf5' : '#ffffff',
+                border: `1.5px solid ${isFilterActive ? '#27b29b' : '#e2e8f0'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0,
+                position: 'relative',
+                transition: 'all 0.2s ease',
+                '&:active': { transform: 'scale(0.96)' }
+              }}
+            >
+              <FunnelSimple size={20} color={isFilterActive ? '#0d9488' : '#64748b'} weight={isFilterActive ? 'fill' : 'bold'} />
+              {isFilterActive && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 6,
+                    right: 6,
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    backgroundColor: '#0d9488'
+                  }}
+                />
+              )}
+            </Box>
+          </Box>
+
+          {/* Active Filter Indicators (Quick Dismiss Tags) */}
+          {isFilterActive && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 1.5, flexWrap: 'wrap', flexShrink: 0 }}>
+              {unitStatusFilter !== 'All' && (
+                <Chip
+                  size="small"
+                  label={`Status: ${unitStatusFilter}`}
+                  onDelete={() => setUnitStatusFilter('All')}
+                  sx={{
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    backgroundColor: '#ecfdf5',
+                    color: '#0d9488',
+                    border: '1px solid #a7f3d0'
+                  }}
+                />
+              )}
+              {floorFilter !== 'All' && (
+                <Chip
+                  size="small"
+                  label={`Lt. ${parseInt(floorFilter)}`}
+                  onDelete={() => setFloorFilter('All')}
+                  sx={{
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    backgroundColor: '#ecfdf5',
+                    color: '#0d9488',
+                    border: '1px solid #a7f3d0'
+                  }}
+                />
+              )}
+              <Typography
+                onClick={() => {
+                  setUnitStatusFilter('All');
+                  setFloorFilter('All');
+                }}
+                sx={{ fontSize: '0.74rem', color: '#ef4444', fontWeight: 600, cursor: 'pointer', ml: 0.4 }}
+              >
+                Reset
               </Typography>
-              {availableFloors.map((floor) => {
-                const isSelected = floorFilter === floor;
-                return (
-                  <Chip
-                    key={floor}
-                    label={floor === 'All' ? 'Semua Lt.' : `Lt. ${parseInt(floor)}`}
-                    size="small"
-                    onClick={() => setFloorFilter(floor)}
-                    sx={{
-                      borderRadius: '8px',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      height: 28,
-                      minHeight: 28,
-                      flexShrink: 0,
-                      backgroundColor: isSelected ? '#0f172a' : '#ffffff',
-                      color: isSelected ? '#ffffff' : '#64748b',
-                      border: `1px solid ${isSelected ? '#0f172a' : '#e2e8f0'}`,
-                      cursor: 'pointer',
-                      '& .MuiChip-label': {
-                        px: 1,
-                        lineHeight: 1
-                      }
-                    }}
-                  />
-                );
-              })}
             </Box>
           )}
 
@@ -1902,6 +1905,216 @@ export function TenantUnitView({ controller }) {
 
         </Box>
       )}
+
+      {/* ========================================================================= */}
+      {/* DRAWER 0: FILTER UNITS BOTTOM SHEET (STATUS & FLOOR) */}
+      {/* ========================================================================= */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.45)',
+          backdropFilter: 'blur(3px)',
+          zIndex: 1300,
+          opacity: filterDrawerOpen ? 1 : 0,
+          pointerEvents: filterDrawerOpen ? 'auto' : 'none',
+          transition: 'opacity 0.25s ease'
+        }}
+        onClick={() => setFilterDrawerOpen(false)}
+      />
+
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          width: '100%',
+          maxWidth: 430,
+          mx: 'auto',
+          backgroundColor: '#ffffff',
+          borderTopLeftRadius: '16px',
+          borderTopRightRadius: '16px',
+          boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
+          zIndex: 1400,
+          overflow: 'hidden',
+          transform: filterDrawerOpen ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: '85vh'
+        }}
+      >
+        {/* Drag Handle & Header */}
+        <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9' }}>
+          <Box sx={{ width: 40, height: 4, borderRadius: '8px', backgroundColor: '#cbd5e1', mx: 'auto', mb: 1.5 }} />
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>
+              Filter Units
+            </Typography>
+            <IconButton onClick={() => setFilterDrawerOpen(false)} size="small" sx={{ color: '#94a3b8' }}>
+              <X size={20} weight="bold" />
+            </IconButton>
+          </Box>
+        </Box>
+
+        {/* Scrollable Filter Content */}
+        <Box sx={{ p: 2.5, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          {/* Section 1: Filter by Status */}
+          <Box>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', mb: 1.2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Status Unit
+            </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+              {[
+                { key: 'All', label: 'All Status' },
+                { key: UNIT_STATUS.OCCUPIED, label: 'Occupied' },
+                { key: UNIT_STATUS.RENTED, label: 'Renter' },
+                { key: UNIT_STATUS.VACANT, label: 'Vacant' }
+              ].map(item => {
+                const isSelected = tempUnitStatusFilter === item.key;
+                return (
+                  <Box
+                    key={item.key}
+                    onClick={() => setTempUnitStatusFilter(item.key)}
+                    sx={{
+                      p: 1.3,
+                      borderRadius: '8px',
+                      border: `1.5px solid ${isSelected ? '#27b29b' : '#e2e8f0'}`,
+                      backgroundColor: isSelected ? '#ecfdf5' : '#ffffff',
+                      color: isSelected ? '#0d9488' : '#334155',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.8,
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        border: `2px solid ${isSelected ? '#27b29b' : '#cbd5e1'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}
+                    >
+                      {isSelected && <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#27b29b' }} />}
+                    </Box>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: isSelected ? 700 : 500 }}>
+                      {item.label}
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Section 2: Filter by Floor (Lantai) */}
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Floor (Lantai)
+              </Typography>
+              {tempFloorFilter !== 'All' && (
+                <Typography
+                  onClick={() => setTempFloorFilter('All')}
+                  sx={{ fontSize: '0.74rem', color: '#ef4444', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Select All
+                </Typography>
+              )}
+            </Box>
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {availableFloors.map((floor) => {
+                const isSelected = tempFloorFilter === floor;
+                return (
+                  <Chip
+                    key={floor}
+                    label={floor === 'All' ? 'All Floors' : `Floor ${parseInt(floor)}`}
+                    onClick={() => setTempFloorFilter(floor)}
+                    sx={{
+                      borderRadius: '8px',
+                      fontSize: '0.76rem',
+                      fontWeight: isSelected ? 700 : 500,
+                      height: 32,
+                      backgroundColor: isSelected ? '#0f172a' : '#f8fafc',
+                      color: isSelected ? '#ffffff' : '#334155',
+                      border: `1px solid ${isSelected ? '#0f172a' : '#e2e8f0'}`,
+                      cursor: 'pointer',
+                      '& .MuiChip-label': {
+                        px: 1.4
+                      }
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Footer Actions */}
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1.5px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            backgroundColor: '#ffffff'
+          }}
+        >
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => {
+              setTempUnitStatusFilter('All');
+              setTempFloorFilter('All');
+            }}
+            sx={{
+              borderRadius: '8px',
+              py: 1.1,
+              borderColor: '#cbd5e1',
+              color: '#64748b',
+              fontWeight: 700,
+              fontSize: '0.86rem',
+              textTransform: 'none',
+              '&:hover': { borderColor: '#94a3b8' }
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            disableElevation
+            onClick={() => {
+              setUnitStatusFilter(tempUnitStatusFilter);
+              setFloorFilter(tempFloorFilter);
+              setFilterDrawerOpen(false);
+            }}
+            sx={{
+              borderRadius: '8px',
+              py: 1.1,
+              backgroundColor: '#27b29b',
+              color: '#ffffff',
+              fontWeight: 700,
+              fontSize: '0.86rem',
+              textTransform: 'none',
+              '&:hover': { backgroundColor: '#209683' }
+            }}
+          >
+            Apply Filter
+          </Button>
+        </Box>
+      </Box>
 
       {/* ========================================================================= */}
       {/* DRAWER 1: ASSIGN / GANTI PENGHUNI (BOTTOM SHEET PATTERN) */}
