@@ -537,12 +537,20 @@ export function TenantUnitView({ controller }) {
             Daftar Tower
           </Typography>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {initialTowersData.map((tower) => {
               const towerUnits = units.filter(u => u.tower_id === tower.id);
-              const occCount = towerUnits.filter(u => u.status !== UNIT_STATUS.VACANT).length;
               const totalCount = towerUnits.length;
+              const ownerOccupiedCount = towerUnits.filter(u => u.status === UNIT_STATUS.OCCUPIED).length;
+              const rentedCount = towerUnits.filter(u => u.status === UNIT_STATUS.RENTED).length;
+              const vacantCount = towerUnits.filter(u => u.status === UNIT_STATUS.VACANT).length;
+              const occCount = ownerOccupiedCount + rentedCount;
               const rate = totalCount > 0 ? Math.round((occCount / totalCount) * 100) : tower.occupancyRate;
+              const distinctFloors = Array.from(new Set(towerUnits.map(u => u.floor))).length;
+
+              // Progress percentages
+              const ownerPct = totalCount > 0 ? (ownerOccupiedCount / totalCount) * 100 : 0;
+              const rentedPct = totalCount > 0 ? (rentedCount / totalCount) * 100 : 0;
 
               return (
                 <Box
@@ -550,103 +558,221 @@ export function TenantUnitView({ controller }) {
                   onClick={() => handleSelectTower(tower)}
                   sx={{
                     backgroundColor: '#ffffff',
-                    borderRadius: '8px',
-                    p: 2,
+                    borderRadius: '16px',
+                    border: '1.5px solid #e2e8f0',
+                    p: 2.2,
                     cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    '&:hover': {
+                      borderColor: '#27b29b',
+                      boxShadow: '0 8px 24px -4px rgba(39, 178, 155, 0.15)',
+                      transform: 'translateY(-2px)'
+                    },
                     '&:active': {
                       transform: 'scale(0.99)'
                     }
                   }}
                 >
-                  {/* Top Row: Icon + Tower Name & Total Units + Blue Occupied Badge */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  {/* Top Row: Gradient Icon + Name & Floor Info + Occupancy Badge */}
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.8 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
                       <Box
                         sx={{
-                          width: 46,
-                          height: 46,
-                          borderRadius: '8px',
-                          backgroundColor: '#ecfdf5',
+                          width: 48,
+                          height: 48,
+                          borderRadius: '12px',
+                          background: 'linear-gradient(135deg, #ecfdf5 0%, #ccfbf1 100%)',
+                          border: '1px solid #a7f3d0',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          flexShrink: 0
+                          flexShrink: 0,
+                          boxShadow: '0 2px 6px rgba(39, 178, 155, 0.12)'
                         }}
                       >
-                        <Building size={26} color="#27b29b" weight="fill" />
+                        <Building size={26} color="#0d9488" weight="fill" />
                       </Box>
                       <Box>
-                        <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>
+                        <Typography sx={{ fontWeight: 800, fontSize: '1.08rem', color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                           {tower.name}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.86rem', fontWeight: 600, color: '#64748b', mt: 0.2 }}>
-                          {totalCount} Total Unit
+                        <Typography sx={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 500, mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                          <span>{distinctFloors || 20} Lantai</span>
+                          <span style={{ color: '#cbd5e1' }}>•</span>
+                          <span>{totalCount} Total Unit</span>
                         </Typography>
                       </Box>
                     </Box>
 
+                    {/* Occupancy Rate Badge */}
                     <Box
                       sx={{
-                        backgroundColor: '#eff6ff',
-                        color: '#2563eb',
-                        border: '1px solid #bfdbfe',
-                        borderRadius: '8px',
-                        px: 1.2,
-                        py: 0.4,
+                        backgroundColor: rate >= 80 ? '#ecfdf5' : rate >= 50 ? '#eff6ff' : '#fff7ed',
+                        color: rate >= 80 ? '#059669' : rate >= 50 ? '#2563eb' : '#ea580c',
+                        border: `1px solid ${rate >= 80 ? '#a7f3d0' : rate >= 50 ? '#bfdbfe' : '#fed7aa'}`,
+                        borderRadius: '100px',
+                        px: 1.3,
+                        py: 0.45,
                         fontSize: '0.74rem',
-                        fontWeight: 700
+                        fontWeight: 800,
+                        letterSpacing: '0.01em',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        flexShrink: 0
                       }}
                     >
+                      <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: rate >= 80 ? '#059669' : rate >= 50 ? '#2563eb' : '#ea580c' }} />
                       {rate}% Occupied
                     </Box>
                   </Box>
 
-                  {/* Clean Divider */}
-                  <Box sx={{ height: '1.5px', backgroundColor: '#f1f5f9', my: 1.6 }} />
-
-                  {/* Bottom Row: Breakdown Counters & Tap CTA */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.6,
-                          backgroundColor: '#ecfdf5',
-                          borderRadius: '8px',
-                          px: 1,
-                          py: 0.4
-                        }}
-                      >
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#059669' }} />
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#065f46' }}>
-                          {occCount} Terhuni
-                        </Typography>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.6,
-                          backgroundColor: '#fff7ed',
-                          borderRadius: '8px',
-                          px: 1,
-                          py: 0.4
-                        }}
-                      >
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#ea580c' }} />
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#9a3412' }}>
-                          {totalCount - occCount} Vacant
-                        </Typography>
-                      </Box>
+                  {/* Visual Occupancy Progress Bar (Meter) */}
+                  <Box sx={{ mb: 1.8 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.7 }}>
+                      <Typography sx={{ fontSize: '0.73rem', fontWeight: 600, color: '#64748b' }}>
+                        Tingkat Keterhunian
+                      </Typography>
+                      <Typography sx={{ fontSize: '0.73rem', fontWeight: 700, color: '#0f172a' }}>
+                        <span style={{ color: '#059669' }}>{occCount}</span> / {totalCount} Unit Terisi
+                      </Typography>
                     </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, color: '#27b29b' }}>
-                      <Typography sx={{ fontSize: '0.76rem', fontWeight: 700 }}>
-                        Pilih Tower
+                    <Box
+                      sx={{
+                        height: 8,
+                        borderRadius: '100px',
+                        backgroundColor: '#f1f5f9',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        width: '100%'
+                      }}
+                    >
+                      {/* Segment 1: Owner Occupied */}
+                      <Box
+                        sx={{
+                          width: `${ownerPct}%`,
+                          height: '100%',
+                          backgroundColor: '#059669',
+                          transition: 'width 0.5s ease'
+                        }}
+                      />
+                      {/* Segment 2: Rented */}
+                      <Box
+                        sx={{
+                          width: `${rentedPct}%`,
+                          height: '100%',
+                          backgroundColor: '#3b82f6',
+                          transition: 'width 0.5s ease'
+                        }}
+                      />
+                    </Box>
+                  </Box>
+
+                  {/* Breakdown Grid: 3 Clean Micro-Cards */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, mb: 1.8 }}>
+                    {/* 1. Dihuni Pemilik */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#f0fdf4',
+                        border: '1px solid #dcfce7',
+                        borderRadius: '10px',
+                        p: 1.1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.2
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#059669' }} />
+                        <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: '#166534' }}>
+                          Pemilik
+                        </Typography>
+                      </Box>
+                      <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#065f46', mt: 0.3 }}>
+                        {ownerOccupiedCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#166534' }}>Unit</span>
                       </Typography>
-                      <CaretRight size={16} weight="bold" />
+                    </Box>
+
+                    {/* 2. Disewakan */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#eff6ff',
+                        border: '1px solid #dbeafe',
+                        borderRadius: '10px',
+                        p: 1.1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.2
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#3b82f6' }} />
+                        <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: '#1e40af' }}>
+                          Penyewa
+                        </Typography>
+                      </Box>
+                      <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#1e3a8a', mt: 0.3 }}>
+                        {rentedCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#1e40af' }}>Unit</span>
+                      </Typography>
+                    </Box>
+
+                    {/* 3. Kosong (Vacant) */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#fff7ed',
+                        border: '1px solid #ffedd5',
+                        borderRadius: '10px',
+                        p: 1.1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.2
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#ea580c' }} />
+                        <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: '#9a3412' }}>
+                          Vacant
+                        </Typography>
+                      </Box>
+                      <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#9a3412', mt: 0.3 }}>
+                        {vacantCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#9a3412' }}>Unit</span>
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Footer CTA: Site & Action Link */}
+                  <Box
+                    sx={{
+                      pt: 1.4,
+                      borderTop: '1px solid #f1f5f9',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <Typography sx={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 500 }}>
+                      Site: <strong style={{ color: '#64748b' }}>{tower.siteName || 'Paladian Park'}</strong>
+                    </Typography>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7, color: '#0d9488' }}>
+                      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700 }}>
+                        Lihat Unit Tower
+                      </Typography>
+                      <Box
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          backgroundColor: '#ecfdf5',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <CaretRight size={14} color="#0d9488" weight="bold" />
+                      </Box>
                     </Box>
                   </Box>
                 </Box>
