@@ -2619,14 +2619,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 <CalendarBlank size={22} color={trReviewEndDate ? '#27b29b' : '#94a3b8'} weight="bold" />
               </Box>
 
-              {/* Quick Presets (February 2026) */}
+              {/* Quick Presets (February - March 2026) */}
               <Box sx={{ display: 'flex', gap: 1 }}>
                 {[
                   { days: 1, label: '+1 Day', date: '13 Feb 2026', raw: '2026-02-13' },
-                  { days: 2, label: '+2 Days', date: '14 Feb 2026', raw: '2026-02-14' },
                   { days: 3, label: '+3 Days', date: '15 Feb 2026', raw: '2026-02-15' },
-                  { days: 4, label: '+4 Days', date: '16 Feb 2026', raw: '2026-02-16' },
-                  { days: 7, label: '+7 Days', date: '19 Feb 2026', raw: '2026-02-19' }
+                  { days: 7, label: '+7 Days', date: '19 Feb 2026', raw: '2026-02-19' },
+                  { days: 30, label: '+30 Days', date: '14 Mar 2026', raw: '2026-03-14' }
                 ].map((preset) => {
                   const isSelected = trReviewExtendedDays === preset.days;
                   return (
