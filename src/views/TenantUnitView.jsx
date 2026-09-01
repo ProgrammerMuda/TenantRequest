@@ -29,8 +29,8 @@ import {
   DialogActions,
   FormControl,
   Select,
-  MenuItem,
   TextField,
+  InputBase,
   Alert
 } from '@mui/material';
 import {
@@ -454,36 +454,165 @@ export function TenantUnitView({ controller }) {
       <Box
         sx={{
           backgroundColor: '#ffffff',
-          px: 2,
-          pt: 4,
-          pb: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #f1f5f9',
           position: 'relative',
-          zIndex: 10
+          zIndex: 10,
+          borderBottom: '1px solid #e2e8f0'
         }}
       >
-        <IconButton onClick={handleBack} sx={{ color: '#334155', p: 0.6, width: 40, height: 40 }}>
-          <CaretLeft size={24} weight="bold" />
-        </IconButton>
+        <Box
+          sx={{
+            px: 2,
+            pt: 4,
+            pb: navLevel === 'units' ? 1.5 : 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <IconButton onClick={handleBack} sx={{ color: '#334155', p: 0.6, width: 40, height: 40 }}>
+            <CaretLeft size={24} weight="bold" />
+          </IconButton>
 
-        <Box sx={{ flexGrow: 1, textAlign: 'center', px: 1 }}>
-          <Typography sx={{ fontWeight: 700, color: '#1e293b', fontSize: '1.05rem', lineHeight: 1.2 }}>
-            {navLevel === 'towers' && 'Tenant Unit'}
-            {navLevel === 'units' && `Unit ${selectedTower?.name || 'Tower'}`}
-            {navLevel === 'unit_detail' && selectedUnit?.unit_name}
-          </Typography>
+          <Box sx={{ flexGrow: 1, textAlign: 'center', px: 1 }}>
+            <Typography sx={{ fontWeight: 700, color: '#1e293b', fontSize: '1.05rem', lineHeight: 1.2 }}>
+              {navLevel === 'towers' && 'Tenant Unit'}
+              {navLevel === 'units' && `Unit ${selectedTower?.name || 'Tower'}`}
+              {navLevel === 'unit_detail' && selectedUnit?.unit_name}
+            </Typography>
+          </Box>
+
+          <Box sx={{ width: navLevel === 'unit_detail' ? 'auto' : 40, minWidth: 40, display: 'flex', justifyContent: 'flex-end' }}>
+            {navLevel === 'unit_detail' && selectedUnit ? (
+              renderStatusBadge(selectedUnit.status)
+            ) : (
+              <Box sx={{ width: 40 }} />
+            )}
+          </Box>
         </Box>
 
-        <Box sx={{ width: navLevel === 'unit_detail' ? 'auto' : 40, minWidth: 40, display: 'flex', justifyContent: 'flex-end' }}>
-          {navLevel === 'unit_detail' && selectedUnit ? (
-            renderStatusBadge(selectedUnit.status)
-          ) : (
-            <Box sx={{ width: 40 }} />
-          )}
-        </Box>
+        {/* Search and Filter in Title Bar (Level 2: Units List) - Same standard as WorkRequest, FitOutPermit, GoodsInOut */}
+        {navLevel === 'units' && (
+          <Box sx={{ px: 2, pb: 2, pt: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box 
+                sx={{ 
+                  flexGrow: 1, 
+                  backgroundColor: '#f1f5f9', 
+                  borderRadius: '8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  px: 2,
+                  py: 1,
+                  height: 46,
+                  boxSizing: 'border-box'
+                }}
+              >
+                <MagnifyingGlass size={20} color="#94a3b8" weight="bold" />
+                <InputBase
+                  placeholder={`Search unit, owner, or renter in ${selectedTower?.name || 'tower'}...`}
+                  value={unitSearchQuery}
+                  onChange={(e) => setUnitSearchQuery(e.target.value)}
+                  sx={{ 
+                    ml: 1, 
+                    flexGrow: 1, 
+                    fontSize: '0.92rem', 
+                    color: '#334155',
+                    '& .MuiInputBase-input::placeholder': {
+                      color: '#94a3b8',
+                      opacity: 1,
+                      fontWeight: 500
+                    }
+                  }}
+                />
+                {unitSearchQuery && (
+                  <Box
+                    onClick={() => setUnitSearchQuery('')}
+                    sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#94a3b8', '&:hover': { color: '#64748b' }, ml: 0.5 }}
+                  >
+                    <X size={16} weight="bold" />
+                  </Box>
+                )}
+              </Box>
+
+              <IconButton 
+                onClick={() => {
+                  setTempUnitStatusFilter(unitStatusFilter);
+                  setTempFloorFilter(floorFilter);
+                  setFilterDrawerOpen(true);
+                }}
+                sx={{ 
+                  border: `1px solid ${isFilterActive ? '#27b29b' : '#cbd5e1'}`, 
+                  borderRadius: '8px', 
+                  width: 46,
+                  height: 46,
+                  color: isFilterActive ? '#0d9488' : '#64748b',
+                  backgroundColor: isFilterActive ? '#ecfdf5' : '#ffffff',
+                  position: 'relative'
+                }}
+              >
+                <FunnelSimple size={22} weight={isFilterActive ? 'fill' : 'bold'} />
+                {isFilterActive && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 7,
+                      right: 7,
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      backgroundColor: '#0d9488'
+                    }}
+                  />
+                )}
+              </IconButton>
+            </Box>
+
+            {/* Active Filter Indicators (Quick Dismiss Tags) */}
+            {isFilterActive && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, pt: 0.2, flexWrap: 'wrap' }}>
+                {unitStatusFilter !== 'All' && (
+                  <Chip
+                    size="small"
+                    label={`Status: ${unitStatusFilter}`}
+                    onDelete={() => setUnitStatusFilter('All')}
+                    sx={{
+                      borderRadius: '6px',
+                      fontSize: '0.74rem',
+                      fontWeight: 600,
+                      backgroundColor: '#ecfdf5',
+                      color: '#0d9488',
+                      border: '1px solid #a7f3d0'
+                    }}
+                  />
+                )}
+                {floorFilter !== 'All' && (
+                  <Chip
+                    size="small"
+                    label={`Lt. ${parseInt(floorFilter)}`}
+                    onDelete={() => setFloorFilter('All')}
+                    sx={{
+                      borderRadius: '6px',
+                      fontSize: '0.74rem',
+                      fontWeight: 600,
+                      backgroundColor: '#ecfdf5',
+                      color: '#0d9488',
+                      border: '1px solid #a7f3d0'
+                    }}
+                  />
+                )}
+                <Typography
+                  onClick={() => {
+                    setUnitStatusFilter('All');
+                    setFloorFilter('All');
+                  }}
+                  sx={{ fontSize: '0.74rem', color: '#ef4444', fontWeight: 600, cursor: 'pointer', ml: 0.4 }}
+                >
+                  Reset
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
       </Box>
 
       {/* ========================================================================= */}
@@ -910,136 +1039,6 @@ export function TenantUnitView({ controller }) {
       {/* ========================================================================= */}
       {navLevel === 'units' && (
         <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', p: 2, pb: 4 }}>
-
-          {/* Search Bar + Filter Button Row */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexShrink: 0 }}>
-            {/* Search Bar */}
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#ffffff',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                px: 1.5,
-                height: 44,
-                minHeight: 44,
-                gap: 1.2,
-                boxSizing: 'border-box'
-              }}
-            >
-              <MagnifyingGlass size={19} color="#94a3b8" weight="bold" />
-              <input
-                type="text"
-                placeholder={`Search unit, owner, or renter in ${selectedTower?.name || 'tower'}...`}
-                value={unitSearchQuery}
-                onChange={(e) => setUnitSearchQuery(e.target.value)}
-                style={{
-                  border: 'none',
-                  outline: 'none',
-                  width: '100%',
-                  height: '100%',
-                  fontSize: '0.86rem',
-                  color: '#1e293b',
-                  backgroundColor: 'transparent'
-                }}
-              />
-              {unitSearchQuery && (
-                <Box
-                  onClick={() => setUnitSearchQuery('')}
-                  sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#94a3b8', '&:hover': { color: '#64748b' } }}
-                >
-                  <X size={16} weight="bold" />
-                </Box>
-              )}
-            </Box>
-
-            {/* Filter Button (Opens Bottom Sheet) */}
-            <Box
-              onClick={() => {
-                setTempUnitStatusFilter(unitStatusFilter);
-                setTempFloorFilter(floorFilter);
-                setFilterDrawerOpen(true);
-              }}
-              sx={{
-                width: 44,
-                height: 44,
-                borderRadius: '8px',
-                backgroundColor: isFilterActive ? '#ecfdf5' : '#ffffff',
-                border: `1.5px solid ${isFilterActive ? '#27b29b' : '#e2e8f0'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                flexShrink: 0,
-                position: 'relative',
-                transition: 'all 0.2s ease',
-                '&:active': { transform: 'scale(0.96)' }
-              }}
-            >
-              <FunnelSimple size={20} color={isFilterActive ? '#0d9488' : '#64748b'} weight={isFilterActive ? 'fill' : 'bold'} />
-              {isFilterActive && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 6,
-                    right: 6,
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    backgroundColor: '#0d9488'
-                  }}
-                />
-              )}
-            </Box>
-          </Box>
-
-          {/* Active Filter Indicators (Quick Dismiss Tags) */}
-          {isFilterActive && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 1.5, flexWrap: 'wrap', flexShrink: 0 }}>
-              {unitStatusFilter !== 'All' && (
-                <Chip
-                  size="small"
-                  label={`Status: ${unitStatusFilter}`}
-                  onDelete={() => setUnitStatusFilter('All')}
-                  sx={{
-                    borderRadius: '6px',
-                    fontSize: '0.74rem',
-                    fontWeight: 600,
-                    backgroundColor: '#ecfdf5',
-                    color: '#0d9488',
-                    border: '1px solid #a7f3d0'
-                  }}
-                />
-              )}
-              {floorFilter !== 'All' && (
-                <Chip
-                  size="small"
-                  label={`Lt. ${parseInt(floorFilter)}`}
-                  onDelete={() => setFloorFilter('All')}
-                  sx={{
-                    borderRadius: '6px',
-                    fontSize: '0.74rem',
-                    fontWeight: 600,
-                    backgroundColor: '#ecfdf5',
-                    color: '#0d9488',
-                    border: '1px solid #a7f3d0'
-                  }}
-                />
-              )}
-              <Typography
-                onClick={() => {
-                  setUnitStatusFilter('All');
-                  setFloorFilter('All');
-                }}
-                sx={{ fontSize: '0.74rem', color: '#ef4444', fontWeight: 600, cursor: 'pointer', ml: 0.4 }}
-              >
-                Reset
-              </Typography>
-            </Box>
-          )}
-
           {/* Units List */}
           {filteredUnits.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
