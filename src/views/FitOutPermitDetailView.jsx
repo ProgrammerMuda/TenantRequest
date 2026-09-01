@@ -1135,60 +1135,6 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         >
                           Detail Invoice
                         </Button>
-
-                        {/* Notice for Waiting Payment + Quick Simulation */}
-                        {req.status === 'WAITING_TENANT_PAYMENT' && (
-                          <Box
-                            sx={{
-                              mt: 1.5,
-                              p: 1.3,
-                              borderRadius: '10px',
-                              backgroundColor: '#fff7ed',
-                              border: '1px solid #fed7aa',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              gap: 1.2
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Clock size={18} color="#ea580c" weight="fill" />
-                              <Box>
-                                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#9a3412' }}>
-                                  Waiting for Payment
-                                </Typography>
-                                <Typography sx={{ fontSize: '0.7rem', color: '#c2410c', mt: 0.2 }}>
-                                  Schedule extends to {req.endDate} once paid.
-                                </Typography>
-                              </Box>
-                            </Box>
-
-                            <Button
-                              size="small"
-                              variant="contained"
-                              disableElevation
-                              onClick={() => handleMarkPaymentPaid(req.id)}
-                              sx={{
-                                fontSize: '0.72rem',
-                                fontWeight: 700,
-                                py: 0.6,
-                                px: 1.4,
-                                textTransform: 'none',
-                                borderRadius: '8px',
-                                backgroundColor: '#27b29b !important',
-                                color: '#ffffff !important',
-                                whiteSpace: 'nowrap',
-                                flexShrink: 0,
-                                boxShadow: 'none !important',
-                                '&:hover': {
-                                  backgroundColor: '#0f766e !important'
-                                }
-                              }}
-                            >
-                              Simulate Pay
-                            </Button>
-                          </Box>
-                        )}
                       </Box>
                     )}
 
@@ -1245,6 +1191,60 @@ export function FitOutPermitDetailView({ permit, controller }) {
                       <Typography sx={{ fontSize: '0.76rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.45, mt: 0.6 }}>
                         Technical Remarks: "{req.notes}"
                       </Typography>
+                    )}
+
+                    {/* Notice for Waiting Payment + Quick Simulation (At the very bottom of the card) */}
+                    {req.status === 'WAITING_TENANT_PAYMENT' && (
+                      <Box
+                        sx={{
+                          mt: 1.8,
+                          p: 1.3,
+                          borderRadius: '10px',
+                          backgroundColor: '#fff7ed',
+                          border: '1px solid #fed7aa',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 1.2
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Clock size={18} color="#ea580c" weight="fill" />
+                          <Box>
+                            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#9a3412' }}>
+                              Waiting for Payment
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.7rem', color: '#c2410c', mt: 0.2 }}>
+                              Schedule extends to {req.endDate} once paid.
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        <Button
+                          size="small"
+                          variant="contained"
+                          disableElevation
+                          onClick={() => handleMarkPaymentPaid(req.id)}
+                          sx={{
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            py: 0.6,
+                            px: 1.4,
+                            textTransform: 'none',
+                            borderRadius: '8px',
+                            backgroundColor: '#27b29b !important',
+                            color: '#ffffff !important',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                            boxShadow: 'none !important',
+                            '&:hover': {
+                              backgroundColor: '#0f766e !important'
+                            }
+                          }}
+                        >
+                          Simulate Pay
+                        </Button>
+                      </Box>
                     )}
                   </Box>
                 ))}
