@@ -220,6 +220,29 @@ export function FitOutPermitDetailView({ permit, controller }) {
   };
 
   const trReviewDateInputRef = useRef(null);
+  const [trReviewRawDate, setTrReviewRawDate] = useState('2026-02-15');
+  const [trReviewEndDate, setTrReviewEndDate] = useState('15 Feb 2026');
+  const [trReviewExtendedDays, setTrReviewExtendedDays] = useState(2);
+  const [trReviewFeePolicy, setTrReviewFeePolicy] = useState('FREE_OF_CHARGE');
+  const [trReviewChargeableAmount, setTrReviewChargeableAmount] = useState('2.000.000');
+
+  const convertToRawDate = (dStr) => {
+    if (!dStr) return '2026-02-15';
+    if (dStr.includes('-')) return dStr;
+    if (dStr.includes('/')) {
+      const [d, m, y] = dStr.split('/');
+      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+    const months = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06', Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12' };
+    const parts = dStr.trim().split(' ');
+    if (parts.length === 3) {
+      const [d, m, y] = parts;
+      const mNum = months[m] || '02';
+      return `${y}-${mNum}-${d.padStart(2, '0')}`;
+    }
+    return '2026-02-15';
+  };
+
   const handleTriggerReviewDatePicker = () => {
     if (trReviewDateInputRef.current) {
       if (typeof trReviewDateInputRef.current.showPicker === 'function') {
@@ -231,14 +254,50 @@ export function FitOutPermitDetailView({ permit, controller }) {
     }
   };
 
+  const handleReviewDateChange = (dateVal) => {
+    if (!dateVal) return;
+    setTrReviewRawDate(dateVal);
+    const [y, m, d] = dateVal.split('-');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const mIdx = parseInt(m, 10) - 1;
+    const formatted = `${d} ${months[mIdx] || m} ${y}`;
+    setTrReviewEndDate(formatted);
+
+    // Calculate diff from base end date (12 Feb 2026)
+    const baseDate = new Date(2026, 1, 12);
+    const targetDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+    const diffTime = targetDate - baseDate;
+    const diffDays = Math.max(1, Math.round(diffTime / (1000 * 60 * 60 * 24)));
+    setTrReviewExtendedDays(diffDays);
+  };
+
+  const handleReviewSelectPreset = (days, dateString, rawString) => {
+    setTrReviewRawDate(rawString);
+    setTrReviewEndDate(dateString);
+    setTrReviewExtendedDays(days);
+  };
+
+  const handleReviewChargeableAmountChange = (val) => {
+    const rawDigits = val.replace(/\D/g, '');
+    if (!rawDigits) {
+      setTrReviewChargeableAmount('');
+      return;
+    }
+    const num = parseInt(rawDigits, 10);
+    const formatted = new Intl.NumberFormat('id-ID').format(num);
+    setTrReviewChargeableAmount(formatted);
+  };
+
   const handleOpenTrReview = () => {
     if (latestExtension) {
       const engEnd = latestExtension.endDate || '15 Feb 2026';
-      setTrNewEndDate(engEnd);
-      setTrExtendedDaysCount(latestExtension.extendedDays || 2);
-      setTrTotalDurationCount(6 + (latestExtension.extendedDays || 2));
-      setTrFeePolicy(latestExtension.feePolicy === 'CHARGEABLE' ? 'CHARGEABLE' : 'FREE_OF_CHARGE');
-      setTrChargeableAmount(latestExtension.amount && latestExtension.amount !== '0' ? latestExtension.amount : '2.000.000');
+      const rawDate = convertToRawDate(engEnd);
+      const days = latestExtension.extendedDays || 2;
+      setTrReviewRawDate(rawDate);
+      setTrReviewEndDate(engEnd);
+      setTrReviewExtendedDays(days);
+      setTrReviewFeePolicy(latestExtension.feePolicy === 'CHARGEABLE' ? 'CHARGEABLE' : 'FREE_OF_CHARGE');
+      setTrReviewChargeableAmount(latestExtension.amount && latestExtension.amount !== '0' ? latestExtension.amount : '2.000.000');
     }
     setTrReviewModalOpen(true);
   };
@@ -369,7 +428,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
       submittedAt: '12/02/2026 16:20',
       startDate: '13 Feb 2026',
       endDate: formattedEnd,
+      newEndDate: formattedEnd,
+      originalEndDate: formattedEnd,
       extendedDays: engExtendedDaysCount || 2,
+      originalExtendedDays: engExtendedDaysCount || 2,
       feePolicy: 'FREE_OF_CHARGE',
       amount: '0',
       invoiceNo: `REQ-ENG-2026-00${34 + nextReqNum}`,
@@ -391,9 +453,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
   };
 
   const handleApproveExtension = () => {
-    const formattedEnd = trNewEndDate ? formatDisplayDate(trNewEndDate) : (latestExtension?.endDate || '15 Feb 2026');
-    const extendedDays = trExtendedDaysCount || latestExtension?.extendedDays || 2;
-    const amountVal = trChargeableAmount || '2.000.000';
+    const finalEnd = trReviewEndDate || '15 Feb 2026';
+    const finalDays = trReviewExtendedDays || 2;
+    const finalAmount = trReviewChargeableAmount || '2.000.000';
 
     setExtensionRequests(prev => {
       const updated = [...prev];
@@ -401,11 +463,12 @@ export function FitOutPermitDetailView({ permit, controller }) {
       if (lastIdx >= 0) {
         updated[lastIdx] = {
           ...updated[lastIdx],
-          endDate: formattedEnd,
-          extendedDays: extendedDays,
-          feePolicy: trFeePolicy,
-          amount: trFeePolicy === 'CHARGEABLE' ? amountVal : '0',
-          invoiceNo: trFeePolicy === 'CHARGEABLE' ? (updated[lastIdx].invoiceNo || `PRO/INV/082026/00003${updated[lastIdx].requestNumber}`) : updated[lastIdx].invoiceNo,
+          endDate: finalEnd,
+          newEndDate: finalEnd,
+          extendedDays: finalDays,
+          feePolicy: trReviewFeePolicy,
+          amount: trReviewFeePolicy === 'CHARGEABLE' ? finalAmount : '0',
+          invoiceNo: trReviewFeePolicy === 'CHARGEABLE' ? (updated[lastIdx].invoiceNo || `PRO/INV/082026/00003${updated[lastIdx].requestNumber}`) : updated[lastIdx].invoiceNo,
           status: 'APPROVED',
           approvedAt: '12/02/2026, 05:15 PM',
           approvedBy: 'Tenant Relation Lead'
@@ -414,7 +477,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
       return updated;
     });
     setTrReviewModalOpen(false);
-    setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} approved (+${extendedDays} Days, ${trFeePolicy === 'CHARGEABLE' ? 'Chargeable' : 'Free of Charge'})!`);
+    setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} approved until ${finalEnd} (+${finalDays} Days, ${trReviewFeePolicy === 'CHARGEABLE' ? 'Chargeable' : 'Free of Charge'})!`);
     setExtensionSuccessOpen(true);
   };
 
@@ -2342,10 +2405,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.3 }}>
                   <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
-                    {latestExtension?.endDate || latestExtension?.newEndDate || '—'}
+                    {latestExtension?.originalEndDate || latestExtension?.endDate || latestExtension?.newEndDate || '—'}
                   </Typography>
                   <Box sx={{ px: 0.9, py: 0.2, backgroundColor: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa', borderRadius: '100px', fontSize: '0.72rem', fontWeight: 700 }}>
-                    +{latestExtension?.extendedDays || '—'} Day{latestExtension?.extendedDays > 1 ? 's' : ''}
+                    +{latestExtension?.originalExtendedDays || latestExtension?.extendedDays || '—'} Day{(latestExtension?.originalExtendedDays || latestExtension?.extendedDays) > 1 ? 's' : ''}
                   </Box>
                 </Box>
               </Box>
@@ -2427,7 +2490,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   alignItems: 'center', 
                   justifyContent: 'space-between',
                   backgroundColor: '#ffffff', 
-                  border: trNewEndDate ? '1.5px solid #27b29b' : '1.5px solid #cbd5e1', 
+                  border: trReviewEndDate ? '1.5px solid #27b29b' : '1.5px solid #cbd5e1', 
                   borderRadius: '10px',
                   px: 2,
                   py: 1.3,
@@ -2442,9 +2505,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 <input 
                   type="date" 
                   ref={trReviewDateInputRef}
-                  value={trRawDate}
-                  min="2026-08-11"
-                  onChange={(e) => handleDateChange(e.target.value)}
+                  value={trReviewRawDate}
+                  min="2026-02-13"
+                  onChange={(e) => handleReviewDateChange(e.target.value)}
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -2457,21 +2520,22 @@ export function FitOutPermitDetailView({ permit, controller }) {
                   }}
                 />
 
-                <Typography sx={{ fontSize: '0.9rem', color: trNewEndDate ? '#334155' : '#94a3b8', fontWeight: trNewEndDate ? 600 : 400 }}>
-                  {trNewEndDate || 'Select End Date (DD/MM/YYYY)'}
+                <Typography sx={{ fontSize: '0.9rem', color: trReviewEndDate ? '#334155' : '#94a3b8', fontWeight: trReviewEndDate ? 600 : 400 }}>
+                  {trReviewEndDate || 'Select End Date (DD/MM/YYYY)'}
                 </Typography>
-                <CalendarBlank size={22} color={trNewEndDate ? '#27b29b' : '#94a3b8'} weight="bold" />
+                <CalendarBlank size={22} color={trReviewEndDate ? '#27b29b' : '#94a3b8'} weight="bold" />
               </Box>
 
-              {/* Quick Presets */}
+              {/* Quick Presets (February 2026) */}
               <Box sx={{ display: 'flex', gap: 1 }}>
                 {[
-                  { days: 1, label: '+1 Day', date: '11/08/2026', raw: '2026-08-11' },
-                  { days: 2, label: '+2 Days', date: '12/08/2026', raw: '2026-08-12' },
-                  { days: 3, label: '+3 Days', date: '13/08/2026', raw: '2026-08-13' },
-                  { days: 7, label: '+7 Days', date: '17/08/2026', raw: '2026-08-17' }
+                  { days: 1, label: '+1 Day', date: '13 Feb 2026', raw: '2026-02-13' },
+                  { days: 2, label: '+2 Days', date: '14 Feb 2026', raw: '2026-02-14' },
+                  { days: 3, label: '+3 Days', date: '15 Feb 2026', raw: '2026-02-15' },
+                  { days: 4, label: '+4 Days', date: '16 Feb 2026', raw: '2026-02-16' },
+                  { days: 7, label: '+7 Days', date: '19 Feb 2026', raw: '2026-02-19' }
                 ].map((preset) => {
-                  const isSelected = trExtendedDaysCount === preset.days;
+                  const isSelected = trReviewExtendedDays === preset.days;
                   return (
                     <Button
                       key={preset.days}
@@ -2481,7 +2545,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                       disableRipple
                       disableFocusRipple
                       disableTouchRipple
-                      onClick={() => handleSelectPreset(preset.days, preset.date, preset.raw)}
+                      onClick={() => handleReviewSelectPreset(preset.days, preset.date, preset.raw)}
                       sx={{
                         flex: 1,
                         textTransform: 'none',
@@ -2516,10 +2580,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 }}
               >
                 <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#ea580c' }}>
-                  +{trExtendedDaysCount} Days Approved
+                  +{trReviewExtendedDays} Days Approved
                 </Typography>
                 <Typography sx={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>
-                  Total Duration: {trTotalDurationCount} Days
+                  New End Date: {trReviewEndDate}
                 </Typography>
               </Box>
             </Box>
@@ -2532,14 +2596,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
               
               {/* Option 1: FREE OF CHARGE */}
               <Box 
-                onClick={() => setTrFeePolicy('FREE_OF_CHARGE')}
+                onClick={() => setTrReviewFeePolicy('FREE_OF_CHARGE')}
                 sx={{
                   p: 1.8,
                   borderRadius: '12px',
                   cursor: 'pointer',
-                  backgroundColor: trFeePolicy === 'FREE_OF_CHARGE' ? '#f0fdfa' : '#ffffff',
-                  border: trFeePolicy === 'FREE_OF_CHARGE' ? '2px solid #27b29b' : '1.5px solid #e2e8f0',
-                  boxShadow: trFeePolicy === 'FREE_OF_CHARGE' ? '0 3px 10px rgba(39, 178, 155,0.12)' : 'none',
+                  backgroundColor: trReviewFeePolicy === 'FREE_OF_CHARGE' ? '#f0fdfa' : '#ffffff',
+                  border: trReviewFeePolicy === 'FREE_OF_CHARGE' ? '2px solid #27b29b' : '1.5px solid #e2e8f0',
+                  boxShadow: trReviewFeePolicy === 'FREE_OF_CHARGE' ? '0 3px 10px rgba(39, 178, 155,0.12)' : 'none',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'flex-start',
@@ -2547,14 +2611,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 }}
               >
                 <Box sx={{ mt: 0.2, flexShrink: 0 }}>
-                  {trFeePolicy === 'FREE_OF_CHARGE' ? (
+                  {trReviewFeePolicy === 'FREE_OF_CHARGE' ? (
                     <RadioButton size={22} color="#27b29b" weight="fill" />
                   ) : (
                     <Circle size={22} color="#cbd5e1" />
                   )}
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: trFeePolicy === 'FREE_OF_CHARGE' ? '#0f766e' : '#1e293b' }}>
+                  <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: trReviewFeePolicy === 'FREE_OF_CHARGE' ? '#0f766e' : '#1e293b' }}>
                     FREE OF CHARGE (Tolerance / Grace Period)
                   </Typography>
                   <Typography sx={{ fontSize: '0.76rem', color: '#64748b', mt: 0.3, lineHeight: 1.4 }}>
@@ -2565,14 +2629,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
               {/* Option 2: CHARGEABLE */}
               <Box 
-                onClick={() => setTrFeePolicy('CHARGEABLE')}
+                onClick={() => setTrReviewFeePolicy('CHARGEABLE')}
                 sx={{
                   p: 1.8,
                   borderRadius: '12px',
                   cursor: 'pointer',
-                  backgroundColor: trFeePolicy === 'CHARGEABLE' ? '#f0fdfa' : '#ffffff',
-                  border: trFeePolicy === 'CHARGEABLE' ? '2px solid #27b29b' : '1.5px solid #e2e8f0',
-                  boxShadow: trFeePolicy === 'CHARGEABLE' ? '0 3px 10px rgba(39, 178, 155,0.12)' : 'none',
+                  backgroundColor: trReviewFeePolicy === 'CHARGEABLE' ? '#f0fdfa' : '#ffffff',
+                  border: trReviewFeePolicy === 'CHARGEABLE' ? '2px solid #27b29b' : '1.5px solid #e2e8f0',
+                  boxShadow: trReviewFeePolicy === 'CHARGEABLE' ? '0 3px 10px rgba(39, 178, 155,0.12)' : 'none',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'flex-start',
@@ -2580,14 +2644,14 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 }}
               >
                 <Box sx={{ mt: 0.2, flexShrink: 0 }}>
-                  {trFeePolicy === 'CHARGEABLE' ? (
+                  {trReviewFeePolicy === 'CHARGEABLE' ? (
                     <RadioButton size={22} color="#27b29b" weight="fill" />
                   ) : (
                     <Circle size={22} color="#cbd5e1" />
                   )}
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: trFeePolicy === 'CHARGEABLE' ? '#0f766e' : '#1e293b' }}>
+                  <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: trReviewFeePolicy === 'CHARGEABLE' ? '#0f766e' : '#1e293b' }}>
                     CHARGEABLE (Additional Bill)
                   </Typography>
                   <Typography sx={{ fontSize: '0.76rem', color: '#64748b', mt: 0.3, lineHeight: 1.4 }}>
@@ -2597,7 +2661,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               </Box>
 
               {/* Conditional Amount Input for Chargeable */}
-              {trFeePolicy === 'CHARGEABLE' && (
+              {trReviewFeePolicy === 'CHARGEABLE' && (
                 <Box 
                   sx={{ 
                     backgroundColor: '#ffffff', 
@@ -2641,8 +2705,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     <input 
                       type="text"
                       placeholder="0,00"
-                      value={trChargeableAmount}
-                      onChange={(e) => handleChargeableAmountChange(e.target.value)}
+                      value={trReviewChargeableAmount}
+                      onChange={(e) => handleReviewChargeableAmountChange(e.target.value)}
                       style={{
                         flex: 1,
                         border: 'none',
@@ -2661,7 +2725,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                       Invoice Total
                     </Typography>
                     <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f766e' }}>
-                      {trChargeableAmount ? `Rp ${trChargeableAmount},00` : 'Rp 0,00'}
+                      {trReviewChargeableAmount ? `Rp ${trReviewChargeableAmount},00` : 'Rp 0,00'}
                     </Typography>
                   </Box>
                 </Box>
