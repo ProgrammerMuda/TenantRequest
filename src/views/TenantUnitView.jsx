@@ -1075,7 +1075,7 @@ export function TenantUnitView({ controller }) {
                         {unit.unit_name}
                       </Typography>
                       <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
-                        Pemilik: <strong>{unit.owner?.name || '-'}</strong>
+                        Owner: <strong>{unit.owner?.name || '-'}</strong>
                       </Typography>
                     </Box>
                   </Box>
