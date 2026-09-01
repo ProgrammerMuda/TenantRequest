@@ -65,7 +65,7 @@ function generateTowerUnits(towerLetter, towerId, totalFloors, unitsPerFloor) {
 
     for (let u = 1; u <= unitsPerFloor; u++) {
       const unitNumStr = u < 10 ? `0${u}` : `${u}`;
-      const unitName = `Unit ${towerLetter}-${floorStr}${unitNumStr}`;
+      const unitName = `${towerLetter}${floorStr}${unitNumStr}`;
       const unitId = `unit-${towerLetter.toLowerCase()}-${floorStr}${unitNumStr}`;
 
       // Pseudo-random deterministic assignment based on floor and unit number

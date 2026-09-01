@@ -1072,10 +1072,27 @@ export function TenantUnitView({ controller }) {
                       <Door size={22} color="#334155" weight="fill" />
                     </Box>
                     <Box>
-                      <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1e293b' }}>
-                        {unit.unit_name}
-                      </Typography>
-                      <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1e293b' }}>
+                          {unit.unit_name}
+                        </Typography>
+                        <Box
+                          sx={{
+                            backgroundColor: '#f1f5f9',
+                            color: '#64748b',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '4px',
+                            px: 0.8,
+                            py: 0.15,
+                            fontSize: '0.68rem',
+                            fontWeight: 600,
+                            lineHeight: 1.2
+                          }}
+                        >
+                          Lt. {parseInt(unit.floor)}
+                        </Box>
+                      </Box>
+                      <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.3 }}>
                         Owner: <strong>{unit.owner?.name || '-'}</strong>
                       </Typography>
                     </Box>
