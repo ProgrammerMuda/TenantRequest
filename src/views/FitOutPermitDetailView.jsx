@@ -964,7 +964,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
                     {/* FitOut Extension Bill Section (Shown if Chargeable) */}
                     {req.feePolicy === 'CHARGEABLE' && (
-                      <Box sx={{ mt: 1.5, mb: 1.5, pt: 1.5, borderTop: '1px solid #f1f5f9' }}>
+                      <Box sx={{ mt: 1.8, mb: 1.8, pt: 1.8, borderTop: '1.5px solid #e2e8f0' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
                             <Box
