@@ -591,24 +591,25 @@ export function TenantUnitView({ controller }) {
                     </Box>
 
                     {/* Occupancy Rate Badge */}
+                    {/* Occupancy Rate Badge (Neutral Gray) */}
                     <Box
                       sx={{
-                        backgroundColor: rate >= 80 ? '#ecfdf5' : rate >= 50 ? '#eff6ff' : '#fff7ed',
-                        color: rate >= 80 ? '#059669' : rate >= 50 ? '#2563eb' : '#ea580c',
-                        border: `1px solid ${rate >= 80 ? '#a7f3d0' : rate >= 50 ? '#bfdbfe' : '#fed7aa'}`,
+                        backgroundColor: '#f1f5f9',
+                        color: '#475569',
+                        border: '1px solid #e2e8f0',
                         borderRadius: '100px',
-                        px: 1.3,
-                        py: 0.45,
+                        px: 1.2,
+                        py: 0.4,
                         fontSize: '0.74rem',
-                        fontWeight: 800,
+                        fontWeight: 700,
                         letterSpacing: '0.01em',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 0.5,
+                        gap: 0.6,
                         flexShrink: 0
                       }}
                     >
-                      <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: rate >= 80 ? '#059669' : rate >= 50 ? '#2563eb' : '#ea580c' }} />
+                      <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#64748b' }} />
                       {rate}% Occupied
                     </Box>
                   </Box>
