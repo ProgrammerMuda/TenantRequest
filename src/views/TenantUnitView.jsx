@@ -546,7 +546,6 @@ export function TenantUnitView({ controller }) {
               const vacantCount = towerUnits.filter(u => u.status === UNIT_STATUS.VACANT).length;
               const occCount = ownerOccupiedCount + rentedCount;
               const rate = totalCount > 0 ? Math.round((occCount / totalCount) * 100) : tower.occupancyRate;
-              const distinctFloors = Array.from(new Set(towerUnits.map(u => u.floor))).length;
 
               // Progress percentages
               const ownerPct = totalCount > 0 ? (ownerOccupiedCount / totalCount) * 100 : 0;
@@ -574,7 +573,7 @@ export function TenantUnitView({ controller }) {
                     }
                   }}
                 >
-                  {/* Top Row: Gradient Icon + Name & Floor Info + Occupancy Badge */}
+                  {/* Top Row: Gradient Icon + Name & Info + Occupancy Badge */}
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.8 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
                       <Box
@@ -597,10 +596,8 @@ export function TenantUnitView({ controller }) {
                         <Typography sx={{ fontWeight: 800, fontSize: '1.08rem', color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                           {tower.name}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 500, mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                          <span>{distinctFloors || 20} Floors</span>
-                          <span style={{ color: '#cbd5e1' }}>•</span>
-                          <span>{totalCount} Total Units</span>
+                        <Typography sx={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 500, mt: 0.4 }}>
+                          {totalCount} Total Units
                         </Typography>
                       </Box>
                     </Box>
@@ -695,7 +692,7 @@ export function TenantUnitView({ controller }) {
                       </Typography>
                     </Box>
 
-                    {/* 2. Rented (Tenant) */}
+                    {/* 2. Rented (Renter) */}
                     <Box
                       sx={{
                         backgroundColor: '#eff6ff',
@@ -710,7 +707,7 @@ export function TenantUnitView({ controller }) {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
                         <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#3b82f6' }} />
                         <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: '#1e40af' }}>
-                          Tenant
+                          Renter
                         </Typography>
                       </Box>
                       <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#1e3a8a', mt: 0.3 }}>
