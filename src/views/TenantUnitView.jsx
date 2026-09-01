@@ -489,18 +489,26 @@ export function TenantUnitView({ controller }) {
                   Apartemen Paladian Park
                 </Typography>
               </Box>
-              <Chip
-                label={`${siteStats.rate}% Occupied`}
-                size="small"
+              <Box
                 sx={{
-                  backgroundColor: '#eff6ff',
-                  color: '#2563eb',
-                  fontWeight: 700,
+                  backgroundColor: '#f1f5f9',
+                  color: '#475569',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '100px',
+                  px: 1.2,
+                  py: 0.4,
                   fontSize: '0.74rem',
-                  borderRadius: '8px',
-                  border: '1px solid #bfdbfe'
+                  fontWeight: 700,
+                  letterSpacing: '0.01em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.6,
+                  flexShrink: 0
                 }}
-              />
+              >
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#64748b' }} />
+                {siteStats.rate}% Occupied
+              </Box>
             </Box>
 
             {/* Stats Row */}
@@ -569,7 +577,7 @@ export function TenantUnitView({ controller }) {
                         sx={{
                           width: 48,
                           height: 48,
-                          borderRadius: '12px',
+                          borderRadius: '4px',
                           background: 'linear-gradient(135deg, #ecfdf5 0%, #ccfbf1 100%)',
                           border: '1px solid #a7f3d0',
                           display: 'flex',
