@@ -900,10 +900,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
           <Box 
             sx={{ 
               backgroundColor: '#ffffff', 
-              borderRadius: '16px', 
-              p: 2.2, 
-              border: '1.5px solid #e2e8f0',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+              borderRadius: '12px', 
+              p: 2, 
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
             }}
           >
             {/* Header: Extension Request History */}
@@ -911,21 +911,19 @@ export function FitOutPermitDetailView({ permit, controller }) {
               onClick={() => setHistorySectionOpen(prev => !prev)}
               sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
             >
-              <Box>
-                <Typography sx={{ fontWeight: 800, fontSize: '0.98rem', color: '#1e293b' }}>
-                  Extension Request History
-                </Typography>
-                <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
-                  {extensionRequests.length} Request{extensionRequests.length > 1 ? 's' : ''} recorded
-                </Typography>
-              </Box>
-              <IconButton size="small" sx={{ color: '#64748b' }}>
-                {historySectionOpen ? <CaretUp size={20} weight="bold" /> : <CaretDown size={20} weight="bold" />}
+              <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
+                Extension Request History
+              </Typography>
+              <IconButton size="small" sx={{ p: 0.5, color: '#27b29b' }}>
+                {historySectionOpen ? <CaretUp size={18} weight="bold" /> : <CaretDown size={18} weight="bold" />}
               </IconButton>
             </Box>
 
             <Collapse in={historySectionOpen}>
-              <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {/* Header Divider */}
+              <Box sx={{ mt: 1.5, mx: -2, borderTop: '1px solid #e2e8f0' }} />
+
+              <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {extensionRequests.slice().reverse().map((req) => (
                   <Box
                     key={req.id}
