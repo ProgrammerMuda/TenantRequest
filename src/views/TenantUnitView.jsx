@@ -905,7 +905,7 @@ export function TenantUnitView({ controller }) {
       {navLevel === 'units' && (
         <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', p: 2, pb: 4 }}>
           {/* Breadcrumb Info Bar */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexShrink: 0 }}>
             <Typography sx={{ fontSize: '0.76rem', color: '#64748b' }}>
               Site: <strong>Paladian Park</strong> / <strong>{selectedTower?.name}</strong>
             </Typography>
@@ -923,12 +923,15 @@ export function TenantUnitView({ controller }) {
               borderRadius: '8px',
               border: '1px solid #e2e8f0',
               px: 1.5,
-              py: 0.9,
+              height: 44,
+              minHeight: 44,
               gap: 1.2,
-              mb: 1.5
+              mb: 1.5,
+              flexShrink: 0,
+              boxSizing: 'border-box'
             }}
           >
-            <MagnifyingGlass size={18} color="#94a3b8" weight="bold" />
+            <MagnifyingGlass size={19} color="#94a3b8" weight="bold" />
             <input
               type="text"
               placeholder={`Search unit, owner, or renter in ${selectedTower?.name || 'tower'}...`}
@@ -938,7 +941,8 @@ export function TenantUnitView({ controller }) {
                 border: 'none',
                 outline: 'none',
                 width: '100%',
-                fontSize: '0.84rem',
+                height: '100%',
+                fontSize: '0.86rem',
                 color: '#1e293b',
                 backgroundColor: 'transparent'
               }}
@@ -961,6 +965,7 @@ export function TenantUnitView({ controller }) {
               overflowX: 'auto',
               pb: 1,
               mb: 0.5,
+              flexShrink: 0,
               '&::-webkit-scrollbar': { display: 'none' },
               scrollbarWidth: 'none'
             }}
@@ -975,13 +980,18 @@ export function TenantUnitView({ controller }) {
                   sx={{
                     borderRadius: '8px',
                     fontWeight: 700,
-                    fontSize: '0.74rem',
-                    px: 0.6,
-                    height: 30,
+                    fontSize: '0.76rem',
+                    height: 34,
+                    minHeight: 34,
+                    flexShrink: 0,
                     backgroundColor: isSelected ? '#27b29b' : '#ffffff',
                     color: isSelected ? '#ffffff' : '#64748b',
                     border: `1px solid ${isSelected ? '#27b29b' : '#cbd5e1'}`,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    '& .MuiChip-label': {
+                      px: 1.4,
+                      lineHeight: 1
+                    }
                   }}
                 />
               );
@@ -998,6 +1008,7 @@ export function TenantUnitView({ controller }) {
                 overflowX: 'auto',
                 pb: 1.5,
                 mb: 1,
+                flexShrink: 0,
                 '&::-webkit-scrollbar': { display: 'none' },
                 scrollbarWidth: 'none'
               }}
@@ -1017,12 +1028,17 @@ export function TenantUnitView({ controller }) {
                       borderRadius: '8px',
                       fontSize: '0.72rem',
                       fontWeight: 700,
-                      height: 26,
-                      px: 0.4,
+                      height: 28,
+                      minHeight: 28,
+                      flexShrink: 0,
                       backgroundColor: isSelected ? '#0f172a' : '#ffffff',
                       color: isSelected ? '#ffffff' : '#64748b',
                       border: `1px solid ${isSelected ? '#0f172a' : '#e2e8f0'}`,
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      '& .MuiChip-label': {
+                        px: 1,
+                        lineHeight: 1
+                      }
                     }}
                   />
                 );
