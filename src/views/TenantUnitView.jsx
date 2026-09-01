@@ -160,13 +160,8 @@ export function TenantUnitView({ controller }) {
     });
   }, [units, selectedTower, unitStatusFilter, floorFilter, unitSearchQuery]);
 
-  // Displayed Units (with progressive pagination or full list on search)
-  const displayedUnits = useMemo(() => {
-    if (floorFilter !== 'All' || unitSearchQuery.trim() !== '') {
-      return filteredUnits;
-    }
-    return filteredUnits.slice(0, displayLimit);
-  }, [filteredUnits, floorFilter, unitSearchQuery, displayLimit]);
+  // Displayed Units (all filtered units displayed directly)
+  const displayedUnits = filteredUnits;
 
   // -------------------------------------------------------------
   // HANDLERS
@@ -1106,47 +1101,6 @@ export function TenantUnitView({ controller }) {
                   </Box>
                 </Box>
               ))}
-
-              {/* Progressive Load / Pagination for hundreds of units */}
-              {displayedUnits.length < filteredUnits.length && (
-                <Box sx={{ textAlign: 'center', pt: 1.5, pb: 2 }}>
-                  <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mb: 1 }}>
-                    Menampilkan {displayedUnits.length} dari {filteredUnits.length} Unit di {selectedTower?.name}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => setDisplayLimit(prev => prev + 25)}
-                      sx={{
-                        borderRadius: '8px',
-                        borderColor: '#cbd5e1',
-                        color: '#334155',
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        textTransform: 'none',
-                        py: 0.8,
-                        px: 2
-                      }}
-                    >
-                      Muat 25 Unit Lagi
-                    </Button>
-                    <Button
-                      variant="text"
-                      size="small"
-                      onClick={() => setDisplayLimit(filteredUnits.length)}
-                      sx={{
-                        color: '#27b29b',
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        textTransform: 'none'
-                      }}
-                    >
-                      Tampilkan Semua ({filteredUnits.length})
-                    </Button>
-                  </Box>
-                </Box>
-              )}
             </Box>
           )}
         </Box>
