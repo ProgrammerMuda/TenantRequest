@@ -510,7 +510,7 @@ export function TenantUnitView({ controller }) {
                   {siteStats.total}
                 </Typography>
                 <Typography sx={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 500 }}>
-                  Total Unit
+                  Total Units
                 </Typography>
               </Box>
               <Box sx={{ textAlign: 'center', borderLeft: '1.5px solid #e2e8f0', borderRight: '1.5px solid #e2e8f0' }}>
@@ -534,7 +534,7 @@ export function TenantUnitView({ controller }) {
 
           {/* Section: Tower List */}
           <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b', mb: 1.4, mt: 0.5 }}>
-            Daftar Tower
+            Tower List
           </Typography>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -598,9 +598,9 @@ export function TenantUnitView({ controller }) {
                           {tower.name}
                         </Typography>
                         <Typography sx={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 500, mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                          <span>{distinctFloors || 20} Lantai</span>
+                          <span>{distinctFloors || 20} Floors</span>
                           <span style={{ color: '#cbd5e1' }}>•</span>
-                          <span>{totalCount} Total Unit</span>
+                          <span>{totalCount} Total Units</span>
                         </Typography>
                       </Box>
                     </Box>
@@ -632,10 +632,10 @@ export function TenantUnitView({ controller }) {
                   <Box sx={{ mb: 1.8 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.7 }}>
                       <Typography sx={{ fontSize: '0.73rem', fontWeight: 600, color: '#64748b' }}>
-                        Tingkat Keterhunian
+                        Occupancy Rate
                       </Typography>
                       <Typography sx={{ fontSize: '0.73rem', fontWeight: 700, color: '#0f172a' }}>
-                        <span style={{ color: '#059669' }}>{occCount}</span> / {totalCount} Unit Terisi
+                        <span style={{ color: '#059669' }}>{occCount}</span> / {totalCount} Units Occupied
                       </Typography>
                     </Box>
 
@@ -672,7 +672,7 @@ export function TenantUnitView({ controller }) {
 
                   {/* Breakdown Grid: 3 Clean Micro-Cards */}
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, mb: 1.8 }}>
-                    {/* 1. Dihuni Pemilik */}
+                    {/* 1. Owner Occupied */}
                     <Box
                       sx={{
                         backgroundColor: '#f0fdf4',
@@ -687,15 +687,15 @@ export function TenantUnitView({ controller }) {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
                         <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#059669' }} />
                         <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: '#166534' }}>
-                          Pemilik
+                          Owner
                         </Typography>
                       </Box>
                       <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#065f46', mt: 0.3 }}>
-                        {ownerOccupiedCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#166534' }}>Unit</span>
+                        {ownerOccupiedCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#166534' }}>Units</span>
                       </Typography>
                     </Box>
 
-                    {/* 2. Disewakan */}
+                    {/* 2. Rented (Tenant) */}
                     <Box
                       sx={{
                         backgroundColor: '#eff6ff',
@@ -710,15 +710,15 @@ export function TenantUnitView({ controller }) {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
                         <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#3b82f6' }} />
                         <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: '#1e40af' }}>
-                          Penyewa
+                          Tenant
                         </Typography>
                       </Box>
                       <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#1e3a8a', mt: 0.3 }}>
-                        {rentedCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#1e40af' }}>Unit</span>
+                        {rentedCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#1e40af' }}>Units</span>
                       </Typography>
                     </Box>
 
-                    {/* 3. Kosong (Vacant) */}
+                    {/* 3. Vacant */}
                     <Box
                       sx={{
                         backgroundColor: '#fff7ed',
@@ -737,7 +737,7 @@ export function TenantUnitView({ controller }) {
                         </Typography>
                       </Box>
                       <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#9a3412', mt: 0.3 }}>
-                        {vacantCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#9a3412' }}>Unit</span>
+                        {vacantCount} <span style={{ fontSize: '0.68rem', fontWeight: 500, color: '#9a3412' }}>Units</span>
                       </Typography>
                     </Box>
                   </Box>
@@ -758,7 +758,7 @@ export function TenantUnitView({ controller }) {
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7, color: '#0d9488' }}>
                       <Typography sx={{ fontSize: '0.78rem', fontWeight: 700 }}>
-                        Lihat Unit Tower
+                        View Tower Units
                       </Typography>
                       <Box
                         sx={{
