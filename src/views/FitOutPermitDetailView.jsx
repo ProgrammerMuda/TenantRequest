@@ -2321,85 +2321,86 @@ export function FitOutPermitDetailView({ permit, controller }) {
         </Box>
 
         {/* Body */}
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2.2 }}>
-          {/* Section A: Engineering Request Overview */}
-          <Box sx={{ backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', p: 2 }}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', mb: 1, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Engineering Proposal Summary
-            </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.8 }}>
-              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Requested End Date</Typography>
-              <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
-                {latestExtension?.endDate || latestExtension?.newEndDate || '—'}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.8 }}>
-              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Duration Requested</Typography>
-              <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#f97316' }}>
-                +{latestExtension?.extendedDays || '—'} Day{latestExtension?.extendedDays > 1 ? 's' : ''}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Submitted At</Typography>
-              <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>
+        <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Engineering Request Details - Compact Single Card */}
+          <Box 
+            sx={{ 
+              backgroundColor: '#f8fafc', 
+              borderRadius: '14px', 
+              border: '1.5px solid #e2e8f0', 
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1.4
+            }}
+          >
+            {/* Header / Schedule Row */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Engineering Request #{latestExtension?.requestNumber}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.3 }}>
+                  <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
+                    {latestExtension?.endDate || latestExtension?.newEndDate || '—'}
+                  </Typography>
+                  <Box sx={{ px: 0.9, py: 0.2, backgroundColor: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa', borderRadius: '100px', fontSize: '0.72rem', fontWeight: 700 }}>
+                    +{latestExtension?.extendedDays || '—'} Day{latestExtension?.extendedDays > 1 ? 's' : ''}
+                  </Box>
+                </Box>
+              </Box>
+              <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.3 }}>
                 {latestExtension?.submittedAt || '—'}
               </Typography>
             </Box>
-          </Box>
 
-          {/* Notes / Reason */}
-          {(latestExtension?.notes || latestExtension?.reason) && (
-            <Box>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
-                Engineering Notes & Remarks
-              </Typography>
-              <Box sx={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', p: 1.6 }}>
-                <Typography sx={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.55 }}>
-                  {latestExtension?.notes || latestExtension?.reason}
+            {/* Notes / Reason inside the same card */}
+            {(latestExtension?.notes || latestExtension?.reason) && (
+              <Box sx={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', p: 1.2 }}>
+                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', mb: 0.2 }}>
+                  Remarks:
+                </Typography>
+                <Typography sx={{ fontSize: '0.78rem', color: '#334155', lineHeight: 1.45 }}>
+                  "{latestExtension?.notes || latestExtension?.reason}"
                 </Typography>
               </Box>
-            </Box>
-          )}
+            )}
 
-          {/* Progress Photos */}
-          {latestExtension?.photos && latestExtension.photos.length > 0 && (
-            <Box>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
-                Progress Photos ({latestExtension.photos.length})
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5, '&::-webkit-scrollbar': { display: 'none' } }}>
-                {latestExtension.photos.map((photoUrl, idx) => (
-                  <Box
-                    key={idx}
-                    onClick={() => setPreviewPhoto(photoUrl)}
-                    sx={{
-                      width: 90,
-                      height: 90,
-                      borderRadius: '10px',
-                      overflow: 'hidden',
-                      flexShrink: 0,
-                      border: '1.5px solid #e2e8f0',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      '&:active': { opacity: 0.85 }
-                    }}
-                  >
-                    <img
-                      src={photoUrl}
-                      alt={`Progress photo ${idx + 1}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </Box>
-                ))}
+            {/* Progress Photos inside the same card */}
+            {latestExtension?.photos && latestExtension.photos.length > 0 && (
+              <Box>
+                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', mb: 0.6 }}>
+                  Progress Photos ({latestExtension.photos.length}):
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.3, '&::-webkit-scrollbar': { display: 'none' } }}>
+                  {latestExtension.photos.map((photoUrl, idx) => (
+                    <Box
+                      key={idx}
+                      onClick={() => setPreviewPhoto(photoUrl)}
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                        border: '1px solid #cbd5e1',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        '&:active': { opacity: 0.85 }
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={photoUrl}
+                        alt={`Progress photo ${idx + 1}`}
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </Box>
+                  ))}
+                </Box>
               </Box>
-              <Typography sx={{ fontSize: '0.68rem', color: '#94a3b8', mt: 0.5 }}>
-                *Tap photo to enlarge preview
-              </Typography>
-            </Box>
-          )}
-
-          {/* Divider */}
-          <Box sx={{ height: '1.5px', backgroundColor: '#e2e8f0', my: 0.5 }} />
+            )}
+          </Box>
 
           {/* Section B: TR Approval Decision & Schedule Adjustment */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
