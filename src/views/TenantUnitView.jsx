@@ -557,7 +557,7 @@ export function TenantUnitView({ controller }) {
                   onClick={() => handleSelectTower(tower)}
                   sx={{
                     backgroundColor: '#ffffff',
-                    borderRadius: '16px',
+                    borderRadius: '8px',
                     p: 2.2,
                     cursor: 'pointer'
                   }}
