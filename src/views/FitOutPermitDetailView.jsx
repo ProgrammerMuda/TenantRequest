@@ -953,26 +953,27 @@ export function FitOutPermitDetailView({ permit, controller }) {
                           backgroundColor: 
                             req.status === 'REJECTED' ? '#fef2f2' : 
                             req.status === 'APPROVED' ? '#ecfdf5' : 
-                            req.status === 'WAITING_TENANT_PAYMENT' ? '#fffbeb' : '#fff7ed',
+                            req.status === 'WAITING_TENANT_PAYMENT' ? '#fff7ed' : '#fff7ed',
                           color: 
                             req.status === 'REJECTED' ? '#ef4444' : 
                             req.status === 'APPROVED' ? '#059669' : 
-                            req.status === 'WAITING_TENANT_PAYMENT' ? '#d97706' : '#ea580c',
+                            req.status === 'WAITING_TENANT_PAYMENT' ? '#ea580c' : '#ea580c',
                           border: `1px solid ${
                             req.status === 'REJECTED' ? '#fecaca' : 
                             req.status === 'APPROVED' ? '#a7f3d0' : 
-                            req.status === 'WAITING_TENANT_PAYMENT' ? '#fde68a' : '#ffedd5'
+                            req.status === 'WAITING_TENANT_PAYMENT' ? '#ffedd5' : '#ffedd5'
                           }`,
                           borderRadius: '100px',
                           px: 1.3,
                           py: 0.3,
                           fontSize: '0.72rem',
-                          fontWeight: 700
+                          fontWeight: 700,
+                          letterSpacing: '0.01em'
                         }}
                       >
                         {req.status === 'REJECTED' ? 'Rejected' : 
                          req.status === 'APPROVED' ? 'Approved' : 
-                         req.status === 'WAITING_TENANT_PAYMENT' ? 'Waiting Tenant Payment' : 
+                         req.status === 'WAITING_TENANT_PAYMENT' ? 'Waiting Payment' : 
                          'Waiting for Approval'}
                       </Box>
                     </Box>
@@ -1142,8 +1143,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
                               mt: 1.5,
                               p: 1.3,
                               borderRadius: '10px',
-                              backgroundColor: '#fffbeb',
-                              border: '1px solid #fef08a',
+                              backgroundColor: '#fff7ed',
+                              border: '1px solid #fed7aa',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
@@ -1151,13 +1152,13 @@ export function FitOutPermitDetailView({ permit, controller }) {
                             }}
                           >
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Clock size={18} color="#d97706" weight="fill" />
+                              <Clock size={18} color="#ea580c" weight="fill" />
                               <Box>
-                                <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400e' }}>
-                                  Awaiting Tenant Payment
+                                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#9a3412' }}>
+                                  Waiting for Payment
                                 </Typography>
-                                <Typography sx={{ fontSize: '0.7rem', color: '#b45309', lineHeight: 1.35, mt: 0.2 }}>
-                                  Schedule will officially extend to {req.endDate} once payment of Rp {req.amount || '2.000.000'},00 is completed.
+                                <Typography sx={{ fontSize: '0.7rem', color: '#c2410c', mt: 0.2 }}>
+                                  Schedule extends to {req.endDate} once paid.
                                 </Typography>
                               </Box>
                             </Box>
@@ -1171,7 +1172,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                                 fontSize: '0.72rem',
                                 fontWeight: 700,
                                 py: 0.6,
-                                px: 1.3,
+                                px: 1.4,
                                 textTransform: 'none',
                                 borderRadius: '8px',
                                 backgroundColor: '#27b29b !important',
