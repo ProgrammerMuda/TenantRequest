@@ -432,7 +432,7 @@ export function TenantUnitView({ controller }) {
   }, [selectedUnit]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1, overflow: 'hidden', backgroundColor: '#f1f5f9', position: 'relative' }}>
       
       {/* ========================================================================= */}
       {/* MASTER TOP HEADER */}
@@ -1840,12 +1840,12 @@ export function TenantUnitView({ controller }) {
       {/* ========================================================================= */}
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.45)',
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
           backdropFilter: 'blur(3px)',
           zIndex: 1300,
           opacity: filterDrawerOpen ? 1 : 0,
@@ -1857,16 +1857,14 @@ export function TenantUnitView({ controller }) {
 
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
           width: '100%',
-          maxWidth: 430,
-          mx: 'auto',
           backgroundColor: '#ffffff',
-          borderTopLeftRadius: '16px',
-          borderTopRightRadius: '16px',
+          borderTopLeftRadius: '20px',
+          borderTopRightRadius: '20px',
           boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
           zIndex: 1400,
           overflow: 'hidden',
@@ -1874,7 +1872,7 @@ export function TenantUnitView({ controller }) {
           transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '85vh'
+          maxHeight: '85%'
         }}
       >
         {/* Drag Handle & Header */}
@@ -2049,12 +2047,12 @@ export function TenantUnitView({ controller }) {
       {/* ========================================================================= */}
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.45)',
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
           backdropFilter: 'blur(3px)',
           zIndex: 1300,
           opacity: assignDrawerOpen ? 1 : 0,
@@ -2066,16 +2064,14 @@ export function TenantUnitView({ controller }) {
 
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
           width: '100%',
-          maxWidth: 430,
-          mx: 'auto',
           backgroundColor: '#ffffff',
-          borderTopLeftRadius: '8px',
-          borderTopRightRadius: '8px',
+          borderTopLeftRadius: '20px',
+          borderTopRightRadius: '20px',
           boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
           zIndex: 1400,
           overflow: 'hidden',
@@ -2083,7 +2079,7 @@ export function TenantUnitView({ controller }) {
           transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '85vh'
+          maxHeight: '85%'
         }}
       >
         <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9' }}>
@@ -2208,12 +2204,12 @@ export function TenantUnitView({ controller }) {
       {/* ========================================================================= */}
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.45)',
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
           backdropFilter: 'blur(3px)',
           zIndex: 1300,
           opacity: memberDrawerOpen ? 1 : 0,
@@ -2225,16 +2221,14 @@ export function TenantUnitView({ controller }) {
 
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
           width: '100%',
-          maxWidth: 430,
-          mx: 'auto',
           backgroundColor: '#ffffff',
-          borderTopLeftRadius: '8px',
-          borderTopRightRadius: '8px',
+          borderTopLeftRadius: '20px',
+          borderTopRightRadius: '20px',
           boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
           zIndex: 1400,
           overflow: 'hidden',
@@ -2242,7 +2236,7 @@ export function TenantUnitView({ controller }) {
           transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '85vh'
+          maxHeight: '85%'
         }}
       >
         <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9' }}>
@@ -2313,12 +2307,12 @@ export function TenantUnitView({ controller }) {
       {/* ========================================================================= */}
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.45)',
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
           backdropFilter: 'blur(3px)',
           zIndex: 1300,
           opacity: vehicleDrawerOpen ? 1 : 0,
@@ -2330,16 +2324,14 @@ export function TenantUnitView({ controller }) {
 
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
           width: '100%',
-          maxWidth: 430,
-          mx: 'auto',
           backgroundColor: '#ffffff',
-          borderTopLeftRadius: '8px',
-          borderTopRightRadius: '8px',
+          borderTopLeftRadius: '20px',
+          borderTopRightRadius: '20px',
           boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
           zIndex: 1400,
           overflow: 'hidden',
@@ -2347,7 +2339,7 @@ export function TenantUnitView({ controller }) {
           transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '85vh'
+          maxHeight: '85%'
         }}
       >
         <Box sx={{ pt: 1.5, px: 2.5, pb: 1.5, borderBottom: '1px solid #f1f5f9' }}>
