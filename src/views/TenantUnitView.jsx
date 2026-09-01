@@ -58,7 +58,8 @@ import {
   Sparkle,
   Phone,
   Envelope,
-  Info
+  Info,
+  MagnifyingGlass
 } from '@phosphor-icons/react';
 
 import {
@@ -84,6 +85,7 @@ export function TenantUnitView({ controller }) {
   // Filter States
   const [unitStatusFilter, setUnitStatusFilter] = useState('All'); // 'All' | 'Occupied' | 'Vacant' | 'Disewakan'
   const [floorFilter, setFloorFilter] = useState('All'); // 'All' | '01' | '02' ...
+  const [unitSearchQuery, setUnitSearchQuery] = useState('');
   const [displayLimit, setDisplayLimit] = useState(25); // Progressive load limit for hundreds of units
 
   // Drawers & Modals State
@@ -131,24 +133,34 @@ export function TenantUnitView({ controller }) {
     return ['All', ...floors];
   }, [units, selectedTower]);
 
-  // Filtered Units in Selected Tower (supporting hundreds of units)
+  // Filtered Units in Selected Tower (supporting search, status, and floor filters)
   const filteredUnits = useMemo(() => {
     if (!selectedTower) return [];
+    const query = unitSearchQuery.trim().toLowerCase();
     return units.filter(u => {
       if (u.tower_id !== selectedTower.id) return false;
       if (unitStatusFilter !== 'All' && u.status !== unitStatusFilter) return false;
       if (floorFilter !== 'All' && u.floor !== floorFilter) return false;
+      if (query) {
+        const matchesUnitNumber = u.unit_number?.toLowerCase().includes(query) || u.name?.toLowerCase().includes(query);
+        const matchesOwner = u.owner?.name?.toLowerCase().includes(query);
+        const matchesMember = u.members?.some(m => m.name?.toLowerCase().includes(query));
+        const matchesFloor = `lt ${parseInt(u.floor)}`.includes(query) || `lantai ${parseInt(u.floor)}`.includes(query) || `floor ${parseInt(u.floor)}`.includes(query);
+        if (!matchesUnitNumber && !matchesOwner && !matchesMember && !matchesFloor) {
+          return false;
+        }
+      }
       return true;
     });
-  }, [units, selectedTower, unitStatusFilter, floorFilter]);
+  }, [units, selectedTower, unitStatusFilter, floorFilter, unitSearchQuery]);
 
-  // Displayed Units (with progressive pagination when browsing hundreds of units)
+  // Displayed Units (with progressive pagination or full list on search)
   const displayedUnits = useMemo(() => {
-    if (floorFilter !== 'All') {
+    if (floorFilter !== 'All' || unitSearchQuery.trim() !== '') {
       return filteredUnits;
     }
     return filteredUnits.slice(0, displayLimit);
-  }, [filteredUnits, floorFilter, displayLimit]);
+  }, [filteredUnits, floorFilter, unitSearchQuery, displayLimit]);
 
   // -------------------------------------------------------------
   // HANDLERS
@@ -159,19 +171,21 @@ export function TenantUnitView({ controller }) {
     } else if (navLevel === 'units') {
       setNavLevel('towers');
       setSelectedTower(null);
+      setUnitSearchQuery('');
     } else {
       controller.setActiveTab('home');
     }
   };
 
   const handleSelectTower = (tower) => {
-    setTowerSheetTower(tower); // open bottom sheet preview instead of direct navigation
+    handleEnterTower(tower);
   };
 
   const handleEnterTower = (tower) => {
     setSelectedTower(tower);
     setUnitStatusFilter('All');
     setFloorFilter('All');
+    setUnitSearchQuery('');
     setDisplayLimit(25);
     setNavLevel('units');
     setTowerSheetTower(null);
@@ -896,8 +910,47 @@ export function TenantUnitView({ controller }) {
               Site: <strong>Paladian Park</strong> / <strong>{selectedTower?.name}</strong>
             </Typography>
             <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: '#27b29b' }}>
-              {filteredUnits.length} Unit
+              {filteredUnits.length} Unit{filteredUnits.length > 1 ? 's' : ''}
             </Typography>
+          </Box>
+
+          {/* Search Bar */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#ffffff',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              px: 1.5,
+              py: 0.9,
+              gap: 1.2,
+              mb: 1.5
+            }}
+          >
+            <MagnifyingGlass size={18} color="#94a3b8" weight="bold" />
+            <input
+              type="text"
+              placeholder={`Search unit, owner, or renter in ${selectedTower?.name || 'tower'}...`}
+              value={unitSearchQuery}
+              onChange={(e) => setUnitSearchQuery(e.target.value)}
+              style={{
+                border: 'none',
+                outline: 'none',
+                width: '100%',
+                fontSize: '0.84rem',
+                color: '#1e293b',
+                backgroundColor: 'transparent'
+              }}
+            />
+            {unitSearchQuery && (
+              <Box
+                onClick={() => setUnitSearchQuery('')}
+                sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#94a3b8', '&:hover': { color: '#64748b' } }}
+              >
+                <X size={16} weight="bold" />
+              </Box>
+            )}
           </Box>
 
           {/* Status Filter Chips (Horizontal Scrollable) */}
@@ -982,10 +1035,10 @@ export function TenantUnitView({ controller }) {
             <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
               <Door size={48} color="#cbd5e1" weight="duotone" />
               <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b', mt: 1.5 }}>
-                Tidak ada unit yang cocok
+                No units found
               </Typography>
               <Typography sx={{ fontSize: '0.78rem', color: '#94a3b8', mt: 0.5 }}>
-                Silakan ganti kata kunci pencarian atau filter status.
+                Try changing your search keywords or status filter.
               </Typography>
             </Box>
           ) : (
