@@ -998,7 +998,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         </Typography>
                         <Typography sx={{ fontSize: '0.72rem', color: '#991b1b', fontWeight: 700 }}>
                           Rejected by: <span style={{ fontWeight: 600, color: '#1e293b' }}>{req.rejectedBy || 'Brelian - Tenant Relation'}</span>
-                          <span style={{ color: '#94a3b8', fontWeight: 400, marginLeft: 6 }}>• {req.rejectedAt || '12/02/2026, 03:30 PM'}</span>
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.68rem', color: '#94a3b8', mt: 0.2, fontWeight: 500 }}>
+                          {req.rejectedAt || '12/02/2026, 03:30 PM'}
                         </Typography>
                       </Box>
                     )}
