@@ -85,14 +85,14 @@ export function TenantUnitView({ controller }) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Filter States
-  const [unitStatusFilter, setUnitStatusFilter] = useState('All'); // 'All' | 'Occupied' | 'Vacant' | 'Disewakan'
-  const [floorFilter, setFloorFilter] = useState('All'); // 'All' | '01' | '02' ...
+  const [unitStatusFilter, setUnitStatusFilter] = useState('All'); // 'All' | 'Occupied' | 'Vacant'
+  const [floorFilter, setFloorFilter] = useState([]); // array of selected floor strings, empty = All Floors
   const [unitSearchQuery, setUnitSearchQuery] = useState('');
   const [displayLimit, setDisplayLimit] = useState(25); // Progressive load limit for hundreds of units
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [tempUnitStatusFilter, setTempUnitStatusFilter] = useState('All');
-  const [tempFloorFilter, setTempFloorFilter] = useState('All');
-  const isFilterActive = unitStatusFilter !== 'All' || floorFilter !== 'All';
+  const [tempFloorFilter, setTempFloorFilter] = useState([]);
+  const isFilterActive = unitStatusFilter !== 'All' || floorFilter.length > 0;
 
   // Drawers & Modals State
   const [assignDrawerOpen, setAssignDrawerOpen] = useState(false);
@@ -139,7 +139,7 @@ export function TenantUnitView({ controller }) {
     return ['All', ...floors];
   }, [units, selectedTower]);
 
-  // Filtered Units in Selected Tower (supporting search, status (Occupied/Vacant), and floor filters)
+  // Filtered Units in Selected Tower (supporting search, status (Occupied/Vacant), and multiple floor filters)
   const filteredUnits = useMemo(() => {
     if (!selectedTower) return [];
     const query = unitSearchQuery.trim().toLowerCase();
@@ -148,7 +148,7 @@ export function TenantUnitView({ controller }) {
       const isUnitVacant = u.status === UNIT_STATUS.VACANT || u.status === 'Vacant';
       if (unitStatusFilter === 'Vacant' && !isUnitVacant) return false;
       if (unitStatusFilter === 'Occupied' && isUnitVacant) return false;
-      if (floorFilter !== 'All' && u.floor !== floorFilter) return false;
+      if (floorFilter.length > 0 && !floorFilter.includes(u.floor)) return false;
       if (query) {
         const matchesUnitNumber = u.unit_number?.toLowerCase().includes(query) || u.name?.toLowerCase().includes(query);
         const matchesOwner = u.owner?.name?.toLowerCase().includes(query);
@@ -174,6 +174,7 @@ export function TenantUnitView({ controller }) {
     } else if (navLevel === 'units') {
       setNavLevel('towers');
       setSelectedTower(null);
+      setFloorFilter([]);
       setUnitSearchQuery('');
     } else {
       controller.setActiveTab('home');
@@ -187,7 +188,7 @@ export function TenantUnitView({ controller }) {
   const handleEnterTower = (tower) => {
     setSelectedTower(tower);
     setUnitStatusFilter('All');
-    setFloorFilter('All');
+    setFloorFilter([]);
     setUnitSearchQuery('');
     setDisplayLimit(25);
     setNavLevel('units');
@@ -571,11 +572,11 @@ export function TenantUnitView({ controller }) {
                     }}
                   />
                 )}
-                {floorFilter !== 'All' && (
+                {floorFilter.length > 0 && (
                   <Chip
                     size="small"
-                    label={`Lt. ${parseInt(floorFilter)}`}
-                    onDelete={() => setFloorFilter('All')}
+                    label={floorFilter.length === 1 ? `Floor ${parseInt(floorFilter[0])}` : `Floor: ${floorFilter.map(f => parseInt(f)).join(', ')}`}
+                    onDelete={() => setFloorFilter([])}
                     sx={{
                       borderRadius: '6px',
                       fontSize: '0.74rem',
@@ -589,7 +590,7 @@ export function TenantUnitView({ controller }) {
                 <Typography
                   onClick={() => {
                     setUnitStatusFilter('All');
-                    setFloorFilter('All');
+                    setFloorFilter([]);
                   }}
                   sx={{ fontSize: '0.74rem', color: '#ef4444', fontWeight: 600, cursor: 'pointer', ml: 0.4 }}
                 >
@@ -1892,7 +1893,7 @@ export function TenantUnitView({ controller }) {
         <Box sx={{ p: 2.5, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           {/* Section 1: Filter by Status */}
           <Box>
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', mb: 1.2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b', mb: 1.2 }}>
               Status Unit
             </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
@@ -1942,30 +1943,69 @@ export function TenantUnitView({ controller }) {
             </Box>
           </Box>
 
-          {/* Section 2: Filter by Floor (Lantai) */}
+          {/* Section 2: Filter by Floor (Multi-Select) */}
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Floor (Lantai)
+              <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b' }}>
+                Floor
               </Typography>
-              {tempFloorFilter !== 'All' && (
+              {tempFloorFilter.length > 0 && (
                 <Typography
-                  onClick={() => setTempFloorFilter('All')}
-                  sx={{ fontSize: '0.74rem', color: '#ef4444', fontWeight: 600, cursor: 'pointer' }}
+                  onClick={() => setTempFloorFilter([])}
+                  sx={{ fontSize: '0.74rem', color: '#27b29b', fontWeight: 600, cursor: 'pointer' }}
                 >
-                  Select All
+                  Clear Selection ({tempFloorFilter.length})
                 </Typography>
               )}
             </Box>
 
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {availableFloors.map((floor) => {
-                const isSelected = tempFloorFilter === floor;
+              {/* All Floors Chip (Disabled if any specific floor is selected) */}
+              {(() => {
+                const isAllDisabled = tempFloorFilter.length > 0;
+                const isAllSelected = tempFloorFilter.length === 0;
+
+                return (
+                  <Chip
+                    label="All Floors"
+                    onClick={() => {
+                      if (!isAllDisabled) {
+                        setTempFloorFilter([]);
+                      }
+                    }}
+                    sx={{
+                      borderRadius: '8px',
+                      fontSize: '0.76rem',
+                      fontWeight: isAllSelected ? 700 : 500,
+                      height: 32,
+                      backgroundColor: isAllSelected ? '#0f172a' : '#f1f5f9',
+                      color: isAllSelected ? '#ffffff' : isAllDisabled ? '#94a3b8' : '#334155',
+                      border: `1px solid ${isAllSelected ? '#0f172a' : isAllDisabled ? '#e2e8f0' : '#cbd5e1'}`,
+                      cursor: isAllDisabled ? 'not-allowed' : 'pointer',
+                      opacity: isAllDisabled ? 0.45 : 1,
+                      pointerEvents: isAllDisabled ? 'none' : 'auto',
+                      '& .MuiChip-label': {
+                        px: 1.4
+                      }
+                    }}
+                  />
+                );
+              })()}
+
+              {/* Individual Floors (Multi-Select) */}
+              {availableFloors.filter(f => f !== 'All').map((floor) => {
+                const isSelected = tempFloorFilter.includes(floor);
                 return (
                   <Chip
                     key={floor}
-                    label={floor === 'All' ? 'All Floors' : `Floor ${parseInt(floor)}`}
-                    onClick={() => setTempFloorFilter(floor)}
+                    label={`Floor ${parseInt(floor)}`}
+                    onClick={() => {
+                      if (isSelected) {
+                        setTempFloorFilter(tempFloorFilter.filter(f => f !== floor));
+                      } else {
+                        setTempFloorFilter([...tempFloorFilter, floor]);
+                      }
+                    }}
                     sx={{
                       borderRadius: '8px',
                       fontSize: '0.76rem',
@@ -1975,6 +2015,7 @@ export function TenantUnitView({ controller }) {
                       color: isSelected ? '#ffffff' : '#334155',
                       border: `1px solid ${isSelected ? '#0f172a' : '#e2e8f0'}`,
                       cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                       '& .MuiChip-label': {
                         px: 1.4
                       }
@@ -2002,7 +2043,7 @@ export function TenantUnitView({ controller }) {
             variant="outlined"
             onClick={() => {
               setTempUnitStatusFilter('All');
-              setTempFloorFilter('All');
+              setTempFloorFilter([]);
             }}
             sx={{
               borderRadius: '8px',
