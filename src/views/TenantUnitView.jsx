@@ -560,17 +560,7 @@ export function TenantUnitView({ controller }) {
                     borderRadius: '16px',
                     border: '1.5px solid #e2e8f0',
                     p: 2.2,
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                    '&:hover': {
-                      borderColor: '#27b29b',
-                      boxShadow: '0 8px 24px -4px rgba(39, 178, 155, 0.15)',
-                      transform: 'translateY(-2px)'
-                    },
-                    '&:active': {
-                      transform: 'scale(0.99)'
-                    }
+                    cursor: 'pointer'
                   }}
                 >
                   {/* Top Row: Gradient Icon + Name & Info + Occupancy Badge */}
@@ -586,8 +576,7 @@ export function TenantUnitView({ controller }) {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          flexShrink: 0,
-                          boxShadow: '0 2px 6px rgba(39, 178, 155, 0.12)'
+                          flexShrink: 0
                         }}
                       >
                         <Building size={26} color="#0d9488" weight="fill" />
