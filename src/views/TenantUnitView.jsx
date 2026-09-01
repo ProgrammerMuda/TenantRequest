@@ -68,6 +68,7 @@ import {
   UNIT_STATUS,
   MEMBER_ROLES,
   initialTowersData,
+  initialUnitsData
 } from '../models/TenantUnitModel';
 
 const cleanUnitName = (name) => (!name ? '' : name.replace(/^Unit\s+/i, '').replace(/-/g, ''));
