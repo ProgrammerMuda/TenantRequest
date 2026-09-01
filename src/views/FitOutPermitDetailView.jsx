@@ -127,7 +127,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
       issuedDate: '12/02/2026 16:20',
       dueDate: '13 Feb 2026, 23:59',
       permitNo: data.permitNumber || '#PRO/FP/122025/000032',
-      status: 'APPROVED',
+      status: 'WAITING_TENANT_PAYMENT',
+      paymentStatus: 'UNPAID',
       approvedBy: 'Tenant Relation',
       approvedAt: '12/02/2026, 05:00 PM',
       reason: 'Re-submitted with 2 days extension and coordinate daily supervision fee.',
@@ -150,9 +151,9 @@ export function FitOutPermitDetailView({ permit, controller }) {
   const extensionSubmittedData = latestExtension;
   const isLatestRejected = latestExtension?.status === 'REJECTED';
   const isLatestApproved = latestExtension?.status === 'APPROVED';
-  // Multi-extension: new request can be made if no extension, rejected, or already approved!
-  // Only locked when currently WAITING_FOR_APPROVAL
-  const canRequestExtension = !latestExtension || isLatestRejected || isLatestApproved;
+  const isLatestWaitingPayment = latestExtension?.status === 'WAITING_TENANT_PAYMENT';
+  // Multi-extension: new request can be made if no extension, rejected, already approved, or waiting payment
+  const canRequestExtension = !latestExtension || isLatestRejected || isLatestApproved || isLatestWaitingPayment;
   const showBottomBar = canRequestExtension || (activePov === 'tenant_relation' && latestExtension?.status === 'WAITING_FOR_APPROVAL');
   const showExtensionCard = extensionRequests.length > 0;
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
@@ -456,6 +457,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
     const finalEnd = trReviewEndDate || '15 Feb 2026';
     const finalDays = trReviewExtendedDays || 2;
     const finalAmount = trReviewChargeableAmount || '2.000.000';
+    const isChargeable = trReviewFeePolicy === 'CHARGEABLE';
+    const targetStatus = isChargeable ? 'WAITING_TENANT_PAYMENT' : 'APPROVED';
 
     setExtensionRequests(prev => {
       const updated = [...prev];
@@ -467,9 +470,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
           newEndDate: finalEnd,
           extendedDays: finalDays,
           feePolicy: trReviewFeePolicy,
-          amount: trReviewFeePolicy === 'CHARGEABLE' ? finalAmount : '0',
-          invoiceNo: trReviewFeePolicy === 'CHARGEABLE' ? (updated[lastIdx].invoiceNo || `PRO/INV/082026/00003${updated[lastIdx].requestNumber}`) : updated[lastIdx].invoiceNo,
-          status: 'APPROVED',
+          amount: isChargeable ? finalAmount : '0',
+          invoiceNo: isChargeable ? (updated[lastIdx].invoiceNo || `PRO/INV/082026/00003${updated[lastIdx].requestNumber}`) : updated[lastIdx].invoiceNo,
+          status: targetStatus,
+          paymentStatus: isChargeable ? 'UNPAID' : 'N/A',
           approvedAt: '12/02/2026, 05:15 PM',
           approvedBy: 'Tenant Relation Lead'
         };
@@ -477,7 +481,27 @@ export function FitOutPermitDetailView({ permit, controller }) {
       return updated;
     });
     setTrReviewModalOpen(false);
-    setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} approved until ${finalEnd} (+${finalDays} Days, ${trReviewFeePolicy === 'CHARGEABLE' ? 'Chargeable' : 'Free of Charge'})!`);
+    if (isChargeable) {
+      setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} processed! Waiting tenant payment (Rp ${finalAmount},00).`);
+    } else {
+      setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} approved until ${finalEnd} (+${finalDays} Days, Free of Charge)!`);
+    }
+    setExtensionSuccessOpen(true);
+  };
+
+  const handleMarkPaymentPaid = (reqId) => {
+    setExtensionRequests(prev => prev.map(req => {
+      if (!reqId || req.id === reqId) {
+        return {
+          ...req,
+          status: 'APPROVED',
+          paymentStatus: 'PAID',
+          paidAt: '13/02/2026, 09:30 AM'
+        };
+      }
+      return req;
+    }));
+    setSuccessMessage('Payment verified! Extension schedule is now officially approved & active.');
     setExtensionSuccessOpen(true);
   };
 
@@ -926,9 +950,19 @@ export function FitOutPermitDetailView({ permit, controller }) {
 
                       <Box
                         sx={{
-                          backgroundColor: req.status === 'REJECTED' ? '#fef2f2' : req.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed',
-                          color: req.status === 'REJECTED' ? '#ef4444' : req.status === 'APPROVED' ? '#059669' : '#ea580c',
-                          border: `1px solid ${req.status === 'REJECTED' ? '#fecaca' : req.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
+                          backgroundColor: 
+                            req.status === 'REJECTED' ? '#fef2f2' : 
+                            req.status === 'APPROVED' ? '#ecfdf5' : 
+                            req.status === 'WAITING_TENANT_PAYMENT' ? '#fffbeb' : '#fff7ed',
+                          color: 
+                            req.status === 'REJECTED' ? '#ef4444' : 
+                            req.status === 'APPROVED' ? '#059669' : 
+                            req.status === 'WAITING_TENANT_PAYMENT' ? '#d97706' : '#ea580c',
+                          border: `1px solid ${
+                            req.status === 'REJECTED' ? '#fecaca' : 
+                            req.status === 'APPROVED' ? '#a7f3d0' : 
+                            req.status === 'WAITING_TENANT_PAYMENT' ? '#fde68a' : '#ffedd5'
+                          }`,
                           borderRadius: '100px',
                           px: 1.3,
                           py: 0.3,
@@ -936,7 +970,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                           fontWeight: 700
                         }}
                       >
-                        {req.status === 'REJECTED' ? 'Rejected' : req.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
+                        {req.status === 'REJECTED' ? 'Rejected' : 
+                         req.status === 'APPROVED' ? 'Approved' : 
+                         req.status === 'WAITING_TENANT_PAYMENT' ? 'Waiting Tenant Payment' : 
+                         'Waiting for Approval'}
                       </Box>
                     </Box>
 
@@ -1067,12 +1104,12 @@ export function FitOutPermitDetailView({ permit, controller }) {
                                 borderRadius: '100px',
                                 fontSize: '0.66rem',
                                 fontWeight: 700,
-                                backgroundColor: '#fff7ed',
-                                color: '#ea580c',
-                                border: '1px solid #ffedd5'
+                                backgroundColor: (req.paymentStatus === 'PAID' || req.status === 'APPROVED') ? '#ecfdf5' : '#fff7ed',
+                                color: (req.paymentStatus === 'PAID' || req.status === 'APPROVED') ? '#059669' : '#ea580c',
+                                border: `1px solid ${(req.paymentStatus === 'PAID' || req.status === 'APPROVED') ? '#a7f3d0' : '#ffedd5'}`
                               }}
                             >
-                              Unpaid
+                              {(req.paymentStatus === 'PAID' || req.status === 'APPROVED') ? 'Paid' : 'Unpaid'}
                             </Box>
                           </Box>
                         </Box>
@@ -1097,6 +1134,60 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         >
                           Detail Invoice
                         </Button>
+
+                        {/* Notice for Waiting Payment + Quick Simulation */}
+                        {req.status === 'WAITING_TENANT_PAYMENT' && (
+                          <Box
+                            sx={{
+                              mt: 1.5,
+                              p: 1.3,
+                              borderRadius: '10px',
+                              backgroundColor: '#fffbeb',
+                              border: '1px solid #fef08a',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: 1.2
+                            }}
+                          >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Clock size={18} color="#d97706" weight="fill" />
+                              <Box>
+                                <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: '#92400e' }}>
+                                  Awaiting Tenant Payment
+                                </Typography>
+                                <Typography sx={{ fontSize: '0.7rem', color: '#b45309', lineHeight: 1.35, mt: 0.2 }}>
+                                  Schedule will officially extend to {req.endDate} once payment of Rp {req.amount || '2.000.000'},00 is completed.
+                                </Typography>
+                              </Box>
+                            </Box>
+
+                            <Button
+                              size="small"
+                              variant="contained"
+                              disableElevation
+                              onClick={() => handleMarkPaymentPaid(req.id)}
+                              sx={{
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                py: 0.6,
+                                px: 1.3,
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                backgroundColor: '#27b29b !important',
+                                color: '#ffffff !important',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0,
+                                boxShadow: 'none !important',
+                                '&:hover': {
+                                  backgroundColor: '#0f766e !important'
+                                }
+                              }}
+                            >
+                              Simulate Pay
+                            </Button>
+                          </Box>
+                        )}
                       </Box>
                     )}
 
@@ -3792,32 +3883,49 @@ export function FitOutPermitDetailView({ permit, controller }) {
             );
           })()}
         </DialogContent>
-        <DialogActions sx={{ p: 1.5 }}>
+        <DialogActions sx={{ p: 1.5, gap: 1 }}>
           <Button
             fullWidth
-            variant="contained"
+            variant="outlined"
             disableElevation
             disableRipple
-            disableFocusRipple
-            disableTouchRipple
             onClick={() => setInvoiceDetailOpen(false)}
             sx={{
-              backgroundColor: '#27b29b !important',
-              color: '#ffffff !important',
+              borderColor: '#cbd5e1 !important',
+              color: '#334155 !important',
               borderRadius: '10px',
               fontWeight: 600,
               textTransform: 'none',
-              boxShadow: 'none !important',
-              transition: 'none !important',
-              '&:hover, &:focus, &:active, &.MuiButton-root:hover, &.MuiButton-root:focus, &.MuiButton-root:active': {
-                backgroundColor: '#1c8b78 !important',
-                color: '#ffffff !important',
-                boxShadow: 'none !important'
-              }
+              boxShadow: 'none !important'
             }}
           >
             Close
           </Button>
+          {(latestExtension?.status === 'WAITING_TENANT_PAYMENT' || latestExtension?.paymentStatus === 'UNPAID') && (
+            <Button
+              fullWidth
+              variant="contained"
+              disableElevation
+              disableRipple
+              onClick={() => {
+                handleMarkPaymentPaid(latestExtension?.id);
+                setInvoiceDetailOpen(false);
+              }}
+              sx={{
+                backgroundColor: '#27b29b !important',
+                color: '#ffffff !important',
+                borderRadius: '10px',
+                fontWeight: 700,
+                textTransform: 'none',
+                boxShadow: 'none !important',
+                '&:hover': {
+                  backgroundColor: '#0f766e !important'
+                }
+              }}
+            >
+              Pay Invoice (Simulate)
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
       {/* Deposit Invoice Detail Dialog */}
