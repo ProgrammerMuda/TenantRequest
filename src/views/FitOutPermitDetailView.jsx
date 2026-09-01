@@ -102,7 +102,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
       permitNo: data.permitNumber || '#PRO/FP/122025/000032',
       status: 'REJECTED',
       rejectionReason: 'Duration of 3 days exceeds minor fitout grace period. Please resubmit with maximum 2 days or coordinate daily supervision fee policy.',
-      rejectedBy: 'Tenant Relation Lead',
+      rejectedBy: 'Brelian - Tenant Relation',
       rejectedAt: '12/02/2026, 03:30 PM',
       reason: 'Finishing of gypsum partition and MEP cable tray installation requires an additional 3 days before final handover inspection.',
       notes: 'Finishing of gypsum partition and MEP cable tray installation requires an additional 3 days before final handover inspection.',
@@ -515,7 +515,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
           ...updated[lastIdx],
           status: 'REJECTED',
           rejectionReason: finalReason,
-          rejectedBy: 'Tenant Relation Lead',
+          rejectedBy: 'Brelian - Tenant Relation',
           rejectedAt: '12/02/2026, 05:10 PM'
         };
       }
@@ -992,14 +992,15 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.5 }}>
                           <XCircle size={17} weight="fill" />
                           <Typography sx={{ fontSize: '0.82rem', fontWeight: 800 }}>
-                            TR Rejection Reason:
+                            Rejection Reason
                           </Typography>
                         </Box>
-                        <Typography sx={{ fontSize: '0.78rem', color: '#7f1d1d', lineHeight: 1.45, mb: 0.5 }}>
+                        <Typography sx={{ fontSize: '0.78rem', color: '#7f1d1d', lineHeight: 1.45, mb: 0.6 }}>
                           "{req.rejectionReason}"
                         </Typography>
-                        <Typography sx={{ fontSize: '0.7rem', color: '#991b1b', fontWeight: 600 }}>
-                          Rejected on {req.rejectedAt || '12/02/2026, 03:30 PM'}
+                        <Typography sx={{ fontSize: '0.72rem', color: '#991b1b', fontWeight: 700 }}>
+                          Rejected by: <span style={{ fontWeight: 600, color: '#1e293b' }}>{req.rejectedBy || 'Brelian - Tenant Relation'}</span>
+                          <span style={{ color: '#94a3b8', fontWeight: 400, marginLeft: 6 }}>• {req.rejectedAt || '12/02/2026, 03:30 PM'}</span>
                         </Typography>
                       </Box>
                     )}
