@@ -874,7 +874,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     key={req.id}
                     sx={{
                       backgroundColor: req.status === 'REJECTED' ? '#f8fafc' : '#ffffff',
-                      borderRadius: '14px',
+                      borderRadius: '8px',
                       border: req.status === 'REJECTED' ? '1px solid #e2e8f0' : '1.5px solid #e2e8f0',
                       p: 2,
                       boxShadow: 'none'
@@ -927,7 +927,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         sx={{
                           backgroundColor: '#fef2f2',
                           border: '1px solid #fecaca',
-                          borderRadius: '10px',
+                          borderRadius: '8px',
                           p: 1.5,
                           mb: 1.5
                         }}
@@ -1145,7 +1145,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                         sx={{
                           mt: 1.8,
                           p: 1.3,
-                          borderRadius: '10px',
+                          borderRadius: '8px',
                           backgroundColor: '#fff7ed',
                           border: '1px solid #fed7aa',
                           display: 'flex',
