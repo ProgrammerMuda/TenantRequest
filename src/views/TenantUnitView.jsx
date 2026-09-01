@@ -731,7 +731,7 @@ export function TenantUnitView({ controller }) {
                   <Box
                     sx={{
                       pt: 1.4,
-                      borderTop: '1px solid #f1f5f9',
+                      borderTop: '1.5px solid #e2e8f0',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'flex-end'
