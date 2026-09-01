@@ -154,13 +154,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
   // Only locked when currently WAITING_FOR_APPROVAL
   const canRequestExtension = !latestExtension || isLatestRejected || isLatestApproved;
   const showBottomBar = canRequestExtension || (activePov === 'tenant_relation' && latestExtension?.status === 'WAITING_FOR_APPROVAL');
-  // Unified card visibility: hidden only if TR has only 1 rejected request
-  const showExtensionCard = Boolean(
-    latestExtension &&
-    !(activePov === 'tenant_relation' && latestExtension.status === 'REJECTED' && extensionRequests.length === 1)
-  );
-  // History inside the unified card: all requests except the latest active one
-  const visibleHistoryRequests = extensionRequests.slice(0, -1);
+  const showExtensionCard = extensionRequests.length > 0;
   const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
   const [depositInvoiceOpen, setDepositInvoiceOpen] = useState(false);
   const [earlyInspectionDetailOpen, setEarlyInspectionDetailOpen] = useState(false);
@@ -223,6 +217,30 @@ export function FitOutPermitDetailView({ permit, controller }) {
         dateInputRef.current.click();
       }
     }
+  };
+
+  const trReviewDateInputRef = useRef(null);
+  const handleTriggerReviewDatePicker = () => {
+    if (trReviewDateInputRef.current) {
+      if (typeof trReviewDateInputRef.current.showPicker === 'function') {
+        trReviewDateInputRef.current.showPicker();
+      } else {
+        trReviewDateInputRef.current.focus();
+        trReviewDateInputRef.current.click();
+      }
+    }
+  };
+
+  const handleOpenTrReview = () => {
+    if (latestExtension) {
+      const engEnd = latestExtension.endDate || '15 Feb 2026';
+      setTrNewEndDate(engEnd);
+      setTrExtendedDaysCount(latestExtension.extendedDays || 2);
+      setTrTotalDurationCount(6 + (latestExtension.extendedDays || 2));
+      setTrFeePolicy(latestExtension.feePolicy === 'CHARGEABLE' ? 'CHARGEABLE' : 'FREE_OF_CHARGE');
+      setTrChargeableAmount(latestExtension.amount && latestExtension.amount !== '0' ? latestExtension.amount : '2.000.000');
+    }
+    setTrReviewModalOpen(true);
   };
 
   // 2. Engineering Extension Form State
@@ -373,12 +391,21 @@ export function FitOutPermitDetailView({ permit, controller }) {
   };
 
   const handleApproveExtension = () => {
+    const formattedEnd = trNewEndDate ? formatDisplayDate(trNewEndDate) : (latestExtension?.endDate || '15 Feb 2026');
+    const extendedDays = trExtendedDaysCount || latestExtension?.extendedDays || 2;
+    const amountVal = trChargeableAmount || '2.000.000';
+
     setExtensionRequests(prev => {
       const updated = [...prev];
       const lastIdx = updated.length - 1;
       if (lastIdx >= 0) {
         updated[lastIdx] = {
           ...updated[lastIdx],
+          endDate: formattedEnd,
+          extendedDays: extendedDays,
+          feePolicy: trFeePolicy,
+          amount: trFeePolicy === 'CHARGEABLE' ? amountVal : '0',
+          invoiceNo: trFeePolicy === 'CHARGEABLE' ? (updated[lastIdx].invoiceNo || `PRO/INV/082026/00003${updated[lastIdx].requestNumber}`) : updated[lastIdx].invoiceNo,
           status: 'APPROVED',
           approvedAt: '12/02/2026, 05:15 PM',
           approvedBy: 'Tenant Relation Lead'
@@ -386,7 +413,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
       }
       return updated;
     });
-    setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} has been approved.`);
+    setTrReviewModalOpen(false);
+    setSuccessMessage(`Extension Request #${latestExtension?.requestNumber || 1} approved (+${extendedDays} Days, ${trFeePolicy === 'CHARGEABLE' ? 'Chargeable' : 'Free of Charge'})!`);
     setExtensionSuccessOpen(true);
   };
 
@@ -780,7 +808,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
           </Box>
         </Box>
 
-        {/* Extension Information Card (Displayed above Early Inspection when submitted - Hidden on TR if rejected) */}
+        {/* Extension Request History Card (Contains all requests: Request #2 on top, Request #1, and future requests) */}
         {showExtensionCard && (
           <Box 
             sx={{ 
@@ -791,543 +819,282 @@ export function FitOutPermitDetailView({ permit, controller }) {
               boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
             }}
           >
-            {/* Header: Extension Information & Status Badge */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* Header: Extension Request History */}
+            <Box 
+              onClick={() => setHistorySectionOpen(prev => !prev)}
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+            >
               <Box>
-                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
-                  Extension Information {extensionRequests.length > 1 ? `(Request #${latestExtension?.requestNumber})` : ''}
+                <Typography sx={{ fontWeight: 800, fontSize: '0.98rem', color: '#1e293b' }}>
+                  Extension Request History
                 </Typography>
-                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                  {latestExtension?.submittedAt} • by {latestExtension?.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
+                  {extensionRequests.length} Request{extensionRequests.length > 1 ? 's' : ''} recorded
                 </Typography>
               </Box>
-              {latestExtension && (
-                <Box 
-                  sx={{ 
-                    backgroundColor: latestExtension.status === 'REJECTED' ? '#fef2f2' : latestExtension.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed', 
-                    color: latestExtension.status === 'REJECTED' ? '#ef4444' : latestExtension.status === 'APPROVED' ? '#059669' : '#ea580c', 
-                    border: `1px solid ${latestExtension.status === 'REJECTED' ? '#fecaca' : latestExtension.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
-                    borderRadius: '100px', 
-                    px: 1.4, 
-                    py: 0.35, 
-                    fontSize: '0.72rem', 
-                    fontWeight: 700,
-                    display: 'inline-block',
-                    letterSpacing: '0.01em',
-                    flexShrink: 0,
-                    alignSelf: 'flex-start',
-                    mt: 0.2
-                  }}
-                >
-                  {latestExtension.status === 'REJECTED' ? 'Rejected' : latestExtension.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
-                </Box>
-              )}
+              <IconButton size="small" sx={{ color: '#64748b' }}>
+                {historySectionOpen ? <CaretUp size={20} weight="bold" /> : <CaretDown size={20} weight="bold" />}
+              </IconButton>
             </Box>
 
-            {/* Prominent Red Banner if Status is Rejected */}
-            {latestExtension?.status === 'REJECTED' && (
-              <Box 
-                sx={{ 
-                  backgroundColor: '#fef2f2', 
-                  border: '1.5px solid #fecaca', 
-                  borderRadius: '10px', 
-                  p: 1.6, 
-                  mt: 1.5,
-                  mb: 0.5
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.6 }}>
-                  <XCircle size={18} weight="fill" />
-                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 800 }}>
-                    Request #{latestExtension.requestNumber} Rejected
-                  </Typography>
-                </Box>
-                <Typography sx={{ fontSize: '0.8rem', color: '#7f1d1d', lineHeight: 1.5, mb: 0.8 }}>
-                  "{latestExtension.rejectionReason}"
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                  <Typography sx={{ fontSize: '0.72rem', color: '#991b1b', fontWeight: 600 }}>
-                    Rejected by {latestExtension.rejectedBy || 'Tenant Relation'} • {latestExtension.rejectedAt || '12/02/2026, 03:30 PM'}
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: '#dc2626', fontWeight: 700 }}>
-                    *Resubmission permitted
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', my: 1.8 }} />
-
-            {/* Top 2 Items: Schedule Extension & Extension Scheme */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8 }}>
-              {/* Left Item: Schedule Extension */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Box 
-                  sx={{ 
-                    width: 40, 
-                    height: 40, 
-                    borderRadius: '10px', 
-                    backgroundColor: '#ecfdf5', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    flexShrink: 0 
-                  }} 
-                >
-                  <CalendarBlank size={22} color="#27b29b" weight="fill" />
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#94a3b8' }}>
-                    Schedule Extension
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.2 }}>
-                    <Typography sx={{ fontSize: '0.88rem', fontWeight: 500, color: '#1e293b' }}>
-                      {extensionSubmittedData.startDate} → {extensionSubmittedData.endDate}
-                    </Typography>
-                    <Box 
-                      sx={{ 
-                        px: 1.1, 
-                        py: 0.3, 
-                        backgroundColor: '#eff6ff', 
-                        borderRadius: '100px', 
-                        color: '#2563eb', 
-                        fontWeight: 700, 
-                        fontSize: '0.72rem',
-                        lineHeight: 1.2
-                      }} 
-                    >
-                      + {extensionSubmittedData.extendedDays} Day
-                    </Box>
-                  </Box>
-                </Box>
-              </Box>
-
-              {/* Right Item: Extension Scheme */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Box 
-                  sx={{ 
-                    width: 40, 
-                    height: 40, 
-                    borderRadius: '10px', 
-                    backgroundColor: '#ecfdf5', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    flexShrink: 0 
-                  }} 
-                >
-                  <ShieldCheck size={22} color="#27b29b" weight="fill" />
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#94a3b8' }}>
-                    Extension Scheme
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.88rem', fontWeight: 500, color: '#1e293b', mt: 0.2 }}>
-                    {extensionSubmittedData.feePolicy === 'CHARGEABLE' 
-                      ? 'Chargeable Daily Supervision' 
-                      : 'Free of Charge (Grace Period)'}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-
-            {/* Bill Information Section (Shown for CHARGEABLE - Exact match to user reference) */}
-            {extensionSubmittedData.feePolicy === 'CHARGEABLE' && (
-              <Box sx={{ mt: 2.2 }}>
-                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2.2 }} />
-
-                {/* Top Row: Icon + Title/Date on Left, Price + Unpaid Pill on Right */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  {/* Left: Bill Icon + Title + Timestamp */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}
-                    >
-                      <Invoice size={34} weight="bold" color="#1e293b" />
-                    </Box>
-
-                    <Box>
-                      <Typography sx={{ fontWeight: 600, fontSize: '0.96rem', color: '#1e293b', lineHeight: 1.25 }}>
-                        FitOut Extension Bill
-                      </Typography>
-                      <Typography sx={{ fontSize: '0.82rem', color: '#94a3b8', mt: 0.4 }}>
-                        {extensionSubmittedData.issuedDate || '12/02/2026 16:07'}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Right: Price + Unpaid Pill */}
-                  <Box sx={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.6 }}>
-                    <Typography sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#0f172a', letterSpacing: '-0.3px' }}>
-                      Rp {extensionSubmittedData.amount},00
-                    </Typography>
-                    <Box 
-                      sx={{ 
-                        px: 1.6, 
-                        py: 0.3, 
-                        backgroundColor: '#f97316', 
-                        borderRadius: '20px', 
-                        color: '#ffffff', 
-                        fontWeight: 600, 
-                        fontSize: '0.78rem',
-                        lineHeight: 1.2,
-                        display: 'inline-block'
-                      }}
-                    >
-                      Unpaid
-                    </Box>
-                  </Box>
-                </Box>
-
-                {/* Detail Invoice Button (Matching screenshot: clean light border, dark text, zero hover) */}
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  disableElevation
-                  disableRipple
-                  disableFocusRipple
-                  disableTouchRipple
-                  onClick={() => setInvoiceDetailOpen(true)}
-                  sx={{
-                    borderColor: '#cbd5e1 !important',
-                    borderWidth: '1.5px !important',
-                    color: '#334155 !important',
-                    borderRadius: '10px',
-                    py: 1.1,
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.92rem',
-                    backgroundColor: '#ffffff !important',
-                    boxShadow: 'none !important',
-                    transition: 'none !important',
-                    '&:hover, &:focus, &:active, &.MuiButton-root:hover, &.MuiButton-root:focus, &.MuiButton-root:active': {
-                      borderColor: '#94a3b8 !important',
-                      backgroundColor: '#f8fafc !important',
-                      color: '#0f172a !important',
-                      boxShadow: 'none !important'
-                    }
-                  }}
-                >
-                  Detail Invoice
-                </Button>
-              </Box>
-            )}
-
-            {/* 1. Site Progress Documentation Photos (Visual Proof First - No Icon) */}
-            {extensionSubmittedData.photos && extensionSubmittedData.photos.length > 0 && (
-              <Box sx={{ mt: 2.2 }}>
-                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
-
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
-                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
-                    Progress Photos
-                  </Typography>
-
+            <Collapse in={historySectionOpen}>
+              <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {extensionRequests.slice().reverse().map((req) => (
                   <Box
+                    key={req.id}
                     sx={{
-                      px: 1.1,
-                      py: 0.3,
-                      borderRadius: '100px',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      backgroundColor: '#f1f5f9',
-                      color: '#475569',
-                      border: '1px solid #e2e8f0',
-                      lineHeight: 1.2,
-                      display: 'inline-block'
+                      backgroundColor: req.status === 'APPROVED' ? '#ffffff' : '#f8fafc',
+                      borderRadius: '14px',
+                      border: req.status === 'APPROVED' ? '1.5px solid #e2e8f0' : '1px solid #e2e8f0',
+                      p: 2,
+                      boxShadow: 'none'
                     }}
                   >
-                    {extensionSubmittedData.photos.length} Photo{extensionSubmittedData.photos.length > 1 ? 's' : ''}
-                  </Box>
-                </Box>
+                    {/* Header of each request item */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                      <Box>
+                        <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>
+                          Request #{req.requestNumber}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                          {req.submittedAt} • by {req.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
+                        </Typography>
+                      </Box>
 
-                {/* Horizontal Scrollable Thumbnail Row */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 1.2,
-                    overflowX: 'auto',
-                    py: 0.5,
-                    px: 0.2,
-                    '&::-webkit-scrollbar': { display: 'none' },
-                    scrollbarWidth: 'none'
-                  }}
-                >
-                  {extensionSubmittedData.photos.map((photoUrl, idx) => (
-                    <Box
-                      key={idx}
-                      onClick={() => setPreviewPhoto(photoUrl)}
-                      sx={{
-                        width: 82,
-                        height: 82,
-                        flexShrink: 0,
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        border: '1.5px solid #cbd5e1',
-                        cursor: 'pointer',
-                        position: 'relative',
-                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&:hover': {
-                          transform: 'scale(1.04)',
-                          borderColor: '#27b29b',
-                          boxShadow: '0 4px 12px rgba(39, 178, 155, 0.2)'
-                        },
-                        '&:active': {
-                          transform: 'scale(0.97)'
-                        }
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={photoUrl}
-                        alt={`Progress Photo ${idx + 1}`}
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          display: 'block'
-                        }}
-                      />
-                      {/* Zoom Eye Badge */}
                       <Box
                         sx={{
-                          position: 'absolute',
-                          bottom: 5,
-                          right: 5,
-                          backgroundColor: 'rgba(15, 23, 42, 0.65)',
-                          backdropFilter: 'blur(2px)',
-                          borderRadius: '6px',
-                          p: '3px 6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
+                          backgroundColor: req.status === 'REJECTED' ? '#fef2f2' : req.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed',
+                          color: req.status === 'REJECTED' ? '#ef4444' : req.status === 'APPROVED' ? '#059669' : '#ea580c',
+                          border: `1px solid ${req.status === 'REJECTED' ? '#fecaca' : req.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
+                          borderRadius: '100px',
+                          px: 1.3,
+                          py: 0.3,
+                          fontSize: '0.72rem',
+                          fontWeight: 700
                         }}
                       >
-                        <Eye size={13} color="#ffffff" weight="bold" />
+                        {req.status === 'REJECTED' ? 'Rejected' : req.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
                       </Box>
                     </Box>
-                  ))}
-                </Box>
-                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.8, fontStyle: 'italic' }}>
-                  *Tap photo to enlarge preview
-                </Typography>
-              </Box>
-            )}
 
-            {/* 2. Notes & Technical Remarks (Elaboration / Narrative below photos - No Icon) */}
-            {(extensionSubmittedData.notes || extensionSubmittedData.reason) && (
-              <Box sx={{ mt: 2.2 }}>
-                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
-                
-                <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b', mb: 1 }}>
-                  Notes & Remarks
-                </Typography>
-
-                <Box
-                  sx={{
-                    backgroundColor: '#f8fafc',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '12px',
-                    p: 1.6
-                  }}
-                >
-                  <Typography sx={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
-                    {latestExtension.notes || latestExtension.reason}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            {/* 3. Status Action / Guidance Footer */}
-            {latestExtension?.status === 'WAITING_FOR_APPROVAL' && activePov === 'engineering' && (
-              <Box sx={{ mt: 2.2 }}>
-                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      setRejectReason('');
-                      setRejectModalOpen(true);
-                    }}
-                    sx={{
-                      fontSize: '0.72rem',
-                      textTransform: 'none',
-                      color: '#94a3b8',
-                      fontWeight: 600,
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      py: 0.3,
-                      px: 0.5,
-                      minWidth: 0,
-                      textDecoration: 'underline'
-                    }}
-                  >
-                    Simulate TR Rejection
-                  </Button>
-                </Box>
-              </Box>
-            )}
-
-            {/* Guidance for Rejected State */}
-            {latestExtension?.status === 'REJECTED' && (
-              <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 1.2 }}>
-                <Info size={22} color="#2563eb" weight="fill" style={{ flexShrink: 0 }} />
-                <Typography sx={{ fontSize: '0.78rem', color: '#2563eb', fontWeight: 600, lineHeight: 1.4 }}>
-                  Use the "Request Extension" button below to submit a revised schedule extension.
-                </Typography>
-              </Box>
-            )}
-
-            {/* Nested Extension Request History (Unified inside this single card) */}
-            {visibleHistoryRequests.length > 0 && (
-              <Box sx={{ mt: 2.5 }}>
-                <Box sx={{ height: '1px', backgroundColor: '#f1f5f9', mb: 2 }} />
-
-                {/* Accordion Header */}
-                <Box
-                  onClick={() => setHistorySectionOpen(prev => !prev)}
-                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                >
-                  <Box>
-                    <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: '#1e293b' }}>
-                      Extension Request History
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.74rem', color: '#64748b' }}>
-                      {visibleHistoryRequests.length} Previous Request{visibleHistoryRequests.length > 1 ? 's' : ''}
-                    </Typography>
-                  </Box>
-                  <IconButton size="small" sx={{ color: '#64748b' }}>
-                    {historySectionOpen ? <CaretUp size={18} weight="bold" /> : <CaretDown size={18} weight="bold" />}
-                  </IconButton>
-                </Box>
-
-                <Collapse in={historySectionOpen}>
-                  <Box sx={{ mt: 1.8, display: 'flex', flexDirection: 'column', gap: 1.6 }}>
-                    {visibleHistoryRequests.slice().reverse().map((req) => (
+                    {/* Prominent Rejection Note if Rejected */}
+                    {req.status === 'REJECTED' && req.rejectionReason && (
                       <Box
-                        key={req.id}
                         sx={{
-                          backgroundColor: '#f8fafc',
+                          backgroundColor: '#fef2f2',
+                          border: '1.5px solid #fecaca',
                           borderRadius: '10px',
-                          border: '1px solid #e2e8f0',
-                          p: 1.8
+                          p: 1.5,
+                          mb: 1.5
                         }}
                       >
-                        {/* Header of historic request */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
-                          <Box>
-                            <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#1e293b' }}>
-                              Request #{req.requestNumber}
-                            </Typography>
-                            <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                              {req.submittedAt} • by {req.submittedBy === 'engineering' ? 'Engineering' : 'Tenant Relation'}
-                            </Typography>
-                          </Box>
-
-                          <Box
-                            sx={{
-                              backgroundColor: req.status === 'REJECTED' ? '#fef2f2' : req.status === 'APPROVED' ? '#ecfdf5' : '#fff7ed',
-                              color: req.status === 'REJECTED' ? '#ef4444' : req.status === 'APPROVED' ? '#059669' : '#ea580c',
-                              border: `1px solid ${req.status === 'REJECTED' ? '#fecaca' : req.status === 'APPROVED' ? '#a7f3d0' : '#ffedd5'}`,
-                              borderRadius: '100px',
-                              px: 1.2,
-                              py: 0.25,
-                              fontSize: '0.7rem',
-                              fontWeight: 700
-                            }}
-                          >
-                            {req.status === 'REJECTED' ? 'Rejected' : req.status === 'APPROVED' ? 'Approved' : 'Waiting for Approval'}
-                          </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#b91c1c', mb: 0.5 }}>
+                          <XCircle size={17} weight="fill" />
+                          <Typography sx={{ fontSize: '0.82rem', fontWeight: 800 }}>
+                            TR Rejection Reason:
+                          </Typography>
                         </Box>
+                        <Typography sx={{ fontSize: '0.78rem', color: '#7f1d1d', lineHeight: 1.45, mb: 0.5 }}>
+                          "{req.rejectionReason}"
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: '#991b1b', fontWeight: 600 }}>
+                          Rejected on {req.rejectedAt || '12/02/2026, 03:30 PM'}
+                        </Typography>
+                      </Box>
+                    )}
 
-                        {/* Rejection Note in History if Rejected */}
-                        {req.status === 'REJECTED' && req.rejectionReason && (
-                          <Box
-                            sx={{
-                              backgroundColor: '#ffffff',
-                              border: '1px solid #fecaca',
-                              borderRadius: '8px',
-                              p: 1.2,
-                              mb: 1.2
-                            }}
-                          >
-                            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#dc2626', mb: 0.3 }}>
-                              TR Rejection Reason:
-                            </Typography>
-                            <Typography sx={{ fontSize: '0.76rem', color: '#991b1b', lineHeight: 1.4 }}>
-                              "{req.rejectionReason}"
-                            </Typography>
-                            <Typography sx={{ fontSize: '0.68rem', color: '#b91c1c', mt: 0.4 }}>
-                              Rejected on {req.rejectedAt}
-                            </Typography>
-                          </Box>
-                        )}
-
-                        {/* Schedule Info */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <CalendarBlank size={16} color="#64748b" />
-                          <Typography sx={{ fontSize: '0.78rem', color: '#334155' }}>
+                    {/* Schedule Extension Details */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.2 }}>
+                      <Box 
+                        sx={{ 
+                          width: 34, 
+                          height: 34, 
+                          borderRadius: '8px', 
+                          backgroundColor: '#ecfdf5', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          flexShrink: 0 
+                        }}
+                      >
+                        <CalendarBlank size={18} color="#27b29b" weight="fill" />
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>
+                          Schedule Extension
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.2 }}>
+                          <Typography sx={{ fontSize: '0.84rem', fontWeight: 600, color: '#1e293b' }}>
                             {req.startDate} → {req.endDate}
                           </Typography>
-                          <Box sx={{ backgroundColor: '#eff6ff', color: '#2563eb', px: 0.8, py: 0.2, borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                          <Box sx={{ backgroundColor: '#eff6ff', color: '#2563eb', px: 0.9, py: 0.2, borderRadius: '100px', fontSize: '0.7rem', fontWeight: 700 }}>
                             +{req.extendedDays} Days
                           </Box>
                         </Box>
+                      </Box>
+                    </Box>
 
-                        {/* Attached Progress Photos in History */}
-                        {req.photos && req.photos.length > 0 && (
-                          <Box sx={{ mt: 1.2, mb: 1 }}>
-                            <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b', mb: 0.6 }}>
-                              Attached Progress Photos ({req.photos.length}):
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5 }}>
-                              {req.photos.map((photoUrl, pIdx) => (
-                                <Box
-                                  key={pIdx}
-                                  onClick={() => setPreviewPhoto(photoUrl)}
-                                  sx={{
-                                    width: 58,
-                                    height: 58,
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    flexShrink: 0,
-                                    border: '1px solid #e2e8f0',
-                                    cursor: 'pointer',
-                                    position: 'relative'
-                                  }}
-                                >
-                                  <Box
-                                    component="img"
-                                    src={photoUrl}
-                                    alt={`History Photo ${pIdx + 1}`}
-                                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                  />
-                                </Box>
-                              ))}
+                    {/* Extension Scheme */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.5 }}>
+                      <Box 
+                        sx={{ 
+                          width: 34, 
+                          height: 34, 
+                          borderRadius: '8px', 
+                          backgroundColor: '#ecfdf5', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          flexShrink: 0 
+                        }}
+                      >
+                        <ShieldCheck size={18} color="#27b29b" weight="fill" />
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>
+                          Extension Scheme
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.84rem', fontWeight: 600, color: '#1e293b', mt: 0.2 }}>
+                          {req.feePolicy === 'CHARGEABLE' 
+                            ? 'Chargeable Daily Supervision' 
+                            : 'Free of Charge (Grace Period)'}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* FitOut Extension Bill Section (Shown if Chargeable) */}
+                    {req.feePolicy === 'CHARGEABLE' && (
+                      <Box sx={{ mt: 1.5, mb: 1.5, pt: 1.5, borderTop: '1px solid #f1f5f9' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                            <Box
+                              sx={{
+                                width: 34,
+                                height: 34,
+                                borderRadius: '8px',
+                                backgroundColor: '#ecfdf5',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}
+                            >
+                              <Invoice size={18} color="#27b29b" weight="fill" />
+                            </Box>
+                            <Box>
+                              <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#1e293b', lineHeight: 1.2 }}>
+                                FitOut Extension Bill
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.3 }}>
+                                Due on {req.dueDate || '13 Feb 2026, 23:59'}
+                              </Typography>
                             </Box>
                           </Box>
-                        )}
 
-                        {/* Reason Notes */}
-                        {req.notes && (
-                          <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.4, mt: 0.5 }}>
-                            Technical Remarks: "{req.notes}"
-                          </Typography>
-                        )}
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#1e293b', lineHeight: 1.2 }}>
+                              Rp {req.amount || '2.000.000'},00
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: 'inline-block',
+                                mt: 0.5,
+                                px: 1,
+                                py: 0.2,
+                                borderRadius: '100px',
+                                fontSize: '0.66rem',
+                                fontWeight: 700,
+                                backgroundColor: '#fff7ed',
+                                color: '#ea580c',
+                                border: '1px solid #ffedd5'
+                              }}
+                            >
+                              Unpaid
+                            </Box>
+                          </Box>
+                        </Box>
+
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          disableElevation
+                          disableRipple
+                          onClick={() => setInvoiceDetailOpen(true)}
+                          sx={{
+                            borderColor: '#cbd5e1 !important',
+                            color: '#334155 !important',
+                            borderRadius: '8px',
+                            py: 0.9,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '0.84rem',
+                            backgroundColor: '#ffffff !important',
+                            boxShadow: 'none !important'
+                          }}
+                        >
+                          Detail Invoice
+                        </Button>
                       </Box>
-                    ))}
+                    )}
+
+                    {/* Progress Photos in this request */}
+                    {req.photos && req.photos.length > 0 && (
+                      <Box sx={{ mt: 1.2, mb: 1 }}>
+                        <Typography sx={{ fontSize: '0.74rem', fontWeight: 600, color: '#64748b', mb: 0.6 }}>
+                          Attached Progress Photos ({req.photos.length}):
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5, '&::-webkit-scrollbar': { display: 'none' } }}>
+                          {req.photos.map((photoUrl, pIdx) => (
+                            <Box
+                              key={pIdx}
+                              onClick={() => setPreviewPhoto(photoUrl)}
+                              sx={{
+                                width: 62,
+                                height: 62,
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                flexShrink: 0,
+                                border: '1.5px solid #e2e8f0',
+                                cursor: 'pointer',
+                                position: 'relative'
+                              }}
+                            >
+                              <Box
+                                component="img"
+                                src={photoUrl}
+                                alt={`Request Photo ${pIdx + 1}`}
+                                sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              />
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  bottom: 3,
+                                  right: 3,
+                                  backgroundColor: 'rgba(15, 23, 42, 0.65)',
+                                  borderRadius: '4px',
+                                  p: '2px 4px',
+                                  display: 'flex',
+                                  alignItems: 'center'
+                                }}
+                              >
+                                <Eye size={10} color="#ffffff" weight="bold" />
+                              </Box>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Box>
+                    )}
+
+                    {/* Technical Remarks */}
+                    {req.notes && (
+                      <Typography sx={{ fontSize: '0.76rem', color: '#64748b', fontStyle: 'italic', lineHeight: 1.45, mt: 0.6 }}>
+                        Technical Remarks: "{req.notes}"
+                      </Typography>
+                    )}
                   </Box>
-                </Collapse>
+                ))}
               </Box>
-            )}
+            </Collapse>
           </Box>
         )}
 
@@ -2436,7 +2203,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
               disableRipple
               disableFocusRipple
               disableTouchRipple
-              onClick={() => trHasPendingReview ? setTrReviewModalOpen(true) : setExtensionModalOpen(true)}
+              onClick={() => trHasPendingReview ? handleOpenTrReview() : setExtensionModalOpen(true)}
               sx={{
                 borderColor: trHasPendingReview ? '#f97316 !important' : '#f97316 !important',
                 color: trHasPendingReview ? '#f97316 !important' : '#f97316 !important',
@@ -2518,7 +2285,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
           bottom: 0,
           left: 0,
           right: 0,
-          maxHeight: '70%',
+          maxHeight: '90%',
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: '#ffffff',
@@ -2554,20 +2321,20 @@ export function FitOutPermitDetailView({ permit, controller }) {
         </Box>
 
         {/* Body */}
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Schedule Info */}
+        <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2.2 }}>
+          {/* Section A: Engineering Request Overview */}
           <Box sx={{ backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', p: 2 }}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#94a3b8', mb: 0.5, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Extension Details
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', mb: 1, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Engineering Proposal Summary
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.8 }}>
-              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>New End Date</Typography>
+              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Requested End Date</Typography>
               <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
-                {latestExtension?.newEndDate || '—'}
+                {latestExtension?.endDate || latestExtension?.newEndDate || '—'}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.8 }}>
-              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Duration Added</Typography>
+              <Typography sx={{ fontSize: '0.82rem', color: '#64748b' }}>Duration Requested</Typography>
               <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#f97316' }}>
                 +{latestExtension?.extendedDays || '—'} Day{latestExtension?.extendedDays > 1 ? 's' : ''}
               </Typography>
@@ -2583,8 +2350,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
           {/* Notes / Reason */}
           {(latestExtension?.notes || latestExtension?.reason) && (
             <Box>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', mb: 0.8 }}>
-                Engineering Notes
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
+                Engineering Notes & Remarks
               </Typography>
               <Box sx={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', p: 1.6 }}>
                 <Typography sx={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.55 }}>
@@ -2597,7 +2364,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
           {/* Progress Photos */}
           {latestExtension?.photos && latestExtension.photos.length > 0 && (
             <Box>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', mb: 0.8 }}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
                 Progress Photos ({latestExtension.photos.length})
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 0.5, '&::-webkit-scrollbar': { display: 'none' } }}>
@@ -2606,8 +2373,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     key={idx}
                     onClick={() => setPreviewPhoto(photoUrl)}
                     sx={{
-                      width: 100,
-                      height: 100,
+                      width: 90,
+                      height: 90,
                       borderRadius: '10px',
                       overflow: 'hidden',
                       flexShrink: 0,
@@ -2630,6 +2397,276 @@ export function FitOutPermitDetailView({ permit, controller }) {
               </Typography>
             </Box>
           )}
+
+          {/* Divider */}
+          <Box sx={{ height: '1.5px', backgroundColor: '#e2e8f0', my: 0.5 }} />
+
+          {/* Section B: TR Approval Decision & Schedule Adjustment */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box>
+              <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#1e293b' }}>
+                Tenant Relation Decision & Approval
+              </Typography>
+              <Typography sx={{ fontSize: '0.74rem', color: '#64748b', mt: 0.2 }}>
+                Confirm or adjust the schedule, and decide whether this extension is free or chargeable.
+              </Typography>
+            </Box>
+
+            {/* 1. Schedule Decision (Adjust End Date & Days) */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
+              <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155' }}>
+                1. Approved Schedule End Date <span style={{ color: '#ef4444' }}>*</span>
+              </Typography>
+              
+              {/* Clickable Date Box */}
+              <Box 
+                onClick={handleTriggerReviewDatePicker}
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  backgroundColor: '#ffffff', 
+                  border: trNewEndDate ? '1.5px solid #27b29b' : '1.5px solid #cbd5e1', 
+                  borderRadius: '10px',
+                  px: 2,
+                  py: 1.3,
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'border-color 0.2s ease',
+                  '&:hover': {
+                    borderColor: '#27b29b'
+                  }
+                }}
+              >
+                <input 
+                  type="date" 
+                  ref={trReviewDateInputRef}
+                  value={trRawDate}
+                  min="2026-08-11"
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    opacity: 0,
+                    cursor: 'pointer',
+                    zIndex: 2
+                  }}
+                />
+
+                <Typography sx={{ fontSize: '0.9rem', color: trNewEndDate ? '#334155' : '#94a3b8', fontWeight: trNewEndDate ? 600 : 400 }}>
+                  {trNewEndDate || 'Select End Date (DD/MM/YYYY)'}
+                </Typography>
+                <CalendarBlank size={22} color={trNewEndDate ? '#27b29b' : '#94a3b8'} weight="bold" />
+              </Box>
+
+              {/* Quick Presets */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {[
+                  { days: 1, label: '+1 Day', date: '11/08/2026', raw: '2026-08-11' },
+                  { days: 2, label: '+2 Days', date: '12/08/2026', raw: '2026-08-12' },
+                  { days: 3, label: '+3 Days', date: '13/08/2026', raw: '2026-08-13' },
+                  { days: 7, label: '+7 Days', date: '17/08/2026', raw: '2026-08-17' }
+                ].map((preset) => {
+                  const isSelected = trExtendedDaysCount === preset.days;
+                  return (
+                    <Button
+                      key={preset.days}
+                      size="small"
+                      variant={isSelected ? 'contained' : 'outlined'}
+                      disableElevation
+                      disableRipple
+                      disableFocusRipple
+                      disableTouchRipple
+                      onClick={() => handleSelectPreset(preset.days, preset.date, preset.raw)}
+                      sx={{
+                        flex: 1,
+                        textTransform: 'none',
+                        fontSize: '0.74rem',
+                        fontWeight: 600,
+                        py: 0.6,
+                        borderRadius: '8px',
+                        borderColor: isSelected ? '#27b29b !important' : '#cbd5e1 !important',
+                        color: isSelected ? '#ffffff !important' : '#475569 !important',
+                        backgroundColor: isSelected ? '#27b29b !important' : 'transparent !important',
+                        boxShadow: 'none !important',
+                        transition: 'none !important'
+                      }}
+                    >
+                      {preset.label}
+                    </Button>
+                  );
+                })}
+              </Box>
+
+              {/* Duration Pill */}
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  backgroundColor: '#fff7ed', 
+                  border: '1.5px solid #fed7aa', 
+                  borderRadius: '10px',
+                  px: 2,
+                  py: 1.1
+                }}
+              >
+                <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#ea580c' }}>
+                  +{trExtendedDaysCount} Days Approved
+                </Typography>
+                <Typography sx={{ fontSize: '0.84rem', fontWeight: 600, color: '#334155' }}>
+                  Total Duration: {trTotalDurationCount} Days
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* 2. Fee Policy Decision */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
+              <Typography sx={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155' }}>
+                2. Extension Fee Policy <span style={{ color: '#ef4444' }}>*</span>
+              </Typography>
+              
+              {/* Option 1: FREE OF CHARGE */}
+              <Box 
+                onClick={() => setTrFeePolicy('FREE_OF_CHARGE')}
+                sx={{
+                  p: 1.8,
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  backgroundColor: trFeePolicy === 'FREE_OF_CHARGE' ? '#f0fdfa' : '#ffffff',
+                  border: trFeePolicy === 'FREE_OF_CHARGE' ? '2px solid #27b29b' : '1.5px solid #e2e8f0',
+                  boxShadow: trFeePolicy === 'FREE_OF_CHARGE' ? '0 3px 10px rgba(39, 178, 155,0.12)' : 'none',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.2
+                }}
+              >
+                <Box sx={{ mt: 0.2, flexShrink: 0 }}>
+                  {trFeePolicy === 'FREE_OF_CHARGE' ? (
+                    <RadioButton size={22} color="#27b29b" weight="fill" />
+                  ) : (
+                    <Circle size={22} color="#cbd5e1" />
+                  )}
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: trFeePolicy === 'FREE_OF_CHARGE' ? '#0f766e' : '#1e293b' }}>
+                    FREE OF CHARGE (Tolerance / Grace Period)
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.76rem', color: '#64748b', mt: 0.3, lineHeight: 1.4 }}>
+                    Granted tolerance without additional fitout supervision fee.
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Option 2: CHARGEABLE */}
+              <Box 
+                onClick={() => setTrFeePolicy('CHARGEABLE')}
+                sx={{
+                  p: 1.8,
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  backgroundColor: trFeePolicy === 'CHARGEABLE' ? '#f0fdfa' : '#ffffff',
+                  border: trFeePolicy === 'CHARGEABLE' ? '2px solid #27b29b' : '1.5px solid #e2e8f0',
+                  boxShadow: trFeePolicy === 'CHARGEABLE' ? '0 3px 10px rgba(39, 178, 155,0.12)' : 'none',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.2
+                }}
+              >
+                <Box sx={{ mt: 0.2, flexShrink: 0 }}>
+                  {trFeePolicy === 'CHARGEABLE' ? (
+                    <RadioButton size={22} color="#27b29b" weight="fill" />
+                  ) : (
+                    <Circle size={22} color="#cbd5e1" />
+                  )}
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: trFeePolicy === 'CHARGEABLE' ? '#0f766e' : '#1e293b' }}>
+                    CHARGEABLE (Additional Bill)
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.76rem', color: '#64748b', mt: 0.3, lineHeight: 1.4 }}>
+                    Subject to fitout supervision charge and issuance of an extension bill.
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Conditional Amount Input for Chargeable */}
+              {trFeePolicy === 'CHARGEABLE' && (
+                <Box 
+                  sx={{ 
+                    backgroundColor: '#ffffff', 
+                    borderRadius: '12px', 
+                    border: '1.5px solid #e2e8f0', 
+                    p: 1.8,
+                    mt: 0.2
+                  }}
+                >
+                  <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', mb: 0.8 }}>
+                    Extension Fee Amount <span style={{ color: '#ef4444' }}>*</span>
+                  </Typography>
+                  
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      border: '1.5px solid #cbd5e1', 
+                      borderRadius: '10px', 
+                      overflow: 'hidden',
+                      backgroundColor: '#ffffff',
+                      transition: 'border-color 0.2s ease',
+                      '&:focus-within': {
+                        borderColor: '#27b29b'
+                      }
+                    }}
+                  >
+                    <Box 
+                      sx={{ 
+                        px: 1.6, 
+                        py: 1.1, 
+                        backgroundColor: '#f8fafc', 
+                        borderRight: '1.5px solid #cbd5e1', 
+                        color: '#334155', 
+                        fontWeight: 700, 
+                        fontSize: '0.88rem' 
+                      }}
+                    >
+                      Rp
+                    </Box>
+                    <input 
+                      type="text"
+                      placeholder="0,00"
+                      value={trChargeableAmount}
+                      onChange={(e) => handleChargeableAmountChange(e.target.value)}
+                      style={{
+                        flex: 1,
+                        border: 'none',
+                        outline: 'none',
+                        padding: '10px 14px',
+                        fontSize: '0.88rem',
+                        color: '#334155',
+                        fontWeight: 600,
+                        backgroundColor: 'transparent'
+                      }}
+                    />
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1.2 }}>
+                    <Typography sx={{ fontSize: '0.76rem', color: '#64748b' }}>
+                      Invoice Total
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f766e' }}>
+                      {trChargeableAmount ? `Rp ${trChargeableAmount},00` : 'Rp 0,00'}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Box>
         </Box>
 
         {/* Fixed Footer: Action Buttons */}
@@ -2663,10 +2700,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
             variant="contained"
             disableElevation
             disableRipple
-            onClick={() => {
-              handleApproveExtension();
-              setTrReviewModalOpen(false);
-            }}
+            onClick={handleApproveExtension}
             sx={{
               backgroundColor: '#27b29b !important',
               color: '#ffffff !important',
@@ -2675,7 +2709,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
               fontWeight: 700,
               fontSize: '0.9rem',
               textTransform: 'none',
-              boxShadow: 'none !important'
+              boxShadow: 'none !important',
+              '&:hover, &:focus, &:active': {
+                backgroundColor: '#0f766e !important'
+              }
             }}
           >
             Approve Extension
@@ -3190,8 +3227,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
               </Box>
 
               {/* 2. Upload Progress Photos (Max 5 Photos) */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                   <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
                     2. Upload Progress Photos <span style={{ color: '#ef4444' }}>*</span>
                   </Typography>
@@ -3207,7 +3244,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     width: '100%',
                     height: 145,
                     borderRadius: '12px',
-                    border: engPhotos.length >= 5 ? '1.5px dashed #e2e8f0' : '1.5px dashed #cbd5e1',
+                    border: engPhotos.length >= 5 ? '2px dashed #cbd5e1' : '2px dashed #94a3b8',
+                    borderStyle: 'dashed',
+                    borderWidth: '2px',
+                    borderColor: engPhotos.length >= 5 ? '#cbd5e1' : '#94a3b8',
                     backgroundColor: '#f8fafc',
                     display: 'flex',
                     flexDirection: 'column',
@@ -3218,7 +3258,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                     transition: 'all 0.2s',
                     p: 2,
                     '&:hover': engPhotos.length < 5 ? {
-                      borderColor: '#27b29b',
+                      borderColor: '#27b29b !important',
                       backgroundColor: '#f0fdf4'
                     } : {}
                   }}
@@ -4405,8 +4445,8 @@ export function FitOutPermitDetailView({ permit, controller }) {
         {/* Scrollable Body */}
         <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2.5, display: 'flex', flexDirection: 'column', gap: 2.2 }}>
           {/* 1. Upload Completion Photos (Max 5 Photos - Matching Request Extension Design) */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
               <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
                 Upload Completion Photos <span style={{ color: '#ef4444' }}>*</span>
               </Typography>
@@ -4422,7 +4462,10 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 width: '100%',
                 height: 145,
                 borderRadius: '12px',
-                border: completePhotos.length >= 5 ? '1.5px dashed #e2e8f0' : '1.5px dashed #cbd5e1',
+                border: completePhotos.length >= 5 ? '2px dashed #cbd5e1' : '2px dashed #94a3b8',
+                borderStyle: 'dashed',
+                borderWidth: '2px',
+                borderColor: completePhotos.length >= 5 ? '#cbd5e1' : '#94a3b8',
                 backgroundColor: '#f8fafc',
                 display: 'flex',
                 flexDirection: 'column',
@@ -4433,7 +4476,7 @@ export function FitOutPermitDetailView({ permit, controller }) {
                 transition: 'all 0.2s',
                 p: 2,
                 '&:hover': completePhotos.length < 5 ? {
-                  borderColor: '#27b29b',
+                  borderColor: '#27b29b !important',
                   backgroundColor: '#f0fdf4'
                 } : {}
               }}
