@@ -500,13 +500,9 @@ export function TenantUnitView({ controller }) {
                   fontSize: '0.74rem',
                   fontWeight: 700,
                   letterSpacing: '0.01em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.6,
                   flexShrink: 0
                 }}
               >
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#64748b' }} />
                 {siteStats.rate}% Occupied
               </Box>
             </Box>
@@ -598,7 +594,6 @@ export function TenantUnitView({ controller }) {
                       </Box>
                     </Box>
 
-                    {/* Occupancy Rate Badge */}
                     {/* Occupancy Rate Badge (Neutral Gray) */}
                     <Box
                       sx={{
@@ -611,13 +606,9 @@ export function TenantUnitView({ controller }) {
                         fontSize: '0.74rem',
                         fontWeight: 700,
                         letterSpacing: '0.01em',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.6,
                         flexShrink: 0
                       }}
                     >
-                      <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#64748b' }} />
                       {rate}% Occupied
                     </Box>
                   </Box>
